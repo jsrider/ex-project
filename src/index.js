@@ -6,7 +6,7 @@ import dva from 'dva';
 const app = dva({
   initialState: {
     products: [
-      {name: 'dva', id: 1},
+      {name: 'dva', id: 11},
       {name: 'antd', id: 2},
     ],
   }
