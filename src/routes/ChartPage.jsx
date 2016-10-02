@@ -1,7 +1,8 @@
 import React from 'react';
 import { Link } from 'dva/router';
 import { connect } from 'dva';
-import MainLayout from '../components/MainLayout'
+import MainLayout from '../components/MainLayout';
+import FormLayout from '../components/FormLayout';
 
 const Products = (props) => {
 
@@ -12,22 +13,28 @@ const Products = (props) => {
   //   });
   // }
 
-  const { location, dispatch, sideMenu } = props;
+  const { location, dispatch, sideMenu, formSelects } = props;
 
   const mainLayoutProps = {
     location,
     dispatch,
-    sideMenu
+    sideMenu,
   };
 
-  console.log('IndexPage', props, mainLayoutProps);
+  console.log('ChartPage', props, mainLayoutProps);
 
   return (
     <MainLayout { ...mainLayoutProps } >
-      <h2>List of Products</h2>
+      <FormLayout formSelects={formSelects} />
     </MainLayout>
   );
 };
 
 // export default Products;
-export default connect(({routing, ...others}) => ({...others}))(Products);
+export default connect(({
+  sideMenu,
+  formSelects
+}) => ({
+  sideMenu,
+  formSelects
+}))(Products);

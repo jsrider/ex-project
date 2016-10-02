@@ -1,7 +1,7 @@
 import dva from 'dva';
 
 export default {
-  namespace: 'sideMenu',
+  namespace: 'formSelects',
   state: {},
   reducers: {
     // click(state, action) {

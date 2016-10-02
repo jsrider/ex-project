@@ -19,7 +19,9 @@ function MainLayout(props) {
               <SideMenu { ...props } />
             </Col>
             <Col span="19">
-              {children}
+              <div className={styles.article}>
+                {children}
+              </div>
             </Col>
           </Row>
         </div>

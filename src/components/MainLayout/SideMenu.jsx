@@ -2,6 +2,7 @@ import React, { PropTypes } from 'react';
 import { Menu, Icon } from 'antd';
 import { Link } from 'dva/router';
 import styles from './index.less'
+
 const SubMenu = Menu.SubMenu;
 
 function getMenuKeyFromUrl(pathname) {
