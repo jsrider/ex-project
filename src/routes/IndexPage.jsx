@@ -3,7 +3,7 @@ import { Link } from 'dva/router';
 import { connect } from 'dva';
 import MainLayout from '../components/MainLayout'
 
-const Products = ({location, dispatch}) => {
+const Products = (props) => {
 
   // function handleDelete(id) {
   //   props.dispatch({
@@ -12,16 +12,24 @@ const Products = ({location, dispatch}) => {
   //   });
   // }
 
-  console.log('IndexPage', location);
+  const { location, dispatch, sideMenu } = props;
+
+  const mainLayoutProps = {
+    location,
+    dispatch,
+    sideMenu
+  };
+
+  console.log('IndexPage', props, mainLayoutProps);
 
   return (
-    <MainLayout location={location}>
+    <MainLayout { ...mainLayoutProps } >
       <h2>List of Products</h2>
     </MainLayout>
   );
 };
 
 // export default Products;
-export default connect(({ props }) => ({
-  props
+export default connect(({ sideMenu }) => ({
+  sideMenu
 }))(Products);

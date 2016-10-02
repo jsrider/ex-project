@@ -4,12 +4,7 @@ import dva from 'dva';
 
 // 1. Initialize
 const app = dva({
-  initialState: {
-    products: [
-      {name: 'dva', id: 1},
-      {name: 'antd', id: 2},
-    ],
-  }
+  initialState: window.pageOpt
 });
 
 // 2. Plugins
@@ -17,7 +12,7 @@ const app = dva({
 
 // 3. Model
 //app.model(require('./models/example'));
-app.model(require('./models/product'));
+app.model(require('./models/sideMenu'));
 
 // 4. Router
 app.router(require('./router'));

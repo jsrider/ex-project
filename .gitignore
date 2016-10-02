@@ -1,6 +1,7 @@
 *.iml
 .idea/
 .idea/workspace.xml
+.idea/watcherTasks.xml
 .ipr
 .iws
 *~
