@@ -2,10 +2,10 @@
 
 module.exports = {
 
-  'GET /api/example': function (req, res) {
+  'GET /api/chart': function (req, res) {
     setTimeout(function () {
       res.json({
-        error: 0,
+        error: 1,
         data: ['foo', 'bar'],
         message: ''
       });

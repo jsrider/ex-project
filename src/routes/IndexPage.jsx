@@ -2,8 +2,9 @@ import React from 'react';
 import { Link } from 'dva/router';
 import { connect } from 'dva';
 import MainLayout from '../components/MainLayout'
+import getMenuKeyFromUrl from '../utils/getMenuKeyFromUrl';
 
-const Products = (props) => {
+const Page = (props) => {
 
   // function handleDelete(id) {
   //   props.dispatch({
@@ -15,10 +16,11 @@ const Products = (props) => {
   const { location, dispatch, sideMenu } = props;
 
   const mainLayoutProps = {
-    location,
     dispatch,
-    sideMenu
+    sideMenu,
+    menuKey: getMenuKeyFromUrl(location.pathname),
   };
+
 
   console.log('IndexPage', props, mainLayoutProps);
 
@@ -30,4 +32,4 @@ const Products = (props) => {
 };
 
 // export default Products;
-export default connect(({routing, ...others}) => ({...others}))(Products);
+export default connect(({routing, ...others}) => ({...others}))(Page);

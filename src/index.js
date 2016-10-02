@@ -14,6 +14,7 @@ const app = dva({
 //app.model(require('./models/example'));
 app.model(require('./models/sideMenu'));
 app.model(require('./models/formSelects'));
+app.model(require('./models/chartPage'));
 
 // 4. Router
 app.router(require('./router'));

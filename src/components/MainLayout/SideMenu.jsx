@@ -5,21 +5,13 @@ import styles from './index.less'
 
 const SubMenu = Menu.SubMenu;
 
-function getMenuKeyFromUrl(pathname) {
-  let key = '';
-  try {
-    key = pathname.match(/\/([^\/]*)/i)[1];
-    /* eslint no-empty:0 */
-  } catch (e) {}
-  return key;
-}
-
-function SideMenu({ location, dispatch, sideMenu }) {
-  console.log('sideMenu', sideMenu);
+function SideMenu({ dispatch, menuKey, sideMenu }) {
+  console.log('sideMenu', sideMenu, menuKey);
 
   const { title, menuItems } = sideMenu;
 
-  const current = getMenuKeyFromUrl(location.pathname);
+  const current = menuKey;
+  const defaultOpenKeys = ['menu'];
 
   // const handleClick = (e) => {
   //   console.log('click ', e);
@@ -31,8 +23,13 @@ function SideMenu({ location, dispatch, sideMenu }) {
   // };
 
   const getItem = (el) => {
-    const { title, link, icon } = el;
+    const { title, link, icon, group, station } = el;
     // console.log(el)
+
+    if (link === current) {
+      station && defaultOpenKeys.push(station);
+      group && defaultOpenKeys.push(group);
+    }
 
     return <Menu.Item key={link}>
       <Link to={`/${link}`}>
@@ -108,17 +105,18 @@ function SideMenu({ location, dispatch, sideMenu }) {
       // )
     });
 
-    console.log(items)
     return items;
   };
 
+  console.log(defaultOpenKeys, current);
+
   return (
     <Menu
-          defaultOpenKeys={['sub1']}
+          defaultOpenKeys={defaultOpenKeys}
           selectedKeys={[current]}
           mode="inline"
     >
-      <SubMenu key="sub1" title={<span><Icon type="folder" /><span>{title}</span></span>}>
+      <SubMenu key="menu" title={<span><Icon type="folder" /><span>{title}</span></span>}>
         {
           getMenuItems()
         }
