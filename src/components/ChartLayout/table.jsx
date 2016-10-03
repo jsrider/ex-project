@@ -45,8 +45,8 @@ function FormLayout(props) {
       obj.children = keyArr.map(el => {
         return {
           title: keyArrCN[el],
-          dataIndex: `${el}${groupArr[i]}`,
-          key: `${el}${groupArr[i]}`,
+          dataIndex: `${groupArr[i]}${el}`,
+          key: `${groupArr[i]}${el}`,
           width: 100,
         }
       });
@@ -60,6 +60,7 @@ function FormLayout(props) {
     <div>
       <h1 className={styles.title}>{title || '报表'}</h1>
       <Table
+        rowKey={(record, index) => index}
         columns={columns}
         dataSource={data || []}
         bordered

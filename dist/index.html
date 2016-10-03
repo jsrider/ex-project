@@ -81,32 +81,21 @@
       ]
     },
     formSelects: {
-      time_interval: {
-        lable: '时间间隔',
-        data: [
-          {
-            title: '5分钟',
-            value: '300'
-          },{
-            title: '10分钟',
-            value: '600'
-          },
-          {
-            title: '30分钟',
-            value: '1800'
-          },
-          {
-            title: '1小时',
-            value: '3600'
-          },
-          {
-            title: '2小时',
-            value: '7200'
-          }
-        ]
+      time_date: {
+        label: '日期',
+        init: '2015-03-01T12:00:00.000Z',
+      },
+      time_month: {
+        label: '月份',
+        init: '2015-03-01T12:00:00.000Z',
+      },
+      time_range: {
+        label: '日期区间',
+//        init: '2015-03-01T12:00:00.000Z',
       },
       time_interval: {
-        lable: '时间间隔',
+        label: '时间间隔',
+        init: '300',
         data: [
           {
             title: '5分钟',
@@ -130,7 +119,8 @@
         ]
       },
       monitor_point: {
-        lable: '检测点',
+        label: '检测点',
+        init: 'all',
         data: [
           {
             title: '总览',
@@ -155,7 +145,8 @@
         ]
       },
       data_info: {
-        lable: '数据选项',
+        label: '数据选项',
+        init: 'all',
         data: [
           {
             title: '总览',

@@ -9,13 +9,12 @@ const getData = () => {
 
   for (let i = 0; i < 10; i++) {
     let res = {
-      key: i,
       time: '11: 10',
     };
 
     for (let gi = 0; gi < 5; gi++) {
       for (let el of keyArr) {
-        res[el + groupArr[gi]] = Math.ceil(Math.random() * 100);
+        res[groupArr[gi] + el] = Math.ceil(Math.random() * 100);
       }
     }
 

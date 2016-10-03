@@ -3,6 +3,15 @@ import { Select, Button, Form, DatePicker } from 'antd';
 import { Link } from 'dva/router';
 import styles from './index.less';
 // import * as routerPath from '../../utils/routerPath';
+// import moment from 'moment-timezone/moment-timezone';
+
+// 推荐在入口文件全局设置 locale 与时区
+// import 'moment/locale/zh-cn';
+// moment.locale('zh-cn');
+
+import moment from 'moment';
+import 'moment/locale/zh-cn';
+moment.locale('zh-cn');
 
 const Option = Select.Option;
 const createForm = Form.create;
@@ -40,7 +49,7 @@ function FormLayout(props) {
 
   };
 
-  const { monitor_point, time_interval } = formSelects;
+  const { monitor_point, time_interval, time_date, time_month, time_range, ...others } = formSelects;
 
   let dateItem = null;
 
@@ -56,28 +65,52 @@ function FormLayout(props) {
 
     case 'ri':
       dateItem = <FormItem
-        label="日期"
+        label={time_date.label}
       >
-        <DatePicker />
+        {
+          getFieldDecorator('time_data', {
+            initialValue: moment(time_month.init, 'YYYY-MM-DD')
+          })(
+            <DatePicker />
+          )
+        }
       </FormItem>;
       break;
 
     case 'yue':
       dateItem = <FormItem
-        label="月份"
+        label={time_month.label}
       >
-        <MonthPicker />
+        {
+          getFieldDecorator('time_month', {
+            initialValue: moment(time_month.init, 'YYYY-MM')
+          })(
+            <MonthPicker />
+          )
+        }
       </FormItem>;
       break;
 
     case 'lishi':
       dateItem = <FormItem
-        label="日期区间"
+        label={time_range.label}
       >
-        <RangePicker />
+        {
+          getFieldDecorator('time_range', {
+            initialValue: moment(time_range.init, 'YYYY-MM-DD')
+          })(
+            <RangePicker />
+          )
+        }
       </FormItem>;
       break;
   }
+
+  const selects = {
+    time_interval,
+    monitor_point,
+    ...others,
+  };
 
 
   return (
@@ -86,16 +119,18 @@ function FormLayout(props) {
         dateItem
       }
       {
-        Object.keys(formSelects).map((key, index) => {
-          const selectEl = formSelects[key];
+        Object.keys(selects).map((key, index) => {
+          const selectEl = selects[key];
 
           return selectEl.hide == 1 ?
             null :
             <FormItem
-              label={selectEl.lable}
+              label={selectEl.label}
               key={index}
             >
-              {getFieldDecorator(key)(
+              {getFieldDecorator(key, {
+                initialValue: selectEl.init
+              })(
                 <Select placeholder={`请选择${selectEl.lable}`} style={{width: selectWidth}}>
                   {
                     selectEl.data.map((el, i) => <Option key={i} value={el.value}>{el.title || el.value}</Option>)
