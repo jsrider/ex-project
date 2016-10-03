@@ -14,6 +14,7 @@ function FormLayout(props) {
   const { chartData, loading } = props.chartPage;
 
   const drawChart = (dataObj) => {
+    // debugger;
     chartDom = chartDom || document.getElementById('c1');
 
     Object.keys(dataObj).forEach((dataKey, index) => {
@@ -60,13 +61,13 @@ function FormLayout(props) {
   return (
     <div>
       <h1 className={styles.title}>{chartData.title}</h1>
-      <div id="c1"></div>
     </div>
   )
 }
 
 FormLayout.propTypes = {
   location: PropTypes.object,
+  chartPage: PropTypes.object.isRequired
 };
 
 export default FormLayout;

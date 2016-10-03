@@ -1,21 +1,30 @@
 'use strict';
 
+const groupArr = ['one', 'two', 'three', 'four', 'five'];
+const groupArrCN = ['一', '二', '三', '四', '五'];
+const keyArr = ['template', 'pressure', 'flow', 'total', 'tolerance'];
+
 const getData = () => {
   const data = [];
 
-  for (let i = 0; i < 100; i++) {
-    data.push({
+  for (let i = 0; i < 10; i++) {
+    let res = {
       key: i,
-      time: '10: 10',
-      template: Math.ceil(Math.random() * 100),
-      pressure: Math.ceil(Math.random() * 100),
-      flow: Math.ceil(Math.random() * 100),
-      total: Math.ceil(Math.random() * 100),
-      tolerance: Math.ceil(Math.random() * 100),
-    })
+      time: '11: 10',
+    };
+
+    for (let gi = 0; gi < 5; gi++) {
+      for (let el of keyArr) {
+        res[el + groupArr[gi]] = Math.ceil(Math.random() * 100);
+      }
+    }
+
+    data.push(res);
   }
 
+  // console.log(data);
   return data;
+
 };
 
 module.exports = {
@@ -26,25 +35,11 @@ module.exports = {
         success: 1,
         data: {
           title: '总览日曲线',
-          chartData: {
-            "一": {
-              data: getData(),
-            },
-            "二": {
-              data: getData(),
-            },
-            "三": {
-              data: getData(),
-            },
-            "四": {
-              data: getData(),
-            },
-            "五": {
-              data: getData(),
-            },
-            "六": {
-              data: getData(),
-            },
+          data: getData(),
+          params: {
+            groupArr,
+            groupArrCN,
+            keyArr
           }
         },
         message: ''

@@ -46,6 +46,7 @@ const Page = (props) => {
             <ChartLayout { ...chartLayoutProps } /> :
             <TableLayout { ...chartLayoutProps } />
         }
+        <div id="c1" style={{display: menuKey.includes('chart') ? 'block' : 'none'}}></div>
       </div>
     </MainLayout>
   );

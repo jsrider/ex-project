@@ -5,16 +5,23 @@ export default {
 
   state: {
     loading: true,
-    chartData: []
+    chartData: {}
   },
 
   subscriptions: {
     setup({ dispatch, history }) {
       history.listen(location => {
-        if (location.pathname.indexOf('chart') > -1) {
+        if (location.pathname.includes('chart')) {
           dispatch({
             type: 'queryData',
-            payloadObj: location.query
+            payloadObj: location.query,
+            apiType: 'chart'
+          });
+        } else if (location.pathname.includes('table')) {
+          dispatch({
+            type: 'queryData',
+            payloadObj: location.query,
+            apiType: 'table'
           });
         }
       });
@@ -22,17 +29,17 @@ export default {
   },
 
   effects: {
-    *queryData({ payloadObj }, { put, call}) {
+    *queryData({ payloadObj, apiType }, { put, call}) {
       // debugger;
 
       yield put({ type: 'showLoading' });
 
-      const { data } = yield call(query, payloadObj);
+      const { data } = yield call(query, payloadObj, apiType);
 
       if (typeof data === 'object' && data.success) {
         yield put({
           type: 'querySuccess',
-          data
+          data,
         });
       }
     },
