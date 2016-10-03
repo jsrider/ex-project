@@ -3,6 +3,8 @@ import { Link } from 'dva/router';
 import { connect } from 'dva';
 import MainLayout from '../components/MainLayout';
 import FormLayout from '../components/FormLayout';
+import ChartLayout from '../components/ChartLayout';
+import TableLayout from '../components/ChartLayout/table';
 import getMenuKeyFromUrl from '../utils/getMenuKeyFromUrl';
 
 const Page = (props) => {
@@ -15,23 +17,36 @@ const Page = (props) => {
   // }
 
   const { location, dispatch, sideMenu, formSelects, chartPage } = props;
+  const menuKey = getMenuKeyFromUrl(location.pathname);
 
   const mainLayoutProps = {
     dispatch,
     sideMenu,
-    menuKey: getMenuKeyFromUrl(location.pathname),
+    menuKey,
   };
   const formLayoutProps = {
     dispatch,
     formSelects,
     chartPage,
+    menuKey,
+  };
+
+  const chartLayoutProps = {
+    chartPage
   };
 
   console.log('ChartPage', props, mainLayoutProps, formLayoutProps);
 
   return (
     <MainLayout { ...mainLayoutProps } >
-      <FormLayout { ...formLayoutProps } />
+      <div>
+        <FormLayout { ...formLayoutProps } />
+        {
+          menuKey.includes('chart') ?
+            <ChartLayout { ...chartLayoutProps } /> :
+            <TableLayout { ...chartLayoutProps } />
+        }
+      </div>
     </MainLayout>
   );
 };

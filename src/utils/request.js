@@ -22,6 +22,9 @@ function checkStatus(response) {
  * @return {object}           An object containing either "data" or "err"
  */
 export default function request(url, options) {
+  // if (options.cache === false) {
+  //   url += `&_timer=${new Date().getTime()}`
+  // }
   return fetch(url, options)
     .then(checkStatus)
     .then(parseJSON)

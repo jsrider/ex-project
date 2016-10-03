@@ -1,18 +1,21 @@
 import React, { PropTypes } from 'react';
-import { Select, Button, Form } from 'antd';
-import styles from './index.less';
+import { Select, Button, Form, DatePicker } from 'antd';
 import { Link } from 'dva/router';
+// import * as routerPath from '../../utils/routerPath';
 
 const Option = Select.Option;
 const createForm = Form.create;
 const FormItem = Form.Item;
+
+const MonthPicker = DatePicker.MonthPicker;
+const RangePicker = DatePicker.RangePicker;
 
 const selectWidth = '150px';
 
 function FormLayout(props) {
   console.log('FormLayout', props);
 
-  const { location, formSelects, dispatch } = props;
+  const { menuKey, formSelects, dispatch } = props;
   const { loading } = props.chartPage;
   const { getFieldDecorator, getFieldsValue } = props.form;
 
@@ -29,9 +32,45 @@ function FormLayout(props) {
 
   };
 
+  let dateItem = null;
+
+  formSelects.time_interval.hide = 1;
+  switch (menuKey.split('-')[0]) {
+    case 'shishi':
+      formSelects.time_interval && (formSelects.time_interval.hide = 0);
+      break;
+
+    case 'ri':
+      dateItem = <FormItem
+        label="日期"
+      >
+        <DatePicker />
+      </FormItem>;
+      break;
+
+    case 'yue':
+      dateItem = <FormItem
+        label="月份"
+      >
+        <MonthPicker />
+      </FormItem>;
+      break;
+
+    case 'lishi':
+      dateItem = <FormItem
+        label="日期区间"
+      >
+        <RangePicker />
+      </FormItem>;
+      break;
+  }
+
+
   return (
     <Form inline onSubmit={handleSubmit}>
-
+      {
+        dateItem
+      }
       {
         Object.keys(formSelects).map((key, index) => {
           const selectEl = formSelects[key];
