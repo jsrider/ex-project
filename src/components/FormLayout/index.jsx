@@ -3,11 +3,6 @@ import { Select, Button, Form, DatePicker } from 'antd';
 import { Link } from 'dva/router';
 import styles from './index.less';
 // import * as routerPath from '../../utils/routerPath';
-// import moment from 'moment-timezone/moment-timezone';
-
-// 推荐在入口文件全局设置 locale 与时区
-// import 'moment/locale/zh-cn';
-// moment.locale('zh-cn');
 
 import moment from 'moment';
 import 'moment/locale/zh-cn';
@@ -40,6 +35,12 @@ function FormLayout(props) {
 
     const valueObj = getFieldsValue();
 
+    for (let key in valueObj) {
+      if (valueObj.hasOwnProperty(key)) {
+        valueObj[key] = typeof valueObj[key].format === 'function' ? valueObj[key].format('YYYY/MM/DD') : valueObj[key]
+      }
+    }
+
     dispatch({
       type: 'chartPage/queryData',
       // type: 'formSelects/submit',
@@ -58,6 +59,9 @@ function FormLayout(props) {
   }
 
   time_interval && (time_interval.hide = 1);
+
+  let format = 'YYYY-MM-DD';
+
   switch (menuTitle) {
     case 'shishi':
       formSelects.time_interval && (formSelects.time_interval.hide = 0);
@@ -69,37 +73,40 @@ function FormLayout(props) {
       >
         {
           getFieldDecorator('time_data', {
-            initialValue: moment(time_month.init, 'YYYY-MM-DD')
+            initialValue: moment(time_month.init, format)
           })(
-            <DatePicker />
+            <DatePicker format={format} />
           )
         }
       </FormItem>;
       break;
 
     case 'yue':
+      format = 'YYYY-MM';
+
       dateItem = <FormItem
         label={time_month.label}
       >
         {
           getFieldDecorator('time_month', {
-            initialValue: moment(time_month.init, 'YYYY-MM')
+            initialValue: moment(time_month.init, format)
           })(
-            <MonthPicker />
+            <MonthPicker format={format} />
           )
         }
       </FormItem>;
       break;
 
     case 'lishi':
+
       dateItem = <FormItem
         label={time_range.label}
       >
         {
           getFieldDecorator('time_range', {
-            initialValue: moment(time_range.init, 'YYYY-MM-DD')
+            initialValue: moment(time_range.init.split(','), format)
           })(
-            <RangePicker />
+            <RangePicker format={format} />
           )
         }
       </FormItem>;

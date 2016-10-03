@@ -3,14 +3,6 @@ import { Table } from 'antd';
 import styles from './index.less';
 import { Link } from 'dva/router';
 
-const keyArrCN = {
-  template: '温度',
-  pressure: '压力',
-  flow: '流量',
-  total: '累积',
-  tolerance: '气量'
-};
-
 function FormLayout(props) {
   console.log('TableLayout', props);
 
@@ -33,7 +25,7 @@ function FormLayout(props) {
 
   if (data && data.length && params) {
 
-    const { groupArr, groupArrCN, keyArr } = params;
+    const { groupArr, groupArrCN, keyArr, keyArrCN } = params;
     const len = groupArr.length;
 
     for (let i = 0; i < len; i++) {
@@ -65,7 +57,7 @@ function FormLayout(props) {
         dataSource={data || []}
         bordered
         size="middle"
-        scroll={{ x: 1200, y: 240 }}
+        scroll={{ x: params && Number(params.width) || 1500, y: 500 }}
       />
     </div>
   )

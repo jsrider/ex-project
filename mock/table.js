@@ -3,6 +3,13 @@
 const groupArr = ['one', 'two', 'three', 'four', 'five'];
 const groupArrCN = ['一', '二', '三', '四', '五'];
 const keyArr = ['template', 'pressure', 'flow', 'total', 'tolerance'];
+const keyArrCN = {
+  template: '温度',
+  pressure: '压力',
+  flow: '流量',
+  total: '累积',
+  tolerance: '气量'
+};
 
 const getData = () => {
   const data = [];
@@ -36,9 +43,11 @@ module.exports = {
           title: '总览日曲线',
           data: getData(),
           params: {
+            width: "1500",
             groupArr,
             groupArrCN,
-            keyArr
+            keyArr,
+            keyArrCN
           }
         },
         message: ''
