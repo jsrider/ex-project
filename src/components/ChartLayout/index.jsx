@@ -11,7 +11,7 @@ function FormLayout(props) {
   console.log('ChartLayout', props);
 
   // const { location, dispatch } = props;
-  const { chartData, loading } = props.chartPage;
+  const { chartData, loading } = props.pageData;
 
   const drawChart = (dataObj) => {
     // debugger;
@@ -67,7 +67,7 @@ function FormLayout(props) {
 
 FormLayout.propTypes = {
   location: PropTypes.object,
-  chartPage: PropTypes.object.isRequired
+  pageData: PropTypes.object.isRequired
 };
 
 export default FormLayout;

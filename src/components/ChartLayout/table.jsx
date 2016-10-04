@@ -7,8 +7,8 @@ import { pageParams } from '../../utils/pageParams';
 function FormLayout(props) {
   console.log('TableLayout', props);
 
-  const { dispatch, chartPage} = props;
-  const { tableData, loading } = chartPage;
+  const { dispatch, pageData, dispatchType, menuKey} = props;
+  const { tableData, loading } = pageData;
 
   // if (!tableData) {
   //   return;
@@ -24,10 +24,10 @@ function FormLayout(props) {
     // pageParams.addQueryParams(payloadObj);
 
     dispatch({
-      type: 'chartPage/queryData',
+      type: dispatchType,
       // type: 'formSelects/submit',
       payloadObj,
-      apiType: 'table'
+      menuKey
     });
   };
 
@@ -86,7 +86,7 @@ function FormLayout(props) {
 
 FormLayout.propTypes = {
   location: PropTypes.object,
-  chartPage: PropTypes.object.isRequired
+  pageData: PropTypes.object.isRequired
 };
 
 export default FormLayout;

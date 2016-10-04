@@ -2,6 +2,7 @@ import React, { PropTypes } from 'react';
 import { Router, Route, IndexRoute, Link } from 'dva/router';
 import IndexPage from './routes/IndexPage';
 import ChartPage from './routes/ChartPage';
+import Alert from './routes/Alert';
 import * as routerPath from './utils/routerPath';
 
 export default function({ history }) {
@@ -15,8 +16,8 @@ export default function({ history }) {
       <Route path={`/${routerPath.riTable}`} component={ChartPage} />
       <Route path={`/${routerPath.yueTable}`} component={ChartPage} />
       <Route path={`/${routerPath.lishiTable}`} component={ChartPage} />
-      <Route path={`/${routerPath.setting}`} component={ChartPage} />
-      <Route path={`/${routerPath.alert}`} component={ChartPage} />
+      <Route path={`/${routerPath.setSetting}`} component={ChartPage} />
+      <Route path={`/${routerPath.dealAlert}`} component={Alert} />
       <Route path="/" component={IndexPage} />
     </Router>
   );

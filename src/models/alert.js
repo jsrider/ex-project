@@ -1,13 +1,13 @@
 import { query } from '../services/formSelects';
 import { pageParams } from '../utils/pageParams';
+import * as routerPath from '../utils/routerPath';
 
 export default {
-  namespace: 'pageData',
+  namespace: 'alertPageData',
 
   state: {
     init: false,
     loading: true,
-    chartData: {},
     tableData: {
       pagination: {
         current: 1,
@@ -18,12 +18,12 @@ export default {
 
   subscriptions: {
     setup({ dispatch, history }) {
-      history.listen(({pathname}) => {
-        if (pathname.includes('chart') || pathname.includes('table')) {
+      history.listen(({ pathname }) => {
+        if (pathname.includes(routerPath.dealAlert)) {
           dispatch({
             type: 'queryData',
             payloadObj: pageParams.queryParams,
-            menuKey: pathname.slice(1)
+            apiType: 'alert'
           });
         }
       });
@@ -31,24 +31,21 @@ export default {
   },
 
   effects: {
-    *queryData({ payloadObj, apiType, menuKey }, { put, call}) {
-      // debugger;
-      // const menuType = menuKey.split('-')[1];
-
-      yield put({ type: 'showLoading' });
-
-      const [menuTitle, menuType] = typeof menuKey === 'string' ? menuKey.split('-') : ['', apiType];
-
-      const { data } = yield call(query, { ...pageParams.queryParams, ...payloadObj, type: menuTitle}, menuType);
-
-      if (typeof data === 'object' && data.success) {
-        yield put({
-          type: 'querySuccess',
-          data,
-          apiType: menuType,
-        });
-      }
-    },
+    // *queryData({ payloadObj, apiType }, { put, call}) {
+    //   // debugger;
+    //
+    //   yield put({ type: 'showLoading' });
+    //
+    //   const { data } = yield call(query, { ...pageParams.queryParams, ...payloadObj }, apiType);
+    //
+    //   if (typeof data === 'object' && data.success) {
+    //     yield put({
+    //       type: 'querySuccess',
+    //       data,
+    //       apiType,
+    //     });
+    //   }
+    // },
   },
 
   reducers: {

@@ -3,7 +3,7 @@ import { Select, Button, Form, DatePicker } from 'antd';
 import { Link } from 'dva/router';
 import styles from './index.less';
 import { pageParams } from '../../utils/pageParams';
-// import * as routerPath from '../../utils/routerPath';
+import * as routerPath from '../../utils/routerPath';
 
 import moment from 'moment';
 import 'moment/locale/zh-cn';
@@ -18,15 +18,27 @@ const RangePicker = DatePicker.RangePicker;
 
 const selectWidth = '150px';
 
+const formatValue = (val) => {
+  const formatStr = 'YYYY/MM/DD';
+
+  if (Array.isArray(val)) {
+    return val.map(el => el.format(formatStr)).join(',')
+  } else if (typeof val.format === 'function') {
+    return val.format(formatStr);
+  } else {
+    return val;
+  }
+};
+
 class FormLayout extends React.Component {
   // componentDidMount() {
   //   this.handleSubmit()
   // }
   //
   // componentWillReceiveProps() {
-  //   const { chartPage } = this.props;
+  //   const { pageData } = this.props;
   //
-  //   chartPage.init || (!chartPage.loading && this.handleSubmit())
+  //   pageData.init || (!pageData.loading && this.handleSubmit())
   // }
 
   getFormData() {
@@ -37,7 +49,7 @@ class FormLayout extends React.Component {
 
     for (let key in valueObj) {
       if (valueObj.hasOwnProperty(key)) {
-        valueObj[key] = typeof valueObj[key].format === 'function' ? valueObj[key].format('YYYY/MM/DD') : valueObj[key]
+        valueObj[key] = formatValue(valueObj[key])
       }
     }
 
@@ -47,18 +59,17 @@ class FormLayout extends React.Component {
   }
 
   handleSubmit (e) {
-    const { dispatch, menuKey } = this.props;
-    const menuType = menuKey.split('-')[1];
+    const { dispatch, menuKey, dispatchType } = this.props;
 
     e && e.preventDefault();
 
     const valueObj = this.getFormData();
 
     dispatch({
-      type: 'chartPage/queryData',
-      // type: 'formSelects/submit',
+      // type: 'chartPage/queryData',
+      type: dispatchType,
       payloadObj: valueObj,
-      apiType: menuType === 'chart' ? 'chart' : 'table'
+      menuKey,
     });
 
   };
@@ -67,8 +78,8 @@ class FormLayout extends React.Component {
 
     console.log('FormLayout', this.props);
 
-    const { menuKey, formSelects, chartPage, form } = this.props;
-    const { loading } = chartPage;
+    const { menuKey, formSelects, pageData, form } = this.props;
+    const { loading } = pageData;
     const { getFieldDecorator } = form;
     const menuTitle = menuKey.split('-')[0];
     const menuType = menuKey.split('-')[1];
@@ -77,7 +88,7 @@ class FormLayout extends React.Component {
       return ;
     }
 
-    const { monitor_point, time_interval, time_date, time_month, time_range, ...others } = formSelects;
+    const { monitor_point, time_interval, time_date, time_month, time_range, station_point, unusual_value, data_info } = formSelects;
 
     let dateItem = null;
 
@@ -89,12 +100,13 @@ class FormLayout extends React.Component {
 
     let format = 'YYYY-MM-DD';
 
-    switch (menuTitle) {
-      case 'shishi':
-        formSelects.time_interval && (formSelects.time_interval.hide = 0);
+    // 根据不同的 类型 显示对应控件
+    switch (menuKey) {
+      case `shishi-${menuType}`:
+        time_interval && (time_interval.hide = 0);
         break;
 
-      case 'ri':
+      case `ri-${menuType}`:
         dateItem = <FormItem
           label={time_date.label}
         >
@@ -108,7 +120,7 @@ class FormLayout extends React.Component {
         </FormItem>;
         break;
 
-      case 'yue':
+      case `yue-${menuType}`:
         format = 'YYYY-MM';
 
         dateItem = <FormItem
@@ -124,28 +136,37 @@ class FormLayout extends React.Component {
         </FormItem>;
         break;
 
-      case 'lishi':
-
-        dateItem = <FormItem
-          label={time_range.label}
-        >
-          {
-            getFieldDecorator('time_range', {
-              initialValue: moment(time_range.init.split(','), format)
-            })(
-              <RangePicker format={format} />
-            )
-          }
-        </FormItem>;
-        break;
     }
 
-    const selects = {
-      time_interval,
-      monitor_point,
-      ...others,
-    };
+    if (menuKey === `lishi-${menuType}` || menuKey === routerPath.dealAlert) {
+      dateItem = <FormItem
+        label={time_range.label}
+      >
+        {
+          getFieldDecorator('time_range', {
+            initialValue: time_range.init.split(',').map(el => moment(el, format))
+          })(
+            <RangePicker format={format} />
+          )
+        }
+      </FormItem>
+    }
 
+    let selects = null;
+
+    if (menuKey === routerPath.dealAlert) {
+      selects = {
+        station_point,
+        monitor_point,
+        unusual_value,
+      }
+    } else {
+      selects = {
+        time_interval,
+        monitor_point,
+        data_info
+      }
+    }
 
     return (
       <Form inline onSubmit={this.handleSubmit.bind(this)}>
@@ -156,6 +177,10 @@ class FormLayout extends React.Component {
           Object.keys(selects).map((key, index) => {
             const selectEl = selects[key];
 
+            if (!selectEl) {
+              return;
+            }
+
             return selectEl.hide == 1 ?
               null :
               <FormItem
@@ -165,7 +190,7 @@ class FormLayout extends React.Component {
                 {getFieldDecorator(key, {
                   initialValue: selectEl.init
                 })(
-                  <Select placeholder={`请选择${selectEl.lable}`} style={{width: selectWidth}}>
+                  <Select placeholder={`请选择${selectEl.label}`} style={{width: selectWidth}}>
                     {
                       selectEl.data.map((el, i) => <Option key={i} value={el.value}>{el.title || el.value}</Option>)
                     }
@@ -177,20 +202,24 @@ class FormLayout extends React.Component {
 
         <Button type="primary" className={styles.opButton} htmlType="submit" loading={loading}>查询</Button>
 
-        <div className={styles.opWrap}>
-          <Button type="primary" className={styles.opButton} >导出Excel</Button>
-          <Button type="primary" className={styles.opButton} >打印</Button>
+        {
+          menuKey === routerPath.dealAlert ?
+            null :
+            <div className={styles.opWrap}>
+              <Button type="primary" className={styles.opButton} >导出Excel</Button>
+              <Button type="primary" className={styles.opButton} >打印</Button>
 
-          <Button type="primary" className={styles.opButton}>
-            <Link to={`/${menuTitle}-${menuType === 'chart' ? 'table' : 'chart'}`}>
-              {
-                menuType === 'chart' ?
-                  '报表':
-                  '曲线'
-              }
-            </Link>
-          </Button>
-        </div>
+              <Button type="primary" className={styles.opButton}>
+                <Link to={`/${menuTitle}-${menuType === 'chart' ? 'table' : 'chart'}`}>
+                  {
+                    menuType === 'chart' ?
+                      '报表':
+                      '曲线'
+                  }
+                </Link>
+              </Button>
+            </div>
+        }
       </Form>
     )
   }

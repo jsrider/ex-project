@@ -77,17 +77,31 @@
           station: '中心站',
           group: '曲线',
           icon: ''
+        },
+        {
+          link: 'deal-alert',
+          title: '报警处理',
+          station: '',
+          group: '',
+          icon: 'exclamation-circle'
+        },
+        {
+          link: 'setting',
+          title: '设置',
+          station: '',
+          group: '',
+          icon: 'setting'
         }
       ]
     },
     formSelects: {
       time_date: {
         label: '日期',
-        init: '2015-03-01T12:00:00.000Z',
+        init: '2015-03-01',
       },
       time_month: {
         label: '月份',
-        init: '2015-03-01T12:00:00.000Z',
+        init: '2015-03-01',
       },
       time_range: {
         label: '日期区间',
@@ -167,6 +181,58 @@
           {
             title: '累计流量',
             value: 'total_flow'
+          },
+        ]
+      },
+      station_point: {
+        label: '站点',
+        init: 'all',
+        data: [
+          {
+            title: '总览',
+            value: 'all'
+          },
+          {
+            title: 'A检测点',
+            value: 'SA'
+          },
+          {
+            title: 'B检测点',
+            value: 'SB'
+          },
+          {
+            title: 'C检测点',
+            value: 'SC'
+          },
+          {
+            title: 'D检测点',
+            value: 'SD'
+          },
+        ]
+      },
+      unusual_value: {
+        label: '异常量',
+        init: '0',
+        data: [
+          {
+            title: '无',
+            value: '0'
+          },
+          {
+            title: 'a',
+            value: 'a'
+          },
+          {
+            title: 'b',
+            value: 'b'
+          },
+          {
+            title: 'c',
+            value: 'c'
+          },
+          {
+            title: 'd',
+            value: 'd'
           },
         ]
       },
