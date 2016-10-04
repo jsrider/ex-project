@@ -7,3 +7,6 @@ export const shishiTable = 'shishi-table';
 export const riTable = 'ri-table';
 export const yueTable = 'yue-table';
 export const lishiTable = 'lishi-table';
+
+export const alert = 'alert';
+export const setting = 'setting';

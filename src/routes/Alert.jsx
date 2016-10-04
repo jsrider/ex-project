@@ -2,9 +2,7 @@ import React from 'react';
 import { Link } from 'dva/router';
 import { connect } from 'dva';
 import MainLayout from '../components/MainLayout';
-import FormLayout from '../components/FormLayout';
-import ChartLayout from '../components/ChartLayout';
-import TableLayout from '../components/ChartLayout/table';
+import Alert from '../components/Alert';
 import getMenuKeyFromUrl from '../utils/getMenuKeyFromUrl';
 
 const Page = (props) => {
@@ -24,30 +22,13 @@ const Page = (props) => {
     sideMenu,
     menuKey,
   };
-  const formLayoutProps = {
-    dispatch,
-    formSelects,
-    chartPage,
-    menuKey,
-    location
-  };
-
-  const chartLayoutProps = {
-    chartPage,
-    dispatch
-  };
 
   console.log('ChartPage', props, mainLayoutProps, formLayoutProps);
 
   return (
     <MainLayout { ...mainLayoutProps } >
       <div>
-        <FormLayout { ...formLayoutProps } />
-        {
-          menuKey.includes('chart') ?
-            <ChartLayout { ...chartLayoutProps } /> :
-            <TableLayout { ...chartLayoutProps } />
-        }
+        <Alert/>
         <div id="c1" style={{display: menuKey.includes('chart') ? 'block' : 'none'}}></div>
       </div>
     </MainLayout>

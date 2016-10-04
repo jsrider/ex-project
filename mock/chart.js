@@ -8,7 +8,7 @@ module.exports = {
         success: 1,
         data: {
           title: '总览日曲线',
-          chartData: {
+          data: {
             template: {
               data: [
                 {name: '温度', time: '2015-03-01T12:00:00.000Z', value: 0},

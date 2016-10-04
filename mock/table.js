@@ -14,7 +14,7 @@ const keyArrCN = {
 const getData = () => {
   const data = [];
 
-  for (let i = 0; i < 10; i++) {
+  for (let i = 0; i < 50; i++) {
     let res = {
       time: '11: 10',
     };
@@ -48,6 +48,10 @@ module.exports = {
             groupArrCN,
             keyArr,
             keyArrCN
+          },
+          pagination: {
+            current: 1,
+            pageSize: 20
           }
         },
         message: ''

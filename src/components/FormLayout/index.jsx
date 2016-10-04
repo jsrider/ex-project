@@ -2,6 +2,7 @@ import React, { PropTypes } from 'react';
 import { Select, Button, Form, DatePicker } from 'antd';
 import { Link } from 'dva/router';
 import styles from './index.less';
+import { pageParams } from '../../utils/pageParams';
 // import * as routerPath from '../../utils/routerPath';
 
 import moment from 'moment';
@@ -17,21 +18,20 @@ const RangePicker = DatePicker.RangePicker;
 
 const selectWidth = '150px';
 
-function FormLayout(props) {
-  console.log('FormLayout', props);
+class FormLayout extends React.Component {
+  // componentDidMount() {
+  //   this.handleSubmit()
+  // }
+  //
+  // componentWillReceiveProps() {
+  //   const { chartPage } = this.props;
+  //
+  //   chartPage.init || (!chartPage.loading && this.handleSubmit())
+  // }
 
-  const { menuKey, formSelects, dispatch } = props;
-  const { loading } = props.chartPage;
-  const { getFieldDecorator, getFieldsValue } = props.form;
-  const menuTitle = menuKey.split('-')[0];
-  const menuType = menuKey.split('-')[1];
-
-  if (typeof formSelects !== 'object') {
-    return ;
-  }
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
+  getFormData() {
+    const { form } = this.props;
+    const { getFieldsValue } = form;
 
     const valueObj = getFieldsValue();
 
@@ -40,6 +40,19 @@ function FormLayout(props) {
         valueObj[key] = typeof valueObj[key].format === 'function' ? valueObj[key].format('YYYY/MM/DD') : valueObj[key]
       }
     }
+
+    pageParams.addQueryParams(valueObj);
+
+    return valueObj
+  }
+
+  handleSubmit (e) {
+    const { dispatch, menuKey } = this.props;
+    const menuType = menuKey.split('-')[1];
+
+    e && e.preventDefault();
+
+    const valueObj = this.getFormData();
 
     dispatch({
       type: 'chartPage/queryData',
@@ -50,122 +63,137 @@ function FormLayout(props) {
 
   };
 
-  const { monitor_point, time_interval, time_date, time_month, time_range, ...others } = formSelects;
+  render() {
 
-  let dateItem = null;
+    console.log('FormLayout', this.props);
 
-  if (menuType === 'table') {
-    monitor_point && (monitor_point.hide = 1)
+    const { menuKey, formSelects, chartPage, form } = this.props;
+    const { loading } = chartPage;
+    const { getFieldDecorator } = form;
+    const menuTitle = menuKey.split('-')[0];
+    const menuType = menuKey.split('-')[1];
+
+    if (typeof formSelects !== 'object') {
+      return ;
+    }
+
+    const { monitor_point, time_interval, time_date, time_month, time_range, ...others } = formSelects;
+
+    let dateItem = null;
+
+    if (menuType === 'table') {
+      monitor_point && (monitor_point.hide = 1)
+    }
+
+    time_interval && (time_interval.hide = 1);
+
+    let format = 'YYYY-MM-DD';
+
+    switch (menuTitle) {
+      case 'shishi':
+        formSelects.time_interval && (formSelects.time_interval.hide = 0);
+        break;
+
+      case 'ri':
+        dateItem = <FormItem
+          label={time_date.label}
+        >
+          {
+            getFieldDecorator('time_data', {
+              initialValue: moment(time_month.init, format)
+            })(
+              <DatePicker format={format} />
+            )
+          }
+        </FormItem>;
+        break;
+
+      case 'yue':
+        format = 'YYYY-MM';
+
+        dateItem = <FormItem
+          label={time_month.label}
+        >
+          {
+            getFieldDecorator('time_month', {
+              initialValue: moment(time_month.init, format)
+            })(
+              <MonthPicker format={format} />
+            )
+          }
+        </FormItem>;
+        break;
+
+      case 'lishi':
+
+        dateItem = <FormItem
+          label={time_range.label}
+        >
+          {
+            getFieldDecorator('time_range', {
+              initialValue: moment(time_range.init.split(','), format)
+            })(
+              <RangePicker format={format} />
+            )
+          }
+        </FormItem>;
+        break;
+    }
+
+    const selects = {
+      time_interval,
+      monitor_point,
+      ...others,
+    };
+
+
+    return (
+      <Form inline onSubmit={this.handleSubmit.bind(this)}>
+        {
+          dateItem
+        }
+        {
+          Object.keys(selects).map((key, index) => {
+            const selectEl = selects[key];
+
+            return selectEl.hide == 1 ?
+              null :
+              <FormItem
+                label={selectEl.label}
+                key={index}
+              >
+                {getFieldDecorator(key, {
+                  initialValue: selectEl.init
+                })(
+                  <Select placeholder={`请选择${selectEl.lable}`} style={{width: selectWidth}}>
+                    {
+                      selectEl.data.map((el, i) => <Option key={i} value={el.value}>{el.title || el.value}</Option>)
+                    }
+                  </Select>
+                )}
+              </FormItem>
+          })
+        }
+
+        <Button type="primary" className={styles.opButton} htmlType="submit" loading={loading}>查询</Button>
+
+        <div className={styles.opWrap}>
+          <Button type="primary" className={styles.opButton} >导出Excel</Button>
+          <Button type="primary" className={styles.opButton} >打印</Button>
+
+          <Button type="primary" className={styles.opButton}>
+            <Link to={`/${menuTitle}-${menuType === 'chart' ? 'table' : 'chart'}`}>
+              {
+                menuType === 'chart' ?
+                  '报表':
+                  '曲线'
+              }
+            </Link>
+          </Button>
+        </div>
+      </Form>
+    )
   }
-
-  time_interval && (time_interval.hide = 1);
-
-  let format = 'YYYY-MM-DD';
-
-  switch (menuTitle) {
-    case 'shishi':
-      formSelects.time_interval && (formSelects.time_interval.hide = 0);
-      break;
-
-    case 'ri':
-      dateItem = <FormItem
-        label={time_date.label}
-      >
-        {
-          getFieldDecorator('time_data', {
-            initialValue: moment(time_month.init, format)
-          })(
-            <DatePicker format={format} />
-          )
-        }
-      </FormItem>;
-      break;
-
-    case 'yue':
-      format = 'YYYY-MM';
-
-      dateItem = <FormItem
-        label={time_month.label}
-      >
-        {
-          getFieldDecorator('time_month', {
-            initialValue: moment(time_month.init, format)
-          })(
-            <MonthPicker format={format} />
-          )
-        }
-      </FormItem>;
-      break;
-
-    case 'lishi':
-
-      dateItem = <FormItem
-        label={time_range.label}
-      >
-        {
-          getFieldDecorator('time_range', {
-            initialValue: moment(time_range.init.split(','), format)
-          })(
-            <RangePicker format={format} />
-          )
-        }
-      </FormItem>;
-      break;
-  }
-
-  const selects = {
-    time_interval,
-    monitor_point,
-    ...others,
-  };
-
-
-  return (
-    <Form inline onSubmit={handleSubmit}>
-      {
-        dateItem
-      }
-      {
-        Object.keys(selects).map((key, index) => {
-          const selectEl = selects[key];
-
-          return selectEl.hide == 1 ?
-            null :
-            <FormItem
-              label={selectEl.label}
-              key={index}
-            >
-              {getFieldDecorator(key, {
-                initialValue: selectEl.init
-              })(
-                <Select placeholder={`请选择${selectEl.lable}`} style={{width: selectWidth}}>
-                  {
-                    selectEl.data.map((el, i) => <Option key={i} value={el.value}>{el.title || el.value}</Option>)
-                  }
-                </Select>
-              )}
-            </FormItem>
-        })
-      }
-
-      <Button type="primary" className={styles.opButton} htmlType="submit" loading={loading}>查询</Button>
-
-      <div className={styles.opWrap}>
-        <Button type="primary" className={styles.opButton} >导出Excel</Button>
-        <Button type="primary" className={styles.opButton} >打印</Button>
-
-        <Button type="primary" className={styles.opButton}>
-          <Link to={`/${menuTitle}-${menuType === 'chart' ? 'table' : 'chart'}`}>
-            {
-              menuType === 'chart' ?
-                '报表':
-                '曲线'
-            }
-          </Link>
-        </Button>
-      </div>
-    </Form>
-  )
 }
 
 FormLayout.propTypes = {

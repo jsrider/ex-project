@@ -1,11 +1,19 @@
 import { query } from '../services/formSelects';
+import { pageParams } from '../utils/pageParams';
 
 export default {
   namespace: 'chartPage',
 
   state: {
+    init: false,
     loading: true,
-    chartData: {}
+    chartData: {},
+    tableData: {
+      pagination: {
+        current: 1,
+        pageSize: 10
+      }
+    }
   },
 
   subscriptions: {
@@ -14,13 +22,13 @@ export default {
         if (location.pathname.includes('chart')) {
           dispatch({
             type: 'queryData',
-            payloadObj: location.query,
+            payloadObj: pageParams.queryParams,
             apiType: 'chart'
           });
         } else if (location.pathname.includes('table')) {
           dispatch({
             type: 'queryData',
-            payloadObj: location.query,
+            payloadObj: pageParams.queryParams,
             apiType: 'table'
           });
         }
@@ -34,12 +42,13 @@ export default {
 
       yield put({ type: 'showLoading' });
 
-      const { data } = yield call(query, payloadObj, apiType);
+      const { data } = yield call(query, { ...pageParams.queryParams, ...payloadObj }, apiType);
 
       if (typeof data === 'object' && data.success) {
         yield put({
           type: 'querySuccess',
           data,
+          apiType,
         });
       }
     },
@@ -49,8 +58,15 @@ export default {
     showLoading(state) {
       return { ...state, loading: true };
     },
-    querySuccess(state, { data }) {
-      return { ...state, loading: false, chartData: data.data };
+    querySuccess(state, { data, apiType }) {
+      const res = {};
+
+      res[`${apiType}Data`] = {
+        ...state[`${apiType}Data`],
+        ...data.data
+      };
+
+      return { ...state, loading: false, ...res };
     },
   },
 };

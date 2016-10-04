@@ -56,7 +56,7 @@ function FormLayout(props) {
 
   };
 
-  loading || drawChart(chartData.chartData);
+  loading || chartData.data && drawChart(chartData.data);
 
   return (
     <div>

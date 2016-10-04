@@ -2,16 +2,34 @@ import React, { PropTypes } from 'react';
 import { Table } from 'antd';
 import styles from './index.less';
 import { Link } from 'dva/router';
+import { pageParams } from '../../utils/pageParams';
 
 function FormLayout(props) {
   console.log('TableLayout', props);
 
-  const { chartData, loading } = props.chartPage;
+  const { dispatch, chartPage} = props;
+  const { tableData, loading } = chartPage;
 
-  // if (!chartData) {
+  // if (!tableData) {
   //   return;
   // }
-  const { title, data, params } = chartData;
+  let { title, data, params, pagination } = tableData;
+
+  const onChange = (pagination, filters, sorter) => {
+    const payloadObj = {
+      current: pagination.current,
+      pageSize: pagination.pageSize
+    };
+
+    // pageParams.addQueryParams(payloadObj);
+
+    dispatch({
+      type: 'chartPage/queryData',
+      // type: 'formSelects/submit',
+      payloadObj,
+      apiType: 'table'
+    });
+  };
 
   const columns = [
     {
@@ -23,7 +41,7 @@ function FormLayout(props) {
     },
   ];
 
-  if (data && data.length && params) {
+  if (Array.isArray(data) && data.length && params) {
 
     const { groupArr, groupArrCN, keyArr, keyArrCN } = params;
     const len = groupArr.length;
@@ -45,8 +63,9 @@ function FormLayout(props) {
 
       columns.push(obj)
     }
+  } else {
+    data = []
   }
-
 
   return (
     <div>
@@ -56,6 +75,8 @@ function FormLayout(props) {
         columns={columns}
         dataSource={data || []}
         bordered
+        pagination={pagination}
+        onChange={onChange}
         size="middle"
         scroll={{ x: params && Number(params.width) || 1500, y: 500 }}
       />
