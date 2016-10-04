@@ -3,40 +3,57 @@ import { Button, Select, Table } from 'antd';
 
 const Alert = (props) => {
 
-  const columns = [{
-    title: '报警时间',
-    dataIndex: 'altime',
-  }, {
-    title: '站点',
-    dataIndex: 'site',
-  }, {
-    title: '检测点',
-    dataIndex: 'check',
-  }, {
-    title: '异常量',
-    dataIndex: 'exception',
-  }, {
-    title: '处理时间',
-    dataIndex: 'dealtime',
-  }, {
-    title: '处理人',
-    dataIndex: 'dealpeople',
-  }, {
-    title: '处理信息',
-    dataIndex: 'dealmsg',
-  }];
+  console.log('AlertLayout', props);
 
-  const data = [];
+  const { dispatch, pageData, dispatchType, menuKey} = props;
+  const { tableData, loading } = pageData;
 
+  // if (!tableData) {
+  //   return;
+  // }
+  let { data, params, pagination } = tableData;
+  const columns = [];
 
+  if (Array.isArray(data) && data.length && params) {
+
+    const { keyArr, keyArrCN } = params;
+    const len = keyArr.length;
+
+    for (let i = 0; i < len; i++) {
+      columns.push({
+        title: keyArrCN[i] || keyArr[i],
+        dataIndex: keyArr[i],
+      })
+    }
+  } else {
+    data = []
+  }
+
+  const onChange = (pagination, filters, sorter) => {
+    const payloadObj = {
+      current: pagination.current,
+      pageSize: pagination.pageSize
+    };
+
+    // pageParams.addQueryParams(payloadObj);
+
+    dispatch({
+      type: dispatchType,
+      // type: 'formSelects/submit',
+      payloadObj,
+      menuKey
+    });
+  };
 
   return (
     <div style={{marginTop: '24px'}}>
         <Table
+          loading={loading}
           rowKey={(record, index) => index}
           columns={columns}
+          onChange={onChange}
           dataSource={data}
-          pagination={false}
+          pagination={pagination}
         />
     </div>
   );

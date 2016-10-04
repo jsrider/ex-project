@@ -1,17 +1,7 @@
 'use strict';
 
-const groupArr = ['one', 'two', 'three', 'four', 'five'];
-const groupArrCN = ['一', '二', '三', '四', '五'];
 const keyArr = ['altime', 'site', 'check', 'exception', 'dealtime', 'dealpeople', 'dealmsg'];
-const keyArrCN = {
-  altime: '报警时间',
-  site: '站点',
-  check: '检测点',
-  exception: '异常量',
-  dealtime: '处理时间',
-  dealpeople: '处理人',
-  dealmsg: '处理信息'
-};
+const keyArrCN = ['报警时间', '站点', '检测点', '异常量', '处理时间', '处理人', '处理信息'];
 
 const getData = () => {
   const data = [];
@@ -37,17 +27,15 @@ const getData = () => {
 
 module.exports = {
 
-  'GET /api/table': function (req, res) {
+  'GET /api/alert': function (req, res) {
     setTimeout(function () {
       res.json({
         success: 1,
         data: {
-          title: '总览日曲线',
+          // title: '总览日曲线',
           data: getData(),
           params: {
-            width: "1500",
-            groupArr,
-            groupArrCN,
+            // width: "1500",
             keyArr,
             keyArrCN
           },

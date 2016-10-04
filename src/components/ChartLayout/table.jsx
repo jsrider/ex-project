@@ -2,7 +2,7 @@ import React, { PropTypes } from 'react';
 import { Table } from 'antd';
 import styles from './index.less';
 import { Link } from 'dva/router';
-import { pageParams } from '../../utils/pageParams';
+// import { pageParams } from '../../utils/pageParams';
 
 function FormLayout(props) {
   console.log('TableLayout', props);
@@ -74,6 +74,7 @@ function FormLayout(props) {
         rowKey={(record, index) => index}
         columns={columns}
         dataSource={data || []}
+        loading={loading}
         bordered
         pagination={pagination}
         onChange={onChange}
