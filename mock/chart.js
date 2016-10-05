@@ -24,6 +24,22 @@ module.exports = {
               ],
               config: {
                 height: 220,
+                guideLine: {
+                  start: ['2015-03-01T12:00:00.000Z',5],
+                  end: ['2015-03-01T20:00:00.000Z',5],
+                  color: 'darkred', // rgb color
+                },
+                guideRect: {
+                  start: ['2015-03-01T12:00:00.000Z',6],
+                  end: ['2015-03-01T20:00:00.000Z',10],
+                  color: 'darkred',
+                  opacity: 0.4,
+                },
+                guideTag: {
+                  start: ['2015-03-01T18:00:00.000Z', 6],
+                  end: ['2015-03-01T19:00:00.000Z', 10],
+                  tag: '红色区域为报警值'
+                }
               }
             },
             pressure: {
@@ -41,6 +57,12 @@ module.exports = {
               ],
               config: {
                 height: 220,
+                guideLine: {
+                  start: ['2015-03-01T12:00:00.000Z',900],
+                  end: ['2015-03-01T20:00:00.000Z',900],
+                  color: 'darkred', // rgb color
+                  opacity: 1, // [0-1] 0 透明
+                }
               }
             },
             flow: {
@@ -58,6 +80,12 @@ module.exports = {
               ],
               config: {
                 height: 220,
+                guideRect: {
+                  start: ['2015-03-01T12:00:00.000Z', 80],
+                  end: ['2015-03-01T20:00:00.000Z',120],
+                  color: 'darkred',
+                  opacity: 0.4,
+                }
               }
             },
           }

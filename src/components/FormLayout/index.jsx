@@ -4,6 +4,7 @@ import { Link } from 'dva/router';
 import styles from './index.less';
 import { pageParams } from '../../utils/pageParams';
 import * as routerPath from '../../utils/routerPath';
+import downTable from '../../utils/downTable';
 
 import moment from 'moment';
 import 'moment/locale/zh-cn';
@@ -79,7 +80,7 @@ class FormLayout extends React.Component {
     console.log('FormLayout', this.props);
 
     const { menuKey, formSelects, pageData, form } = this.props;
-    const { loading, station } = pageData;
+    const { loading, station, tableData } = pageData;
     const { getFieldDecorator } = form;
     const menuTitle = menuKey.split('-')[0];
     const menuType = menuKey.split('-')[1];
@@ -221,7 +222,11 @@ class FormLayout extends React.Component {
           menuKey === routerPath.dealAlert ?
             null :
             <div className={styles.opWrap}>
-              <Button type="primary" className={styles.opButton} >导出Excel</Button>
+              {
+                menuType === 'table' ?
+                  <Button type="primary" className={styles.opButton} onClick={downTable.bind(this, tableData)} >导出Excel</Button> :
+                  null
+              }
               <Button type="primary" className={styles.opButton} >打印</Button>
 
               <Button type="primary" className={styles.opButton}>

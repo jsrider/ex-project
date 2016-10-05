@@ -19,6 +19,7 @@ function FormLayout(props) {
 
     Object.keys(dataObj).forEach((dataKey, index) => {
       const { data, config } = dataObj[dataKey];
+      const { guideLine, guideRect, guideTag, height } = config;
 
       if (!(Array.isArray(data) && data.length)) {
         return;
@@ -28,7 +29,7 @@ function FormLayout(props) {
         chartCvs[dataKey] = new G2.Chart({
           id: 'c1',
           width: chartDom.offsetWidth,
-          height: config.height,
+          height,
           plotCfg: {
             margin: [20, 80, 100, 80]
           }
@@ -47,7 +48,23 @@ function FormLayout(props) {
           alias: data[0].name
         }
       });
-      chartCvs[dataKey].guide().line(['2015-03-01T12:00:00.000Z',5], ['2015-03-01T20:00:00.000Z',5],);
+
+      guideLine && chartCvs[dataKey].guide().line(guideLine.start, guideLine.end, {
+        fill: guideLine.color,
+        fillOpacity: guideLine.opacity
+      });
+
+      guideRect && chartCvs[dataKey].guide().rect(guideRect.start, guideRect.end, {
+        fill: guideRect.color,
+        fillOpacity: guideRect.opacity
+      });
+
+      guideTag && chartCvs[dataKey].guide().tag(guideTag.start, guideTag.end, guideTag.tag);
+      // chartCvs[dataKey].guide().rect(['2015-03-01T12:00:00.000Z', 6], ['2015-03-01T20:00:00.000Z', 10], {
+      //   fill: '#810043',
+      //   fillOpacity: 0.4
+      // });
+      // chartCvs[dataKey].guide().tag(['2015-03-01T18:00:00.000Z', 6], ['2015-03-01T19:00:00.000Z', 10], '红色区域为报警值');
       chartCvs[dataKey].legend(false);
       chartCvs[dataKey].line().position('time*value').color('darkred').shape('smooth').size(2);
       chartCvs[dataKey].point().position('time*value').color('darkred').shape('name', ['circle', 'rect', 'diamond']).size(4);
