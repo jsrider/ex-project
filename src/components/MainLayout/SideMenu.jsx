@@ -5,7 +5,7 @@ import styles from './index.less'
 
 const SubMenu = Menu.SubMenu;
 
-function SideMenu({ dispatch, menuKey, sideMenu }) {
+function SideMenu({ dispatch, menuKey, sideMenu, pageData }) {
   console.log('sideMenu', sideMenu, menuKey);
 
   const { title, menuItems } = sideMenu;
@@ -23,16 +23,16 @@ function SideMenu({ dispatch, menuKey, sideMenu }) {
   // };
 
   const getItem = (el) => {
-    const { title, link, icon, group, station } = el;
+    const { title, link, icon, group, station, stationKey } = el;
     // console.log(el)
 
-    if (link === current) {
+    if (link === current && pageData.station === stationKey) {
       station && defaultOpenKeys.push(station);
       group && defaultOpenKeys.push(group);
     }
 
     return <Menu.Item key={link}>
-      <Link to={`/${link}`}>
+      <Link to={`/${link}?station=${stationKey}`}>
         {
           icon ?
             <Icon type={icon} /> :
@@ -48,6 +48,7 @@ function SideMenu({ dispatch, menuKey, sideMenu }) {
       menu: []
     };
     const items = [];
+    const stationItems = [];
 
     for (let el of menuItems) {
       const { group, station } = el;
@@ -96,7 +97,7 @@ function SideMenu({ dispatch, menuKey, sideMenu }) {
         )
       });
 
-      items.unshift(
+      stationItems.push(
         <SubMenu key={stationKey} title={<span><Icon type="folder" />{stationKey}</span>}>
           {stationMenu}
         </SubMenu>
@@ -105,8 +106,10 @@ function SideMenu({ dispatch, menuKey, sideMenu }) {
       // )
     });
 
-    return items;
+    return stationItems.concat(items);
   };
+
+  const content = getMenuItems();
 
   console.log(defaultOpenKeys, current);
 
@@ -118,7 +121,7 @@ function SideMenu({ dispatch, menuKey, sideMenu }) {
     >
       <SubMenu key="menu" title={<span><Icon type="folder" /><span>{title}</span></span>}>
         {
-          getMenuItems()
+          content
         }
       </SubMenu>
     </Menu>

@@ -60,6 +60,7 @@ class FormLayout extends React.Component {
 
   handleSubmit (e) {
     const { dispatch, menuKey, dispatchType } = this.props;
+    const { station } = this.props.pageData;
 
     e && e.preventDefault();
 
@@ -70,6 +71,7 @@ class FormLayout extends React.Component {
       type: dispatchType,
       payloadObj: valueObj,
       menuKey,
+      station
     });
 
   };
@@ -88,7 +90,7 @@ class FormLayout extends React.Component {
       return ;
     }
 
-    const { monitor_point, time_interval, time_date, time_month, time_range, station_point, unusual_value, data_info } = formSelects;
+    const { monitor_point, time_interval, time_date, time_month, time_range, station_point, unusual_value, data_info, tolerance_value } = formSelects;
 
     let dateItem = null;
 
@@ -176,6 +178,13 @@ class FormLayout extends React.Component {
           monitor_point,
           data_info
         }
+    }
+
+    if (menuTitle === 'ri' || menuTitle === 'yue') {
+      selects = {
+        tolerance_value,
+        ...selects
+      }
     }
 
     return (

@@ -36,6 +36,7 @@ const Page = (props) => {
     dispatch,
     sideMenu,
     menuKey,
+    pageData,
   };
   const formLayoutProps = {
     dispatch,

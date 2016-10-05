@@ -21,7 +21,8 @@ const getData = () => {
 
     for (let gi = 0; gi < 5; gi++) {
       for (let el of keyArr) {
-        res[groupArr[gi] + el] = Math.ceil(Math.random() * 100);
+        res[groupArr[gi] + el] = Math.ceil(Math.random() * 100)
+          + '<font color="red" >red font</font><br/><strong >strong font</strong>';
       }
     }
 
@@ -43,7 +44,7 @@ module.exports = {
           title: '总览日曲线',
           data: getData(),
           params: {
-            width: "1500",
+            width: "2500",
             groupArr,
             groupArrCN,
             keyArr,

@@ -4,6 +4,11 @@ import styles from './index.less';
 import { Link } from 'dva/router';
 // import { pageParams } from '../../utils/pageParams';
 
+const getRealHtml = (text) => {
+
+  return <p dangerouslySetInnerHTML={{__html: text}} />
+};
+
 function FormLayout(props) {
   console.log('TableLayout', props);
 
@@ -37,6 +42,7 @@ function FormLayout(props) {
       dataIndex: 'time',
       key: 'time',
       width: 100,
+      render: getRealHtml
       // fixed: 'left',
     },
   ];
@@ -58,6 +64,7 @@ function FormLayout(props) {
           dataIndex: `${groupArr[i]}${el}`,
           key: `${groupArr[i]}${el}`,
           width: 100,
+          render: getRealHtml
         }
       });
 

@@ -9,6 +9,7 @@ export default {
     init: false,
     loading: true,
     chartData: {},
+    station: '',
     tableData: {
       pagination: {
         current: 1,
@@ -19,12 +20,13 @@ export default {
 
   subscriptions: {
     setup({ dispatch, history }) {
-      history.listen(({pathname}) => {
+      history.listen(({ pathname, search }) => {
         if (pathname.includes('chart') || pathname.includes('table')) {
           dispatch({
             type: 'queryData',
             payloadObj: pageParams.queryParams,
-            menuKey: getMenuKeyFromUrl(pathname)
+            menuKey: getMenuKeyFromUrl(pathname),
+            station: search.match(/station=([^\/]*)/i)[1]
           });
         }
       });
@@ -32,15 +34,15 @@ export default {
   },
 
   effects: {
-    *queryData({ payloadObj, apiType, menuKey }, { put, call}) {
+    *queryData({ payloadObj, apiType, menuKey, station }, { put, call}) {
       // debugger;
       // const menuType = menuKey.split('-')[1];
 
-      yield put({ type: 'showLoading' });
+      yield put({ type: 'showLoading', station });
 
       const [menuTitle, menuType] = typeof menuKey === 'string' ? menuKey.split('-') : ['', apiType];
 
-      const { data } = yield call(query, { ...pageParams.queryParams, ...payloadObj, type: menuTitle}, menuType);
+      const { data } = yield call(query, { ...pageParams.queryParams, ...payloadObj, type: menuTitle, station}, menuType);
 
       if (typeof data === 'object' && data.success) {
         yield put({
@@ -53,8 +55,8 @@ export default {
   },
 
   reducers: {
-    showLoading(state) {
-      return { ...state, loading: true };
+    showLoading(state, { station }) {
+      return { ...state, loading: true, station };
     },
     querySuccess(state, { data, apiType }) {
       const res = {};
