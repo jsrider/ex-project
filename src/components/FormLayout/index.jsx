@@ -60,7 +60,6 @@ class FormLayout extends React.Component {
 
   handleSubmit (e) {
     const { dispatch, menuKey, dispatchType } = this.props;
-    const { station } = this.props.pageData;
 
     e && e.preventDefault();
 
@@ -71,7 +70,6 @@ class FormLayout extends React.Component {
       type: dispatchType,
       payloadObj: valueObj,
       menuKey,
-      station
     });
 
   };
@@ -81,7 +79,7 @@ class FormLayout extends React.Component {
     console.log('FormLayout', this.props);
 
     const { menuKey, formSelects, pageData, form } = this.props;
-    const { loading } = pageData;
+    const { loading, station } = pageData;
     const { getFieldDecorator } = form;
     const menuTitle = menuKey.split('-')[0];
     const menuType = menuKey.split('-')[1];
@@ -98,16 +96,10 @@ class FormLayout extends React.Component {
       monitor_point && (monitor_point.hide = 1)
     }
 
-    time_interval && (time_interval.hide = 1);
-
     let format = 'YYYY-MM-DD';
 
     // 根据不同的 类型 显示对应控件
     switch (menuKey) {
-      case `shishi-${menuType}`:
-        time_interval && (time_interval.hide = 0);
-        break;
-
       case `ri-${menuType}`:
         dateItem = <FormItem
           label={time_date.label}
@@ -174,7 +166,6 @@ class FormLayout extends React.Component {
 
       default:
         selects = {
-          time_interval,
           monitor_point,
           data_info
         }
@@ -183,6 +174,11 @@ class FormLayout extends React.Component {
     if (menuTitle === 'ri' || menuTitle === 'yue') {
       selects = {
         tolerance_value,
+        ...selects
+      }
+    } else if (menuTitle === 'lishi' || menuTitle === 'shishi') {
+      selects = {
+        time_interval,
         ...selects
       }
     }
@@ -229,7 +225,7 @@ class FormLayout extends React.Component {
               <Button type="primary" className={styles.opButton} >打印</Button>
 
               <Button type="primary" className={styles.opButton}>
-                <Link to={`/${menuTitle}-${menuType === 'chart' ? 'table' : 'chart'}`}>
+                <Link to={`/${menuTitle}-${menuType === 'chart' ? 'table' : 'chart'}?station=${station}`}>
                   {
                     menuType === 'chart' ?
                       '报表':

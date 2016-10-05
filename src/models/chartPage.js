@@ -22,11 +22,15 @@ export default {
     setup({ dispatch, history }) {
       history.listen(({ pathname, search }) => {
         if (pathname.includes('chart') || pathname.includes('table')) {
+          const station = search.match(/station=([^\/]*)/i)[1];
+
+          pageParams.addQueryParams({station});
+
           dispatch({
             type: 'queryData',
             payloadObj: pageParams.queryParams,
             menuKey: getMenuKeyFromUrl(pathname),
-            station: search.match(/station=([^\/]*)/i)[1]
+            station
           });
         }
       });
@@ -42,7 +46,7 @@ export default {
 
       const [menuTitle, menuType] = typeof menuKey === 'string' ? menuKey.split('-') : ['', apiType];
 
-      const { data } = yield call(query, { ...pageParams.queryParams, ...payloadObj, type: menuTitle, station}, menuType);
+      const { data } = yield call(query, { ...pageParams.queryParams, ...payloadObj, type: menuTitle }, menuType);
 
       if (typeof data === 'object' && data.success) {
         yield put({
