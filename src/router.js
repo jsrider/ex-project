@@ -16,7 +16,7 @@ export default function({ history }) {
       <Route path={`/${routerPath.riTable}`} component={ChartPage} />
       <Route path={`/${routerPath.yueTable}`} component={ChartPage} />
       <Route path={`/${routerPath.lishiTable}`} component={ChartPage} />
-      <Route path={`/${routerPath.setSetting}`} component={ChartPage} />
+      <Route path={`/${routerPath.setSetting}`} component={Alert} />
       <Route path={`/${routerPath.dealAlert}`} component={Alert} />
       <Route path="/" component={IndexPage} />
     </Router>

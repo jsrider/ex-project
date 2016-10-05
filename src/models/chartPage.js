@@ -1,5 +1,6 @@
 import { query } from '../services/formSelects';
 import { pageParams } from '../utils/pageParams';
+import getMenuKeyFromUrl from '../utils/getMenuKeyFromUrl';
 
 export default {
   namespace: 'pageData',
@@ -23,7 +24,7 @@ export default {
           dispatch({
             type: 'queryData',
             payloadObj: pageParams.queryParams,
-            menuKey: pathname.slice(1)
+            menuKey: getMenuKeyFromUrl(pathname)
           });
         }
       });

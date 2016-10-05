@@ -154,18 +154,28 @@ class FormLayout extends React.Component {
 
     let selects = null;
 
-    if (menuKey === routerPath.dealAlert) {
-      selects = {
-        station_point,
-        monitor_point,
-        unusual_value,
-      }
-    } else {
-      selects = {
-        time_interval,
-        monitor_point,
-        data_info
-      }
+    switch (menuKey) {
+      case routerPath.dealAlert:
+        selects = {
+          station_point,
+          monitor_point,
+          unusual_value,
+        };
+        break;
+
+      case routerPath.setSetting:
+        selects = {
+          station_point,
+          monitor_point,
+        };
+        break;
+
+      default:
+        selects = {
+          time_interval,
+          monitor_point,
+          data_info
+        }
     }
 
     return (

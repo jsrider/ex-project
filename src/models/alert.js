@@ -19,7 +19,7 @@ export default {
   subscriptions: {
     setup({ dispatch, history }) {
       history.listen(({ pathname }) => {
-        if (pathname.includes(routerPath.dealAlert)) {
+        if (pathname.includes(routerPath.dealAlert) || pathname.includes(routerPath.setSetting)) {
           dispatch({
             type: 'queryData',
             payloadObj: {},
@@ -31,13 +31,13 @@ export default {
   },
 
   effects: {
-    *queryData({ payloadObj, apiType, menuKey }, { put, call}) {
+    *queryData({ payloadObj, menuKey }, { put, call}) {
       // debugger;
       // const menuType = menuKey.split('-')[1];
 
       yield put({ type: 'showLoading' });
 
-      const [menuTitle, menuType] = typeof menuKey === 'string' ? menuKey.split('-') : ['', apiType];
+      const [menuTitle, menuType] = typeof menuKey === 'string' ? menuKey.split('-') : [];
 
       const { data } = yield call(query, { ...pageParams.queryParams, ...payloadObj, type: menuTitle}, menuType);
 
@@ -45,7 +45,7 @@ export default {
         yield put({
           type: 'querySuccess',
           data,
-          apiType: menuType,
+          // apiType: menuType,
         });
       }
     },

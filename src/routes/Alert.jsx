@@ -4,6 +4,7 @@ import { connect } from 'dva';
 import MainLayout from '../components/MainLayout';
 import FormLayout from '../components/FormLayout';
 import Alert from '../components/Alert';
+import Setting from '../components/Setting';
 import getMenuKeyFromUrl from '../utils/getMenuKeyFromUrl';
 import * as routerPath from '../utils/routerPath';
 
@@ -23,6 +24,10 @@ const Page = (props) => {
 
   switch (menuKey) {
     case routerPath.dealAlert:
+      dispatchType = 'alertPageData/queryData';
+      break;
+
+    case routerPath.setSetting:
       dispatchType = 'alertPageData/queryData';
       break;
 
@@ -58,7 +63,11 @@ const Page = (props) => {
     <MainLayout { ...mainLayoutProps } >
       <div>
         <FormLayout { ...formLayoutProps } />
-        <Alert { ...alertProps } />
+        {
+          menuKey === routerPath.dealAlert ?
+            <Alert { ...alertProps } /> :
+            <Setting { ...alertProps } />
+        }
       </div>
     </MainLayout>
   );
