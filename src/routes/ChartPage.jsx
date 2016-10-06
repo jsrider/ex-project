@@ -17,7 +17,7 @@ const Page = (props) => {
   //   });
   // }
 
-  const { location, dispatch, sideMenu, formSelects, pageData } = props;
+  const { location, dispatch, sideMenu, formSelects, pageData, userCenter } = props;
   const menuKey = getMenuKeyFromUrl(location.pathname);
 
   let dispatchType = 'pageData';
@@ -37,6 +37,7 @@ const Page = (props) => {
     sideMenu,
     menuKey,
     pageData,
+    userCenter,
   };
   const formLayoutProps = {
     dispatch,

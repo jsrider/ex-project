@@ -51,11 +51,11 @@ export default {
         });
       }
     },
-    *deleteRecord({ payloadObj }, { put, call}) {
+    *operateRecord({ payloadObj, opType }, { put, call}) {
       // debugger;
       const messageHide = message.loading('请求中...', 9);
 
-      const { data } = yield call(query, { payloadObj }, 'settingDel');
+      const { data } = yield call(query, { payloadObj, type: opType }, 'setting');
 
       if (typeof data === 'object' && data.success) {
         messageHide();

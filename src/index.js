@@ -17,6 +17,7 @@ app.model(require('./models/formSelects'));
 app.model(require('./models/chartPage'));
 app.model(require('./models/alert'));
 app.model(require('./models/flowChart'));
+app.model(require('./models/login'));
 
 // 4. Router
 app.router(require('./router'));

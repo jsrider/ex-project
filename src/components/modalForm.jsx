@@ -54,28 +54,40 @@ class ModalForm extends React.Component {
       props.handleOk({
         ...props.options,
         ...values
-      }).then(() => {
+      });
+
+      setTimeout(() => {
         this.setState({
           confirmLoading: false,
         });
-      })
+      }, 3000)
     });
   }
 
   render() {
     const props = this.props;
     const state = this.state;
-    const { options, visible, handleCancel, title, disableKeys, modifySetting, elementsFields } = props;
+    const { options, visible, handleCancel, title, disableKeys, modifySetting, elementsFields, cancel } = props;
     const { getFieldDecorator } = props.form;
     console.log('ModalForm: ', this.props, this.state);
 
+    const modalProps = {
+      visible
+    };
+
+    if (cancel === false) {
+      modalProps.footer = <Button type="primary" onClick={this.handleOk.bind(this)}>
+        确定
+      </Button>;
+      modalProps.closable = false;
+    }
     return (
       <div>
         <Modal title={title || "对话框"}
-               visible={visible}
                onOk={this.handleOk.bind(this)}
                confirmLoading={state.confirmLoading}
                onCancel={handleCancel}
+               { ...modalProps }
         >
           <QueueAnim component={Form} horizontal type="bottom">
             {
@@ -110,6 +122,10 @@ class ModalForm extends React.Component {
                             )
                           }
                         </Select>;
+                        break;
+
+                      case 'password':
+                        children = <Input type="password" />;
                         break;
 
                       default:

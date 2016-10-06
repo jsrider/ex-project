@@ -16,6 +16,7 @@ class Setting extends React.Component {
   }
 
   getModalForm() {
+    const { dispatch } = this.props;
     const { modalOption, modalVisible } = this.state;
 
     const modalProps = {
@@ -25,6 +26,16 @@ class Setting extends React.Component {
       modifySetting: this.modifySetting || {},
       elementsFields: this.elementsFields,
       handleOk: (values) => {
+
+        dispatch({
+          type: 'alertPageData/operateRecord',
+          payloadObj: values,
+          opType: 'modify'
+        });
+
+        this.setState({
+          modalVisible: false,
+        });
         console.log('handleOk:', values)
       },
       handleCancel: () => {
@@ -41,8 +52,9 @@ class Setting extends React.Component {
     const { dispatch } = this.props;
 
     dispatch({
-      type: 'alertPageData/deleteRecord',
-      payloadObj
+      type: 'alertPageData/operateRecord',
+      payloadObj,
+      opType: 'Del'
     })
   }
 
@@ -132,7 +144,7 @@ class Setting extends React.Component {
           loading={loading}
           rowKey={(record, index) => index}
           columns={columns}
-          onChange={this.onChange}
+          onChange={this.onChange.bind(this)}
           dataSource={data}
           pagination={pagination}
         />
