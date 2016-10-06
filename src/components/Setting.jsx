@@ -146,7 +146,7 @@ class Setting extends React.Component {
           columns={columns}
           onChange={this.onChange.bind(this)}
           dataSource={data}
-          pagination={pagination}
+          pagination={false}
         />
       </div>
     );

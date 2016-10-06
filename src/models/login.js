@@ -35,7 +35,7 @@ export default {
       const { data } = yield call(query, { password: values.password }, 'login');
       //
       if (typeof data === 'object' && data.success) {
-        message.success('登录成功!', 4);
+        message.success('密码验证成功!', 4);
 
         cache.setValue('1');
 

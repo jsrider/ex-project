@@ -1,17 +1,17 @@
 'use strict';
 
-const keyArr = ['id', 'setup', 'setdown', 'switch'];
-const keyArrCN = ['ID', '上限', '下限', '开关'];
+const keyArr = ['value', 'setup', 'setdown', 'switch'];
+const keyArrCN = ['检测量', '上限', '下限', '开关'];
 
 const getData = () => {
   const data = [];
 
-  for (let i = 0; i < 50; i++) {
+  for (let i = 0; i < keyArr.length; i++) {
     let res = {
+      value: keyArrCN[i],
       setup: Math.ceil(Math.random() * 100),
       setdown: Math.ceil(Math.random() * 100),
       switch: '开',
-      id: i,
     };
 
     data.push(res);
