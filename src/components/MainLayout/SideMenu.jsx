@@ -89,7 +89,16 @@ function SideMenu({ dispatch, menuKey, sideMenu, pageData }) {
 
         stationMenu.push(
           Object.keys(station[sKey]).map((groupKey, groupIdx) =>
-            <SubMenu key={`${groupKey}-${stationKey}`} title={<span>{groupKey}</span>}>
+            <SubMenu key={`${groupKey}-${stationKey}`} title={
+              <span>
+                {
+                  groupKey.includes('曲线') ?
+                  <Icon type="line-chart" /> :
+                  <Icon type="credit-card" />
+                }
+                {groupKey}
+              </span>
+            }>
               {
                 station[sKey][groupKey].map((el, i) => getItem(el))
               }
