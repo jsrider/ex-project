@@ -5,7 +5,8 @@ import { Link } from 'dva/router';
 import G2 from 'g2';
 
 let chartCvs = {};
-let chartDom = null;
+let chartWidth = 0;
+const CHART_ID = 'c1';
 
 function FormLayout(props) {
   console.log('ChartLayout', props);
@@ -15,7 +16,6 @@ function FormLayout(props) {
 
   const drawChart = (dataObj) => {
     // debugger;
-    chartDom = chartDom || document.getElementById('c1');
 
     Object.keys(dataObj).forEach((dataKey, index) => {
       const { data, config } = dataObj[dataKey];
@@ -25,18 +25,19 @@ function FormLayout(props) {
         return;
       }
 
-      if (!chartCvs[dataKey]) {
-        chartCvs[dataKey] = new G2.Chart({
-          id: 'c1',
-          width: chartDom.offsetWidth,
-          height,
-          plotCfg: {
-            margin: [20, 80, 100, 80]
-          }
-        });
-      } else {
-        chartCvs[dataKey].clear();
+      if (chartCvs[dataKey]) {
+        chartCvs[dataKey].destroy();
+        // } else {
+      //   chartCvs[dataKey].clear();
       }
+      chartCvs[dataKey] = new G2.Chart({
+        id: 'c1',
+        width: chartWidth || (chartWidth = document.getElementById(CHART_ID).offsetWidth) || 800,
+        height,
+        plotCfg: {
+          margin: [20, 80, 100, 80]
+        }
+      });
 
       chartCvs[dataKey].source(data, {
         time: {

@@ -219,7 +219,7 @@ class FormLayout extends React.Component {
         <Button type="primary" className={styles.opButton} htmlType="submit" loading={loading}>查询</Button>
 
         {
-          menuKey === routerPath.dealAlert ?
+          menuKey === routerPath.dealAlert || menuKey === routerPath.setSetting ?
             null :
             <div className={styles.opWrap}>
               {

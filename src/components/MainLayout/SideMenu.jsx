@@ -30,9 +30,10 @@ function SideMenu({ dispatch, menuKey, sideMenu, pageData }) {
       station && defaultOpenKeys.push(station);
       group && defaultOpenKeys.push(`${group}-${station}`);
     }
+    const stationParams = stationKey ? `?station=${stationKey}` : '';
 
     return <Menu.Item key={`${link}-${stationKey}`}>
-      <Link to={`/${link}?station=${stationKey}`}>
+      <Link to={`/${link}${stationParams}`}>
         {
           icon ?
             <Icon type={icon} /> :

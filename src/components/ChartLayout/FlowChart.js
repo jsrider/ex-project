@@ -226,7 +226,7 @@ const drawChart = (dataObj) => {
   var Stat = G2.Stat;
   var chart = new G2.Chart({
     id: CHART_ID,
-    width: chartWidth || (chartWidth = document.getElementById(CHART_ID).offsetWidth),
+    width: chartWidth || (chartWidth = document.getElementById(CHART_ID).offsetWidth) || 800,
     height: 500,
     plotCfg: {
       margin: [0,0]
