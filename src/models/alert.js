@@ -1,6 +1,8 @@
 import { query } from '../services/formSelects';
 import { pageParams } from '../utils/pageParams';
 import * as routerPath from '../utils/routerPath';
+import getMenuKeyFromUrl from '../utils/getMenuKeyFromUrl';
+import { message } from 'antd';
 
 export default {
   namespace: 'alertPageData',
@@ -23,7 +25,7 @@ export default {
           dispatch({
             type: 'queryData',
             payloadObj: {},
-            menuKey: routerPath.dealAlert
+            menuKey: getMenuKeyFromUrl(pathname)
           });
         }
       });
@@ -42,6 +44,22 @@ export default {
       const { data } = yield call(query, { ...pageParams.queryParams, ...payloadObj, type: menuTitle}, menuType);
 
       if (typeof data === 'object' && data.success) {
+        yield put({
+          type: 'querySuccess',
+          data,
+          // apiType: menuType,
+        });
+      }
+    },
+    *deleteRecord({ payloadObj }, { put, call}) {
+      // debugger;
+      const messageHide = message.loading('请求中...', 9);
+
+      const { data } = yield call(query, { payloadObj }, 'settingDel');
+
+      if (typeof data === 'object' && data.success) {
+        messageHide();
+
         yield put({
           type: 'querySuccess',
           data,

@@ -1,48 +1,54 @@
 import React from 'react';
-import { Button, Select, Table } from 'antd';
+import { Button, Select, Table, Popconfirm } from 'antd';
+import ModalForm from './modalForm';
 
-const Alert = (props) => {
+class Setting extends React.Component {
+  constructor() {
+    super();
 
-  console.log('AlertLayout', props);
+    this.state = {
+      modalVisible: false,
+      modalOption: null
+    };
 
-  const { dispatch, pageData, dispatchType, menuKey} = props;
-  const { tableData, loading } = pageData;
-
-  // if (!tableData) {
-  //   return;
-  // }
-  let { data, params, pagination } = tableData;
-  const columns = [];
-
-  if (Array.isArray(data) && data.length && params) {
-
-    const { keyArr, keyArrCN } = params;
-    const len = keyArr.length;
-
-    for (let i = 0; i < len; i++) {
-      columns.push({
-        title: keyArrCN[i] || keyArr[i],
-        dataIndex: keyArr[i],
-      })
-    }
-  } else {
-    data = []
+    this.elementsFields = [];
+    this.modifySetting = {};
   }
 
-  // 操作栏
-  columns.push({
-    title: '操作',
-    key: 'operation',
-    render: (text, record) => (
-      <span>
-        <a href="javascript;;">修改{record.setup}</a>
-        <span className="ant-divider" />
-        <a href="javascript;;">删除</a>
-      </span>
-    ),
-  });
+  getModalForm() {
+    const { modalOption, modalVisible } = this.state;
 
-  const onChange = (pagination, filters, sorter) => {
+    const modalProps = {
+      options: modalOption,
+      title: '修改数据',
+      visible: modalVisible || false,
+      modifySetting: this.modifySetting || {},
+      elementsFields: this.elementsFields,
+      handleOk: (values) => {
+        console.log('handleOk:', values)
+      },
+      handleCancel: () => {
+        this.setState({
+          modalVisible: false,
+        });
+      }
+    };
+
+    return <ModalForm {...modalProps} />;
+  };
+
+  handleDelete(payloadObj) {
+    const { dispatch } = this.props;
+
+    dispatch({
+      type: 'alertPageData/deleteRecord',
+      payloadObj
+    })
+  }
+
+  onChange(pagination, filters, sorter) {
+    const { dispatch, dispatchType, menuKey} = this.props;
+
     const payloadObj = {
       current: pagination.current,
       pageSize: pagination.pageSize
@@ -56,23 +62,86 @@ const Alert = (props) => {
       payloadObj,
       menuKey
     });
-  };
+  }
 
-  return (
-    <div style={{marginTop: '24px'}}>
+  handleModify(record) {
+    this.setState({
+      modalOption: record,
+      modalVisible: true
+    })
+  }
+
+  render () {
+    console.log('SettingLayout', this.props);
+
+    const { pageData } = this.props;
+    const { tableData, loading } = pageData;
+
+    // if (!tableData) {
+    //   return;
+    // }
+    let { data, params, pagination } = tableData;
+    const columns = [];
+
+    this.elementsFields = [];
+    if (Array.isArray(data) && data.length && params) {
+
+      const { keyArr, keyArrCN, setting } = params;
+      const len = keyArr.length;
+
+      this.modifySetting = setting;
+
+      for (let i = 0; i < len; i++) {
+        const key = keyArr[i];
+        const title = keyArrCN[i];
+
+        this.elementsFields.push(key);
+
+        columns.push({
+          title: title || key,
+          dataIndex: key,
+        })
+      }
+    } else {
+      data = []
+    }
+
+    // 操作栏
+    columns.push({
+      title: '操作',
+      key: 'operation',
+      render: (text, record) => {
+        return (
+          <span>
+          <a href="javascript:;" onClick={this.handleModify.bind(this, record)}>修改</a>
+          <span className="ant-divider"/>
+          <Popconfirm title="确定要删除这条数据吗？" onConfirm={
+            this.handleDelete.bind(this, record)
+          }>
+            <a href="javascript:;">删除</a>
+          </Popconfirm>
+        </span>
+        )
+      },
+    });
+
+    return (
+      <div style={{marginTop: '24px'}}>
+        {this.getModalForm()}
         <Table
           loading={loading}
           rowKey={(record, index) => index}
           columns={columns}
-          onChange={onChange}
+          onChange={this.onChange}
           dataSource={data}
           pagination={pagination}
         />
-    </div>
-  );
+      </div>
+    );
+  }
+}
+
+Setting.propTypes = {
 };
 
-Alert.propTypes = {
-};
-
-export default Alert;
+export default Setting;
