@@ -28,10 +28,10 @@ function SideMenu({ dispatch, menuKey, sideMenu, pageData }) {
 
     if (link === current && pageData.station === stationKey) {
       station && defaultOpenKeys.push(station);
-      group && defaultOpenKeys.push(group);
+      group && defaultOpenKeys.push(`${group}-${station}`);
     }
 
-    return <Menu.Item key={link}>
+    return <Menu.Item key={`${link}-${stationKey}`}>
       <Link to={`/${link}?station=${stationKey}`}>
         {
           icon ?
@@ -88,7 +88,7 @@ function SideMenu({ dispatch, menuKey, sideMenu, pageData }) {
 
         stationMenu.push(
           Object.keys(station[sKey]).map((groupKey, groupIdx) =>
-            <SubMenu key={groupKey} title={<span>{groupKey}</span>}>
+            <SubMenu key={`${groupKey}-${stationKey}`} title={<span>{groupKey}</span>}>
               {
                 station[sKey][groupKey].map((el, i) => getItem(el))
               }
@@ -111,12 +111,12 @@ function SideMenu({ dispatch, menuKey, sideMenu, pageData }) {
 
   const content = getMenuItems();
 
-  console.log(defaultOpenKeys, current);
+  console.log(defaultOpenKeys, `${current}-${pageData.station}`);
 
   return (
     <Menu
           defaultOpenKeys={defaultOpenKeys}
-          selectedKeys={[current]}
+          selectedKeys={[`${current}-${pageData.station}`]}
           mode="inline"
     >
       <SubMenu key="menu" title={<span><Icon type="folder" /><span>{title}</span></span>}>

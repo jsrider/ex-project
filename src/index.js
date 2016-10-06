@@ -16,6 +16,7 @@ app.model(require('./models/sideMenu'));
 app.model(require('./models/formSelects'));
 app.model(require('./models/chartPage'));
 app.model(require('./models/alert'));
+app.model(require('./models/flowChart'));
 
 // 4. Router
 app.router(require('./router'));

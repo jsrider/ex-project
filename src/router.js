@@ -3,6 +3,7 @@ import { Router, Route, IndexRoute, Link } from 'dva/router';
 import IndexPage from './routes/IndexPage';
 import ChartPage from './routes/ChartPage';
 import Alert from './routes/Alert';
+import FlowChart from './routes/FlowChart';
 import * as routerPath from './utils/routerPath';
 
 export default function({ history }) {
@@ -18,6 +19,7 @@ export default function({ history }) {
       <Route path={`/${routerPath.lishiTable}`} component={ChartPage} />
       <Route path={`/${routerPath.setSetting}`} component={Alert} />
       <Route path={`/${routerPath.dealAlert}`} component={Alert} />
+      <Route path={`/${routerPath.liuchengTu}`} component={FlowChart} />
       <Route path="/" component={IndexPage} />
     </Router>
   );
