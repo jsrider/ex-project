@@ -64,10 +64,10 @@ class MainLayout extends React.Component {
         <div className={styles.content}>
           <div className={styles.main}>
             <Row>
-              <Col span="5">
+              <Col span="4">
                 <SideMenu { ...this.props } />
               </Col>
-              <Col span="19">
+              <Col span="20">
                 <div className={styles.article}>
                   {
                     login ?

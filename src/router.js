@@ -20,7 +20,7 @@ export default function({ history }) {
       <Route path={`/${routerPath.setSetting}`} component={Alert} />
       <Route path={`/${routerPath.dealAlert}`} component={Alert} />
       <Route path={`/${routerPath.liuchengTu}`} component={FlowChart} />
-      <Route path="/" component={IndexPage} />
+      <Route path="/" component={FlowChart} />
     </Router>
   );
 };

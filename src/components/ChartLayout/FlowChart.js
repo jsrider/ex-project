@@ -5,13 +5,13 @@ import styles from './index.less';
 import G2 from 'g2';
 
 let chartCvs = {};
-let chartWidth = 0;
+let chartWidth = 932;
 const CHART_ID = 'flowChart';
-const img = {
+const static_img = {
   station: {
     src: require('../../img/station.png'),
-    rate: 1364/1718,
-    width: 80
+    rate: 220/145,
+    width: 168
   },
   pot: {
     src: require('../../img/pot.png'),
@@ -26,207 +26,450 @@ const img = {
   switch: {
     src: require('../../img/switch.png'),
     rate: 542/553,
-    width: 20,
+    width: 28,
   },
   switch_black: {
     src: require('../../img/switch_black.png'),
     rate: 124/124,
-    width: 20,
+    width: 18,
   },
   flow: {
     src: require('../../img/flow.png'),
     rate: 255/853,
-    width: 40,
+    width: 12,
+  }
+};
+
+// path 画笔
+function combine(Command, x, y) {
+  return Command + ' ' + x + ' ' + y;
+}
+const pan_line = {
+  smallGreen: {
+    lineWidth: 3,
+    lineJoin: 'round',
+    stroke: '#0ce60c'
+  },
+  normal: {
+    lineWidth: 7,
+    lineJoin: 'round',
+    stroke: '#ffc000'
+  },
+  combinPoint: (point) => {
+    return point.map(el => combine(el.type, el.x, el.y)).join('')
   }
 };
 
 /**
- * @name 注册 站 的图形
+ * @name 注册 图形
  * x, y 为图形中心坐标
  */
-const registStationImg = () => {
-  G2.Shape.registShape('point', 'station', {
-    drawShape: function(cfg, group) {
-      const { x, y } = cfg;
-      const { width, rate, src } = img.station;
-      const height = width / rate;
+const registImg = {
+  registStationImg: () => {
+    G2.Shape.registShape('point', 'station', {
+      drawShape: function(cfg, group) {
+        const { x, y } = cfg;
+        const { width, rate, src } = static_img.station;
+        const height = width / rate;
 
-      return group.addShape('image', { // 由于开始的点设置了透明度，所以会显示连接线
-        attrs: {
-          x: x - width/2,
-          y: y - height/2,
-          width: width,
-          height,
-          // rotate: '180',
-          img: src
-        }
-      });
+        return group.addShape('image', { // 由于开始的点设置了透明度，所以会显示连接线
+          attrs: {
+            x: x - width/2,
+            y: y - height/2,
+            width: width,
+            height,
+            // rotate: '180',
+            img: src
+          }
+        });
+      }
+    });
+  },
+  // 注册 开关 的图形
+  registSwitchImg: (small) => {
+    G2.Shape.registShape('point', small ? 'switch_small' : 'switch', {
+      drawShape: function(cfg, group) {
+        const { x, y } = cfg;
+        let { width, rate, src } = static_img.switch;
+
+        width = small ? width / 2 : width;
+
+        const height = width / rate;
+
+        return group.addShape('image', { // 由于开始的点设置了透明度，所以会显示连接线
+          attrs: {
+            x: x - width/2,
+            y: y - height/2 -2,
+            width,
+            height,
+            // rotate: '180',
+            img: src
+          }
+        });
+      }
+    });
+  },
+  registSwitchImgVertical: () => {
+    G2.Shape.registShape('point', 'switch_vertical', {
+      drawShape: function(cfg, group) {
+        const { x, y } = cfg;
+        const { width, rate, src } = static_img.switch;
+        const height = width / rate;
+
+        return group.addShape('image', { // 由于开始的点设置了透明度，所以会显示连接线
+          attrs: {
+            x: x - width,
+            y: y + height,
+            width,
+            height,
+            rotate: '-90',
+            img: src
+          }
+        });
+      }
+    });
+  },
+  // 黑色开关, 用于无流量数据情况
+  // registSwitchBlackImg: () => {
+  //   G2.Shape.registShape('point', 'switch_black', {
+  //     drawShape: function(cfg, group) {
+  //       const { x, y } = cfg;
+  //       const { width, rate, src } = static_img.switch_black;
+  //       const height = width / rate;
+  //
+  //       return group.addShape('image', { // 由于开始的点设置了透明度，所以会显示连接线
+  //         attrs: {
+  //           x: x - width/2,
+  //           y: y - height/2,
+  //           width,
+  //           height,
+  //           // rotate: '180',
+  //           img: src
+  //         }
+  //       });
+  //     }
+  //   });
+  // },
+  // 注册 流量计 的图形
+  registFlowImg: () => {
+    G2.Shape.registShape('point', 'flow', {
+      drawShape: function(cfg, group) {
+        const { x, y } = cfg;
+        const { width, rate, src } = static_img.flow;
+        const height = width / rate;
+
+        return group.addShape('image', { // 由于开始的点设置了透明度，所以会显示连接线
+          attrs: {
+            x: x - width/2,
+            y: y - height/2,
+            width,
+            height,
+            // rotate: '180',
+            img: src
+          }
+        });
+      }
+    });
+  },
+  registFlowImgVertical: () => {
+    G2.Shape.registShape('point', 'flow_vertical', {
+      drawShape: function(cfg, group) {
+        const { x, y } = cfg;
+        const { width, rate, src } = static_img.flow;
+        const height = width / rate;
+
+        return group.addShape('image', { // 由于开始的点设置了透明度，所以会显示连接线
+          attrs: {
+            x: x - 3.3*width,
+            y: y + height/2,
+            width,
+            height,
+            rotate: '-90',
+            img: src
+          }
+        });
+      }
+    });
+  },
+  all: () => {
+    registImg.registStationImg();
+    registImg.registSwitchImg();
+    registImg.registSwitchImg(true);
+    registImg.registSwitchImgVertical();
+    registImg.registFlowImgVertical();
+    registImg.registFlowImg();
+  }
+};
+
+
+/**
+ * @name 注册 管道 path
+ * x, y 为图形中心坐标
+ */
+const registPath = {
+  // x,y 起点; x2
+  addShape(group, panLine, { x, y, x2, y2, y3 }) {
+
+    let point = [
+      {type: 'L', x: x2, y: y2},
+      {type: 'L', x: x2, y: y3},
+    ];
+
+    if (y) {
+      point = [
+        {type: 'M', x: x, y: y},
+        {type: 'L', x: x, y: y2},
+      ].concat(point);
+    } else {
+      point.unshift({type: 'M', x: x, y: y2})
     }
-  });
+
+    return group.addShape('path', { // 由于开始的点设置了透明度，所以会显示连接线
+      attrs: {
+        path: pan_line.combinPoint(point),
+        ...panLine
+      }
+    });
+  },
+  // 注册 station path small green
+  stationPathSmallGreen() {
+    G2.Shape.registShape('point', 'station_path_sg', {
+      drawShape: function(cfg, group) {
+        const { x, y } = cfg;
+        const y2 = y+17;
+        const x2 = x-48;
+        const y3 = y+30;
+
+        return registPath.addShape(group, pan_line.smallGreen, { x, y, x2, y2, y3 })
+      }
+    });
+  },
+  stationPath() {
+    G2.Shape.registShape('point', 'station_path', {
+      drawShape: function(cfg, group) {
+        const { x, y } = cfg;
+        const x2 = x-62;
+        const y2 = y+14;
+        const y3 = y+53;
+
+        return registPath.addShape(group, pan_line.normal, { x, y, x2, y2, y3 })
+      }
+    });
+  },
+  all() {
+    this.stationPathSmallGreen();
+    this.stationPath();
+  }
 };
 
 /**
- * @name 注册 开关 的图形
- * x, y 为图形中心坐标
- * @params small { Boolean }
- */
-const registSwitchImg = (small) => {
-
-  G2.Shape.registShape('point', small ? 'switch-small' : 'switch', {
-    drawShape: function(cfg, group) {
-      const { x, y } = cfg;
-      let { width, rate, src } = img.switch;
-
-      width = small ? width / 2 : width;
-
-      const height = width / rate;
-
-      return group.addShape('image', { // 由于开始的点设置了透明度，所以会显示连接线
-        attrs: {
-          x: x - width/2,
-          y: y - height/2,
-          width,
-          height,
-          // rotate: '180',
-          img: src
-        }
-      });
-    }
-  });
-};
-/**
- * @name 注册 开关 的图形 —— 垂直方向
+ * @name 注册 管道 path
  * x, y 为图形中心坐标
  */
-const registSwitchImgVertical = () => {
-  G2.Shape.registShape('point', 'switch-vertical', {
-    drawShape: function(cfg, group) {
-      const { x, y } = cfg;
-      const { width, rate, src } = img.switch;
-      const height = width / rate;
-
-      return group.addShape('image', { // 由于开始的点设置了透明度，所以会显示连接线
-        attrs: {
-          x: x - width,
-          y: y + height,
-          width,
-          height,
-          rotate: '-90',
-          img: src
-        }
-      });
-    }
-  });
+const textConfig = {
+  // fontFamily: 'Hiragino Sans GB',
+  fontSize: 14,
+  textAlign: 'right',
+  textBaseline: 'top',
+  fill: 'black',
+  // stroke: 'blue'
 };
 
-/**
- * @name 注册 开关 黑色 的图形
- * x, y 为图形中心坐标
- */
-const registSwitchBlackImg = () => {
-  G2.Shape.registShape('point', 'switch_black', {
-    drawShape: function(cfg, group) {
-      const { x, y } = cfg;
-      const { width, rate, src } = img.switch_black;
-      const height = width / rate;
-
-      return group.addShape('image', { // 由于开始的点设置了透明度，所以会显示连接线
-        attrs: {
-          x: x - width/2,
-          y: y - height/2,
-          width,
-          height,
-          // rotate: '180',
-          img: src
-        }
-      });
-    }
-  });
-};
-/**
- * @name 注册 流量计 的图形
- * x, y 为图形中心坐标
- */
-const registFlowImg = () => {
-  G2.Shape.registShape('point', 'flow', {
-    drawShape: function(cfg, group) {
-      const { x, y } = cfg;
-      const { width, rate, src } = img.flow;
-      const height = width / rate;
-
-      return group.addShape('image', { // 由于开始的点设置了透明度，所以会显示连接线
-        attrs: {
-          x: x - width/2,
-          y: y - height/2,
-          width,
-          height,
-          // rotate: '180',
-          img: src
-        }
-      });
-    }
-  });
+const unicodeText = {
+  template: '\u2103',
+  m3: 'm\u00B3',
 };
 
-const drawChart = (dataObj) => {
+const registText = {
+  flowContent() {
+    G2.Shape.registShape('point', 'flow_content', {
+      drawShape: function(cfg, group) {
+        const { x, y } = cfg;
+        // debugger;
+        const distanceY = 20;
+        const x2 = x + 4;
+        const x3 = x - 30;
+        const y2 = y + 65;
+        const y3 = y2 + distanceY;
+        const y4 = y3 + distanceY;
+        const y5 = y4 + distanceY;
+        const y6 = y5 + distanceY;
+
+        group.addShape('text', { // 由于开始的点设置了透明度，所以会显示连接线
+          attrs: {
+            x: x2,
+            y: y2,
+            text: '坨五站接收',
+            ...textConfig,
+          }
+        });
+        // 温度
+        group.addShape('text', { // 由于开始的点设置了透明度，所以会显示连接线
+          attrs: {
+            x: x3,
+            y: y3,
+            text: '0',
+            ...textConfig,
+            fill: 'blue',
+          }
+        });
+        group.addShape('text', { // 由于开始的点设置了透明度，所以会显示连接线
+          attrs: {
+            x: x2,
+            y: y3,
+            text: unicodeText.template,
+            ...textConfig,
+          }
+        });
+        // 压力
+        group.addShape('text', { // 由于开始的点设置了透明度，所以会显示连接线
+          attrs: {
+            x: x3,
+            y: y4,
+            text: '0',
+            ...textConfig,
+            fill: 'blue',
+          }
+        });
+        group.addShape('text', { // 由于开始的点设置了透明度，所以会显示连接线
+          attrs: {
+            x: x2,
+            y: y4,
+            text: 'KPa',
+            ...textConfig,
+          }
+        });
+        // 瞬时流量
+        group.addShape('text', { // 由于开始的点设置了透明度，所以会显示连接线
+          attrs: {
+            x: x3,
+            y: y5,
+            text: '0',
+            ...textConfig,
+            fill: 'blue',
+          }
+        });
+        group.addShape('text', { // 由于开始的点设置了透明度，所以会显示连接线
+          attrs: {
+            x: x2,
+            y: y5,
+            text: `${unicodeText.m3}/h`,
+            ...textConfig,
+          }
+        });
+        // 流量
+        group.addShape('text', { // 由于开始的点设置了透明度，所以会显示连接线
+          attrs: {
+            x: x3,
+            y: y6,
+            text: '0',
+            ...textConfig,
+            fill: 'blue',
+          }
+        });
+        group.addShape('text', { // 由于开始的点设置了透明度，所以会显示连接线
+          attrs: {
+            x: x2,
+            y: y6,
+            text: unicodeText.m3,
+            ...textConfig,
+          }
+        });
+      }
+    });
+  },
+};
+
+// 站 公共部分
+const draCommon = {
+
+  getStation: (x, y) => {
+    const y2 = y+5;
+
+    return [
+      {name: '',type: 'station_path_sg',x, y: y+5},
+      {name: '',type: 'station_path',x, y},
+      {name: '',type: 'station',x, y},
+      {name: '',type: 'switch_small',x: x-4,y: y+8},
+      {name: '',type: 'switch_vertical',x: x-6,y: y+4},
+    ]
+  },
+
+  getThreeSwitchFlow: (x, y) => {
+    return [
+      {name: '',type: 'switch_vertical',x, y: y+3},
+      {name: '',type: 'flow_vertical',x, y: y+8},
+      {name: '',type: 'switch_vertical',x, y: y+13},
+    ]
+  }
+};
+
+// 所有 站  绘画方法
+const drawStation = {
+  center: (data) => {
+    const getStation = (x, y) => {
+      const y2 = y+10;
+      const x2 = x+6;
+
+      return [
+        {name: '',type: 'station_path_right',x, y},
+        {name: '',type: 'station_path_right2',x, y},
+        ...draCommon.getStation(x, y),
+        ...draCommon.getThreeSwitchFlow(x2, y2),
+        {name: '',type: 'switch_vertical',x: x2+4, y: y2+11},
+        {name: 'my text',type: 'flow_content',x, y},
+      ]
+    };
+
+    registImg.all();
+    registPath.all();
+    registText.flowContent();
+
+    // 右1 管道
+    G2.Shape.registShape('point', 'station_path_right', {
+      drawShape: function(cfg, group) {
+        const { x, y } = cfg;
+        const x2 = x+49;
+        const y2 = y-66;
+        const y3 = y+160;
+
+        return registPath.addShape(group, pan_line.normal, { x, y, x2, y2, y3 })
+      }
+    });
+    // 右2 管道
+    G2.Shape.registShape('point', 'station_path_right2', {
+      drawShape: function(cfg, group) {
+        let { x, y } = cfg;
+
+        x = x+52;
+
+        const x2 = x+34.5;
+        const y2 = y+60;
+        const y3 = y+160;
+
+        return registPath.addShape(group, pan_line.normal, { x, x2, y2, y3 })
+      }
+    });
+
+    return [
+      ...getStation(10, 20),
+      ...getStation(30, 20),
+      ...getStation(50, 20),
+      ...getStation(70, 20),
+      ...getStation(90, 20),
+    ];
+  }
+};
+
+const drawChart = (dataArr) => {
   // debugger;
 
-  registStationImg();
-  registSwitchImg();
-  registSwitchImg(true);
-  registSwitchImgVertical();
-  registFlowImg();
-
-  function combine(Command, x, y) {
-    return Command + ' ' + x + ' ' + y;
-  }
-  // 自定义condition 的图形
-  G2.Shape.registShape('point', 'condition', {
-    drawShape: function(cfg, group) {
-      var x = cfg.x;
-      var y = cfg.y;
-      var width = 50;
-      var height = 50;
-      var path = '';
-      path += combine('M', x, y - height / 2);
-      path += combine('L', x - width / 2, y);
-      path += combine('L', x, y + height / 2);
-      path += combine('L', x + width / 2, y);
-      path += 'z';
-      var shape = group.addShape('path', {
-        attrs: {
-          path: path,
-          fill: '#fff',
-          stroke: 'black' // 可以直接设置颜色 cfg.color，也可以使用映射
-        }
-      });
-      return shape;
-    }
-  });
-  var nodes = [// 节点信息：类别、ID，位置 x,y
-    {name: '',type: 'station',x: 10,y: 20},
-    {name: '',type: 'switch-small',x: 6,y: 27},
-    {name: '',type: 'switch-vertical',x: 5,y: 25},
-    {name: '',type: 'flow',x: 20,y: 25},
-    {name: '',type: 'station',x: 30,y: 20},
-    {name: '',type: 'station',x: 50,y: 20},
-    {name: '',type: 'station',x: 70,y: 20},
-    {name: '',type: 'station',x: 90,y: 20},
-  ];
-  // var edges = [
-  //   {source: '0', target: '1'},
-  //   {source: '1', target: '2'},
-  //   {source: '2', target: '3'},
-  //   {source: '3', target: '4.1'},
-  //   {source: '3', target: '4.2'},
-  //   {source: '4.1', target: '5'},
-  //   {source: '4.2', target: '5'},
-  //   {source: '5', target: '6'}
-  // ];
-  var Stat = G2.Stat;
+  var nodes = drawStation.center(dataArr);
+  // var Stat = G2.Stat;
   var chart = new G2.Chart({
     id: CHART_ID,
-    width: chartWidth || (chartWidth = document.getElementById(CHART_ID).offsetWidth) || 800,
+    // width: chartWidth || (chartWidth = document.getElementById(CHART_ID).offsetWidth) || 800,
+    width: chartWidth,
     height: 500,
     plotCfg: {
       margin: [0,0]
@@ -244,17 +487,6 @@ const drawChart = (dataObj) => {
     '..x': {min: 0,max:100},
     '..y': {min: 0,max:100}
   };
-  // 首先绘制 edges，点要在边的上面
-  // 创建单独的视图
-  // var edgeView = chart.createView();
-  // edgeView.source(edges, defs);
-  // edgeView.coord().reflect(); // 从上到下
-  // edgeView.axis(false);
-  // edgeView.tooltip(false);
-  // // Stat.link 方法会生成 ..x, ..y的字段类型，数值范围是 0-1
-  // edgeView.edge()
-  //   .position(Stat.link('source*target',nodes))
-  //   .color('#ccc');
   // 创建节点视图
   var nodeView = chart.createView();
   nodeView.coord().reflect(); // 从上到下
@@ -264,17 +496,11 @@ const drawChart = (dataObj) => {
     .shape('type', function(val) {
       return val;
     })
-    .label('name', {
-      offset: 0,
-      labelEmit: true
-    })
-    .tooltip('name');
+    // .legend(false);
 
-  // 添加辅助图片
-  // nodeView.guide().image([50, 10], [55, 15], {
-  //   src: img.station, // 图片路径
-  //   // width: 1405, // 宽度，可以不设置，如果设置了end，此属性无效
-  //   // height: 1841 // 高度，可以不设置，如果设置了end，此属性无效
+  // .label('name', {
+  //   offset: 0,
+  //   labelEmit: true
   // });
 
   chart.render();
@@ -287,8 +513,11 @@ function FlowChart(props) {
   // const { location, dispatch } = props;
   const { flowData, loading, init } = props.pageData;
 
-  loading || (init && drawChart(flowData.data));
-  // loading || flowData.data && drawChart(flowData.data);
+  try {
+    loading || Array.isArray(flowData.data) && drawChart(flowData.data);
+  } catch (e) {
+    // alert(e.Message);
+  }
 
   return (
     <div>
