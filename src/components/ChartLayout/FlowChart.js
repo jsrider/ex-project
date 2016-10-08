@@ -698,7 +698,7 @@ drawStation[stationObj.tuoyizhan] = {
       ...drawCommon.getThreeSwitchFlow(10, y3-5),
       ...drawCommon.getThreeSwitchFlow(30, y3),
       ...drawCommon.getThreeSwitchFlow(70, y3),
-      {type: 'pots', x: 90, y: y1 + 4.6},
+      {type: 'pots', x: 95, y: y1 + 4.6},
     ])
   },
   staticViewPipeline() {
@@ -792,7 +792,7 @@ drawStation[stationObj.tuoyizhan] = {
     resArr.push(...getStation(10, 20));
 
     return resArr.concat([
-      {type: 'pots_path', x: 90, y: 38},
+      {type: 'pots_path', x: 95, y: 38},
       {type: 'pots_path_right', x: 50, y: 63},
       {type: 'pots_path_left', x: 25, y: 63},
     ])
@@ -829,6 +829,209 @@ drawStation[stationObj.tuoyizhan] = {
 
     return resArr
   },
+  flowView({ data, params }) {
+    return [];
+    const { stationTitle, keyArr } = params || {};
+    const resArr = [];
+
+    // 底1 管道 流动
+    G2.Shape.registShape('point', 'station_path_bottom_flow', {
+      drawShape: function(cfg, group) {
+        let { x, y } = cfg;
+
+        x = x+15;
+
+        let x2 = new Date().getTime() % ((CHART_WIDTH - x) * FLOW_SPEED);
+        // console.log(x2)
+
+        if (x2 < x + 50 || x2 > CHART_WIDTH) {
+          x2 = CHART_WIDTH;
+        }
+
+        // const x2 = x+ 850 * percent;
+        const y2 = y+180;
+        // const y3 = y+180;
+
+        return registPath.addArrowLine(group, pan_line.flowArrow, { x1: x, y1: y2, x2, y2 })
+      }
+    });
+
+    return resArr.concat([
+      {type: 'station_path_bottom_flow', x: 10, y: 20},
+      {type: 'station_path_bottom_flow', x: 10, y: 56},
+    ])
+  }
+};
+
+drawStation[stationObj.tuoerzhan] = {
+  staticView() {
+    let resArr = [];
+    const [x1, x2, x3, x4, x5] = [21, 37, 55, 63, 78];
+    const [y1, y2] = [30, 75];
+
+    const switchDataXY = [
+      {x: x5, y: y1},
+      {x: x1, y: y2},
+      {x: x2, y: y2},
+      {x: x4, y: y2},
+      {x: x5, y: y2},
+    ];
+
+    const getStation = (x, y) => {
+
+      return [
+        ...drawCommon.getStation(x, y),
+      ]
+    };
+
+    registImg.all();
+    registImg.registPotImg();
+
+    resArr.push(...getStation(10, 20));
+
+    for (let el of switchDataXY) {
+      resArr = resArr.concat([...drawCommon.getThreeSwitchFlow(el.x, el.y)])
+    }
+
+    return resArr.concat([
+      {type: 'pot', x: x3, y: y2 + 1.6},
+    ])
+  },
+  dataView({ data, params }) {
+    const { stationTitle, keyArr } = params || {};
+
+    const getStation = (x, y, idx) => {
+      registText.flowContent({dataObj: data[idx], title: stationTitle[idx], keyArr, idx});
+
+      return drawCommon.getTextBySwitch(`flow_content${idx}`, x, y)
+    };
+
+    let resArr = [];
+    const [x1, x2, x3, x4, x5] = [21, 37, 55, 63, 78];
+    const [y1, y2] = [30, 75];
+
+    const switchDataXY = [
+      {x: x5, y: y1},
+      {x: x1, y: y2},
+      {x: x2, y: y2},
+      {x: x4, y: y2},
+      {x: x5, y: y2},
+    ];
+
+    // 数据文字
+    for (let el of switchDataXY) {
+      resArr = resArr.concat([...drawCommon.getThreeSwitchFlow(el.x, el.y)])
+    }
+
+    if (Array.isArray(stationTitle)) {
+      for (let i = 0; i < stationTitle.length; i++) {
+        registText.flowContent({dataObj: data[i], title: stationTitle[i], keyArr, idx: i});
+
+        resArr.push(getStation(switchDataXY[i].x, switchDataXY[i].y, i))
+      }
+    }
+
+    return resArr
+  },
+  staticViewPipeline() {
+    const resArr = [];
+
+    const getStation = (x, y) => {
+
+      return [
+        {type: 'station_path_right', x, y},
+        {type: 'station_path_right2', x, y},
+      ]
+    };
+
+    registPath.all();
+
+    // 上1 管道
+    G2.Shape.registShape('point', 'station_path_right', {
+      drawShape: function (cfg, group) {
+        const {x, y} = cfg;
+        const x2 = x + 59;
+        const y2 = y - 66;
+        const y3 = y + 55;
+        const x3 = x2 + 700;
+
+        const point = [
+          {type: 'M', x: x, y: y},
+          {type: 'L', x: x, y: y2},
+          {type: 'L', x: x2, y: y2},
+          {type: 'L', x: x2, y: y3},
+          {type: 'L', x: x3, y: y3},
+        ];
+
+        return registPath.addShape(group, pan_line.normal, point)
+      }
+    });
+
+    // 上2 管道
+    G2.Shape.registShape('point', 'station_path_right2', {
+      drawShape: function (cfg, group) {
+        const {x, y} = cfg;
+        const x2 = x + 59;
+        const y2 = y + 280;
+        const x3 = x2 + 700;
+
+        const point = [
+          {type: 'M', x: x2, y: y},
+          {type: 'L', x: x2, y: y2},
+          {type: 'L', x: x3, y: y2},
+        ];
+
+        return registPath.addShape(group, pan_line.normal, point)
+      }
+    });
+    // 罐子 管道 左
+    // G2.Shape.registShape('point', 'pots_path_left', {
+    //   drawShape: function (cfg, group) {
+    //     const {x, y} = cfg;
+    //
+    //     const x2 = x - 100;
+    //     const y2 = y + 170;
+    //     const x3 = x - 380;
+    //
+    //     const point = [
+    //       {type: 'M', x: x, y: y},
+    //       {type: 'L', x: x2, y: y},
+    //       {type: 'L', x: x2, y: y2},
+    //       {type: 'L', x: x3, y: y2},
+    //     ];
+    //
+    //     return registPath.addShape(group, pan_line.normal, point)
+    //   }
+    // });
+    // // 罐子 管道 右
+    // G2.Shape.registShape('point', 'pots_path_right', {
+    //   drawShape: function (cfg, group) {
+    //     const {x, y} = cfg;
+    //
+    //     const x2 = x + 100;
+    //     const y2 = y + 170;
+    //     const x3 = x + 340;
+    //
+    //     const point = [
+    //       {type: 'M', x: x, y: y},
+    //       {type: 'L', x: x2, y: y},
+    //       {type: 'L', x: x2, y: y2},
+    //       {type: 'L', x: x3, y: y2},
+    //     ];
+    //
+    //     return registPath.addShape(group, pan_line.normal, point)
+    //   }
+    // });
+
+    resArr.push(...getStation(10, 20));
+
+    return resArr
+    //   .concat([
+    //   {type: 'pots_path_left', x: 55, y: 63},
+    //   {type: 'pots_path_right', x: 55, y: 63},
+    // ])
+  },
+
   flowView({ data, params }) {
     return [];
     const { stationTitle, keyArr } = params || {};
@@ -962,8 +1165,8 @@ function FlowChart(props) {
     })
   };
 
-  window.clearInterval(getDataTimer);
-  getDataTimer = window.setInterval(getDataInterval, GET_DATA_TIMER);
+  // window.clearInterval(getDataTimer);
+  // getDataTimer = window.setInterval(getDataInterval, GET_DATA_TIMER);
 
   try {
     loading || Array.isArray(flowData.data) && drawChart(flowData, station);
