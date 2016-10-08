@@ -53,7 +53,8 @@ const pan_line = {
   normal: {
     lineWidth: 7,
     lineJoin: 'round',
-    stroke: '#ffc000'
+    stroke: '#ffc000',
+    // lineDash: [50, 2]
   },
   combinPoint: (point) => {
     return point.map(el => combine(el.type, el.x, el.y)).join('')
@@ -72,7 +73,7 @@ const registImg = {
         const { width, rate, src } = static_img.station;
         const height = width / rate;
 
-        return group.addShape('image', { // 由于开始的点设置了透明度，所以会显示连接线
+        return group.addShape('image', {
           attrs: {
             x: x - width/2,
             y: y - height/2,
@@ -96,7 +97,7 @@ const registImg = {
 
         const height = width / rate;
 
-        return group.addShape('image', { // 由于开始的点设置了透明度，所以会显示连接线
+        return group.addShape('image', {
           attrs: {
             x: x - width/2,
             y: y - height/2 -2,
@@ -116,7 +117,7 @@ const registImg = {
         const { width, rate, src } = static_img.switch;
         const height = width / rate;
 
-        return group.addShape('image', { // 由于开始的点设置了透明度，所以会显示连接线
+        return group.addShape('image', {
           attrs: {
             x: x - width,
             y: y + height,
@@ -137,7 +138,7 @@ const registImg = {
   //       const { width, rate, src } = static_img.switch_black;
   //       const height = width / rate;
   //
-  //       return group.addShape('image', { // 由于开始的点设置了透明度，所以会显示连接线
+  //       return group.addShape('image', {
   //         attrs: {
   //           x: x - width/2,
   //           y: y - height/2,
@@ -158,7 +159,7 @@ const registImg = {
         const { width, rate, src } = static_img.flow;
         const height = width / rate;
 
-        return group.addShape('image', { // 由于开始的点设置了透明度，所以会显示连接线
+        return group.addShape('image', {
           attrs: {
             x: x - width/2,
             y: y - height/2,
@@ -178,7 +179,7 @@ const registImg = {
         const { width, rate, src } = static_img.flow;
         const height = width / rate;
 
-        return group.addShape('image', { // 由于开始的点设置了透明度，所以会显示连接线
+        return group.addShape('image', {
           attrs: {
             x: x - 3.3*width,
             y: y + height/2,
@@ -212,8 +213,14 @@ const registPath = {
 
     let point = [
       {type: 'L', x: x2, y: y2},
-      {type: 'L', x: x2, y: y3},
     ];
+
+    if (y3) {
+      point.push(
+        {type: 'L', x: x2, y: y3},
+      )
+    }
+
 
     if (y) {
       point = [
@@ -224,7 +231,7 @@ const registPath = {
       point.unshift({type: 'M', x: x, y: y2})
     }
 
-    return group.addShape('path', { // 由于开始的点设置了透明度，所以会显示连接线
+    return group.addShape('path', {
       attrs: {
         path: pan_line.combinPoint(point),
         ...panLine
@@ -281,149 +288,126 @@ const unicodeText = {
 };
 
 const registText = {
-  flowContent() {
-    G2.Shape.registShape('point', 'flow_content', {
+  flowContent({ dataObj, title, idx, keyArr }) {
+    G2.Shape.registShape('point', `flow_content${idx}`, {
       drawShape: function(cfg, group) {
         const { x, y } = cfg;
         // debugger;
         const distanceY = 20;
         const x2 = x + 4;
-        const x3 = x - 30;
+        const x3 = x - 20;
         const y2 = y + 65;
-        const y3 = y2 + distanceY;
-        const y4 = y3 + distanceY;
-        const y5 = y4 + distanceY;
-        const y6 = y5 + distanceY;
+        // const y3 = y2 + distanceY;
+        // const y4 = y3 + distanceY;
+        // const y5 = y4 + distanceY;
+        // const y6 = y5 + distanceY;
 
-        group.addShape('text', { // 由于开始的点设置了透明度，所以会显示连接线
+        const flagArr = [unicodeText.template, 'KPa', `${unicodeText.m3}/h`, unicodeText.m3];
+
+        keyArr.map((el, i) => {
+          let targetY = y2 + distanceY * (i+1);
+
+          group.addShape('text', {
+            attrs: {
+              x: x3,
+              y: targetY,
+              text: dataObj[el] || '0',
+              ...textConfig,
+              fill: 'blue',
+            }
+          });
+
+          // 单位
+          group.addShape('text', {
+            attrs: {
+              x: x2-15,
+              y: targetY,
+              text: flagArr[i],
+              ...textConfig,
+              textAlign: 'left',
+            }
+          });
+        });
+
+        group.addShape('text', {
           attrs: {
             x: x2,
             y: y2,
-            text: '坨五站接收',
+            text: title,
             ...textConfig,
           }
         });
-        // 温度
-        group.addShape('text', { // 由于开始的点设置了透明度，所以会显示连接线
-          attrs: {
-            x: x3,
-            y: y3,
-            text: '0',
-            ...textConfig,
-            fill: 'blue',
-          }
-        });
-        group.addShape('text', { // 由于开始的点设置了透明度，所以会显示连接线
-          attrs: {
-            x: x2,
-            y: y3,
-            text: unicodeText.template,
-            ...textConfig,
-          }
-        });
-        // 压力
-        group.addShape('text', { // 由于开始的点设置了透明度，所以会显示连接线
-          attrs: {
-            x: x3,
-            y: y4,
-            text: '0',
-            ...textConfig,
-            fill: 'blue',
-          }
-        });
-        group.addShape('text', { // 由于开始的点设置了透明度，所以会显示连接线
-          attrs: {
-            x: x2,
-            y: y4,
-            text: 'KPa',
-            ...textConfig,
-          }
-        });
-        // 瞬时流量
-        group.addShape('text', { // 由于开始的点设置了透明度，所以会显示连接线
-          attrs: {
-            x: x3,
-            y: y5,
-            text: '0',
-            ...textConfig,
-            fill: 'blue',
-          }
-        });
-        group.addShape('text', { // 由于开始的点设置了透明度，所以会显示连接线
-          attrs: {
-            x: x2,
-            y: y5,
-            text: `${unicodeText.m3}/h`,
-            ...textConfig,
-          }
-        });
-        // 流量
-        group.addShape('text', { // 由于开始的点设置了透明度，所以会显示连接线
-          attrs: {
-            x: x3,
-            y: y6,
-            text: '0',
-            ...textConfig,
-            fill: 'blue',
-          }
-        });
-        group.addShape('text', { // 由于开始的点设置了透明度，所以会显示连接线
-          attrs: {
-            x: x2,
-            y: y6,
-            text: unicodeText.m3,
-            ...textConfig,
-          }
-        });
+
+        // group.addShape('rect', {
+        //   attrs: {
+        //     x: x2 - 60,
+        //     y: y2 - 5,
+        //     width: 80,
+        //     height: 110,
+        //     stroke: 'blue'
+        //   }
+        // });
       }
     });
   },
 };
 
 // 站 公共部分
-const draCommon = {
+const drawCommon = {
 
   getStation: (x, y) => {
     const y2 = y+5;
 
     return [
-      {name: '',type: 'station_path_sg',x, y: y+5},
-      {name: '',type: 'station_path',x, y},
-      {name: '',type: 'station',x, y},
-      {name: '',type: 'switch_small',x: x-4,y: y+8},
-      {name: '',type: 'switch_vertical',x: x-6,y: y+4},
+      {type: 'station_path_sg',x, y: y+5},
+      {type: 'station_path',x, y},
+      {type: 'station',x, y},
+      {type: 'switch_small',x: x-4,y: y+8},
+      {type: 'switch_vertical',x: x-6,y: y+4},
+    ]
+  },
+
+  getThreeSwitch: (x, y) => {
+    return [
+      {type: 'switch',x, y},
+      {type: 'flow',x: x+5, y: y-1.5},
+      {type: 'switch',x: x+10, y},
     ]
   },
 
   getThreeSwitchFlow: (x, y) => {
     return [
-      {name: '',type: 'switch_vertical',x, y: y+3},
-      {name: '',type: 'flow_vertical',x, y: y+8},
-      {name: '',type: 'switch_vertical',x, y: y+13},
+      {type: 'switch_vertical',x, y: y+3},
+      {type: 'flow_vertical',x, y: y+8},
+      {type: 'switch_vertical',x, y: y+13},
     ]
   }
 };
 
 // 所有 站  绘画方法
 const drawStation = {
-  center: (data) => {
-    const getStation = (x, y) => {
-      const y2 = y+10;
+  center: ({ data, params }) => {
+    const { stationTitle, keyArr } = params || {};
+    const resArr = [];
+
+    const getStation = (x, y, idx) => {
+      const y2 = y+13;
       const x2 = x+6;
 
+      registText.flowContent({dataObj: data[idx], title: stationTitle[idx], keyArr, idx});
+
       return [
-        {name: '',type: 'station_path_right',x, y},
-        {name: '',type: 'station_path_right2',x, y},
-        ...draCommon.getStation(x, y),
-        ...draCommon.getThreeSwitchFlow(x2, y2),
-        {name: '',type: 'switch_vertical',x: x2+4, y: y2+11},
-        {name: 'my text',type: 'flow_content',x, y},
+        {type: 'station_path_right',x, y},
+        {type: 'station_path_right2',x, y},
+        ...drawCommon.getStation(x, y),
+        ...drawCommon.getThreeSwitchFlow(x2, y2),
+        {type: 'switch_vertical',x: x2+4, y: y2+8},
+        {type: `flow_content${idx}`,x, y},
       ]
     };
 
     registImg.all();
     registPath.all();
-    registText.flowContent();
 
     // 右1 管道
     G2.Shape.registShape('point', 'station_path_right', {
@@ -431,7 +415,7 @@ const drawStation = {
         const { x, y } = cfg;
         const x2 = x+49;
         const y2 = y-66;
-        const y3 = y+160;
+        const y3 = y+180;
 
         return registPath.addShape(group, pan_line.normal, { x, y, x2, y2, y3 })
       }
@@ -445,26 +429,81 @@ const drawStation = {
 
         const x2 = x+34.5;
         const y2 = y+60;
-        const y3 = y+160;
+        const y3 = y+180;
+
+        return registPath.addShape(group, pan_line.normal, { x, x2, y2, y3 })
+      }
+    });
+    // 底1 管道
+    G2.Shape.registShape('point', 'station_path_bottom', {
+      drawShape: function(cfg, group) {
+        let { x, y } = cfg;
+
+        x = x+15;
+
+        const x2 = x+850;
+        const y2 = y+180;
+        // const y3 = y+180;
+
+        return registPath.addShape(group, pan_line.normal, { x, x2, y2 })
+      }
+    });
+    // 底2 管道
+    G2.Shape.registShape('point', 'station_path_bottom2', {
+      drawShape: function(cfg, group) {
+        let { x, y } = cfg;
+
+        x = x+15;
+
+        const x2 = x+850;
+        const y2 = y+360;
+        // const y3 = y+180;
+
+        return registPath.addShape(group, pan_line.normal, { x, x2, y2 })
+      }
+    });
+    // 底2 底1 之间 管道
+    G2.Shape.registShape('point', 'station_path_bottom1_2', {
+      drawShape: function(cfg, group) {
+        let { x, y } = cfg;
+
+        x = 500;
+
+        const x2 = x;
+        const y2 = y+180;
+        const y3 = y+360;
+        // const y3 = y+180;
 
         return registPath.addShape(group, pan_line.normal, { x, x2, y2, y3 })
       }
     });
 
-    return [
-      ...getStation(10, 20),
-      ...getStation(30, 20),
-      ...getStation(50, 20),
-      ...getStation(70, 20),
-      ...getStation(90, 20),
-    ];
+    // 底部文字
+    registText.flowContent({dataObj: data[5], title: stationTitle[5], keyArr, idx: 5});
+    registText.flowContent({dataObj: data[6], title: stationTitle[6], keyArr, idx: 6});
+
+    if (Array.isArray(stationTitle)) {
+      for (let i = 0; i < stationTitle.length; i++) {
+        resArr.push(...getStation(10 + i*20, 20, i))
+      }
+    }
+
+    return resArr.concat([
+      {type: 'station_path_bottom', x: 10, y: 20},
+      {type: 'station_path_bottom2', x: 10, y: 20},
+      {type: 'station_path_bottom1_2', x: 10, y: 20},
+      ...drawCommon.getThreeSwitch(25, 91),
+      ...drawCommon.getThreeSwitch(75, 91),
+      {type: 'flow_content5',x: 33, y: 50},
+      {type: 'flow_content6',x: 83, y: 50},
+    ])
   }
 };
 
-const drawChart = (dataArr) => {
+const drawChart = (data) => {
   // debugger;
 
-  var nodes = drawStation.center(dataArr);
+  var nodes = drawStation.center(data);
   // var Stat = G2.Stat;
   var chart = new G2.Chart({
     id: CHART_ID,
@@ -495,15 +534,11 @@ const drawChart = (dataArr) => {
   nodeView.point().position('x*y').color('steelblue')
     .shape('type', function(val) {
       return val;
-    })
-    // .legend(false);
+    });
 
-  // .label('name', {
-  //   offset: 0,
-  //   labelEmit: true
-  // });
-
-  chart.render();
+  chart
+    .tooltip(false)
+    .render();
 
 };
 
@@ -511,10 +546,10 @@ function FlowChart(props) {
   console.log('FlowChartLayout', props);
 
   // const { location, dispatch } = props;
-  const { flowData, loading, init } = props.pageData;
+  const { flowData, loading } = props.pageData;
 
   try {
-    loading || Array.isArray(flowData.data) && drawChart(flowData.data);
+    loading || Array.isArray(flowData.data) && drawChart(flowData);
   } catch (e) {
     // alert(e.Message);
   }
