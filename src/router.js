@@ -1,6 +1,5 @@
 import React, { PropTypes } from 'react';
 import { Router, Route, IndexRoute, Link } from 'dva/router';
-import IndexPage from './routes/IndexPage';
 import ChartPage from './routes/ChartPage';
 import Alert from './routes/Alert';
 import FlowChart from './routes/FlowChart';

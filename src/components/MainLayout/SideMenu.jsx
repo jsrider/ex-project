@@ -10,7 +10,7 @@ function SideMenu({ dispatch, menuKey, sideMenu, pageData }) {
 
   const { title, menuItems } = sideMenu;
 
-  const current = menuKey;
+  const current = menuKey || 'liucheng-tu';
   const defaultOpenKeys = ['menu'];
 
   // const handleClick = (e) => {

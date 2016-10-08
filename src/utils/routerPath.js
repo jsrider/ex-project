@@ -2,6 +2,7 @@ export const shishiChart = 'shishi-chart';
 export const riChart = 'ri-chart';
 export const yueChart = 'yue-chart';
 export const lishiChart = 'lishi-chart';
+export const index = '/';
 
 export const shishiTable = 'shishi-table';
 export const riTable = 'ri-table';

@@ -18,8 +18,8 @@ export default {
   subscriptions: {
     setup({ dispatch, history }) {
       history.listen(({ pathname, search }) => {
-        if (pathname.includes(routerPath.liuchengTu)) {
-          const station = search.match(/station=([^\/]*)/i)[1];
+        if (pathname.includes(routerPath.liuchengTu) || pathname === routerPath.index) {
+          const station = search && search.match(/station=([^\/]*)/i)[1] || 'zhongxinzhan';
 
           // pageParams.addQueryParams({station});
 

@@ -56,6 +56,16 @@ const pan_line = {
     stroke: '#ffc000',
     // lineDash: [50, 2]
   },
+
+  // 流动箭头
+  flowArrow: {
+    lineDash: [20,10],
+    // lineWidth: 2,
+    arrow: true,
+    lineJoin: 'round',
+    // stroke: '#0ce60c'
+    stroke: 'r (0.5, 0.5, 1) 0:#ffaa00 0.5:#00ffff 1:#11aacc'
+  },
   combinPoint: (point) => {
     return point.map(el => combine(el.type, el.x, el.y)).join('')
   }
@@ -238,6 +248,30 @@ const registPath = {
       }
     });
   },
+
+  addArrowLine(group, panLine, { x1, y1, x2, y2 }) {
+    const middleX = (x2 - x1) / 2;
+
+    group.addShape('line', {
+      attrs: {
+        x1: x1,
+        y1: y1,
+        x2: x2,
+        y2: y2,
+        ...panLine
+      }
+    });
+
+    // group.addShape('line', {
+    //   attrs: {
+    //     x1: middleX,
+    //     y1: y1,
+    //     x2: x2,
+    //     y2: y2,
+    //     ...panLine
+    //   }
+    // });
+  },
   // 注册 station path small green
   stationPathSmallGreen() {
     G2.Shape.registShape('point', 'station_path_sg', {
@@ -386,128 +420,165 @@ const drawCommon = {
 
 // 所有 站  绘画方法
 const drawStation = {
-  center: ({ data, params }) => {
-    const { stationTitle, keyArr } = params || {};
-    const resArr = [];
+  center: {
+    staticView() {
+      const resArr = [];
 
-    const getStation = (x, y, idx) => {
-      const y2 = y+13;
-      const x2 = x+6;
+      const getStation = (x, y) => {
+        const y2 = y + 13;
+        const x2 = x + 6;
 
-      registText.flowContent({dataObj: data[idx], title: stationTitle[idx], keyArr, idx});
+        return [
+          {type: 'station_path_right', x, y},
+          {type: 'station_path_right2', x, y},
+          ...drawCommon.getStation(x, y),
+          ...drawCommon.getThreeSwitchFlow(x2, y2),
+          {type: 'switch_vertical', x: x2 + 4, y: y2 + 8},
+        ]
+      };
 
-      return [
-        {type: 'station_path_right',x, y},
-        {type: 'station_path_right2',x, y},
-        ...drawCommon.getStation(x, y),
-        ...drawCommon.getThreeSwitchFlow(x2, y2),
-        {type: 'switch_vertical',x: x2+4, y: y2+8},
-        {type: `flow_content${idx}`,x, y},
-      ]
-    };
+      registImg.all();
+      registPath.all();
 
-    registImg.all();
-    registPath.all();
+      // 右1 管道
+      G2.Shape.registShape('point', 'station_path_right', {
+        drawShape: function (cfg, group) {
+          const {x, y} = cfg;
+          const x2 = x + 49;
+          const y2 = y - 66;
+          const y3 = y + 180;
 
-    // 右1 管道
-    G2.Shape.registShape('point', 'station_path_right', {
-      drawShape: function(cfg, group) {
-        const { x, y } = cfg;
-        const x2 = x+49;
-        const y2 = y-66;
-        const y3 = y+180;
+          return registPath.addShape(group, pan_line.normal, {x, y, x2, y2, y3})
+        }
+      });
+      // 右2 管道
+      G2.Shape.registShape('point', 'station_path_right2', {
+        drawShape: function (cfg, group) {
+          let {x, y} = cfg;
 
-        return registPath.addShape(group, pan_line.normal, { x, y, x2, y2, y3 })
+          x = x + 52;
+
+          const x2 = x + 34.5;
+          const y2 = y + 60;
+          const y3 = y + 180;
+
+          return registPath.addShape(group, pan_line.normal, {x, x2, y2, y3})
+        }
+      });
+      // 底1 管道
+      G2.Shape.registShape('point', 'station_path_bottom', {
+        drawShape: function (cfg, group) {
+          let {x, y} = cfg;
+
+          x = x + 15;
+
+          const x2 = x + 850;
+          const y2 = y + 180;
+          // const y3 = y+180;
+
+          return registPath.addShape(group, pan_line.normal, {x, x2, y2})
+        }
+      });
+      // 底2 底1 之间 管道
+      G2.Shape.registShape('point', 'station_path_bottom1_2', {
+        drawShape: function (cfg, group) {
+          let {x, y} = cfg;
+
+          x = 500;
+
+          const x2 = x;
+          const y2 = y + 180;
+          const y3 = y + 360;
+          // const y3 = y+180;
+
+          return registPath.addShape(group, pan_line.normal, {x, x2, y2, y3})
+        }
+      });
+
+
+      for (let i = 0; i < 5; i++) {
+        resArr.push(...getStation(10 + i * 20, 20, i))
       }
-    });
-    // 右2 管道
-    G2.Shape.registShape('point', 'station_path_right2', {
-      drawShape: function(cfg, group) {
-        let { x, y } = cfg;
 
-        x = x+52;
+      return resArr.concat([
+        {type: 'station_path_bottom', x: 10, y: 20},
+        {type: 'station_path_bottom', x: 10, y: 56},
+        {type: 'station_path_bottom1_2', x: 10, y: 20},
+        ...drawCommon.getThreeSwitch(25, 91),
+        ...drawCommon.getThreeSwitch(75, 91),
+      ])
+    },
+    dataView({ data, params }) {
+      const { stationTitle, keyArr } = params || {};
+      const resArr = [];
 
-        const x2 = x+34.5;
-        const y2 = y+60;
-        const y3 = y+180;
+      const getStation = (x, y, idx) => {
+        registText.flowContent({dataObj: data[idx], title: stationTitle[idx], keyArr, idx});
 
-        return registPath.addShape(group, pan_line.normal, { x, x2, y2, y3 })
+        return {type: `flow_content${idx}`,x, y}
+      };
+
+      // 底部文字
+      registText.flowContent({dataObj: data[5], title: stationTitle[5], keyArr, idx: 5});
+      registText.flowContent({dataObj: data[6], title: stationTitle[6], keyArr, idx: 6});
+
+      if (Array.isArray(stationTitle)) {
+        for (let i = 0; i < stationTitle.length; i++) {
+          resArr.push(getStation(10 + i*20, 20, i))
+        }
       }
-    });
-    // 底1 管道
-    G2.Shape.registShape('point', 'station_path_bottom', {
-      drawShape: function(cfg, group) {
-        let { x, y } = cfg;
 
-        x = x+15;
+      return resArr.concat([
+        {type: 'flow_content5',x: 33, y: 50},
+        {type: 'flow_content6',x: 83, y: 50},
+      ])
+    },
+    flowView({ data, params }) {
+      const { stationTitle, keyArr } = params || {};
+      const resArr = [];
 
-        const x2 = x+850;
-        const y2 = y+180;
-        // const y3 = y+180;
+      // 底1 管道 流动
+      G2.Shape.registShape('point', 'station_path_bottom_flow', {
+        drawShape: function(cfg, group) {
+          let { x, y } = cfg;
+          const speed = 2;
 
-        return registPath.addShape(group, pan_line.normal, { x, x2, y2 })
-      }
-    });
-    // 底2 管道
-    G2.Shape.registShape('point', 'station_path_bottom2', {
-      drawShape: function(cfg, group) {
-        let { x, y } = cfg;
+          x = x+15;
 
-        x = x+15;
+          let x2 = new Date().getTime() % ((chartWidth - x) * speed);
+          // console.log(x2)
 
-        const x2 = x+850;
-        const y2 = y+360;
-        // const y3 = y+180;
+          if (x2 < x + 50 || x2 > chartWidth) {
+            x2 = chartWidth;
+          }
 
-        return registPath.addShape(group, pan_line.normal, { x, x2, y2 })
-      }
-    });
-    // 底2 底1 之间 管道
-    G2.Shape.registShape('point', 'station_path_bottom1_2', {
-      drawShape: function(cfg, group) {
-        let { x, y } = cfg;
+          // const x2 = x+ 850 * percent;
+          const y2 = y+180;
+          // const y3 = y+180;
 
-        x = 500;
+          return registPath.addArrowLine(group, pan_line.flowArrow, { x1: x, y1: y2, x2, y2 })
+        }
+      });
 
-        const x2 = x;
-        const y2 = y+180;
-        const y3 = y+360;
-        // const y3 = y+180;
-
-        return registPath.addShape(group, pan_line.normal, { x, x2, y2, y3 })
-      }
-    });
-
-    // 底部文字
-    registText.flowContent({dataObj: data[5], title: stationTitle[5], keyArr, idx: 5});
-    registText.flowContent({dataObj: data[6], title: stationTitle[6], keyArr, idx: 6});
-
-    if (Array.isArray(stationTitle)) {
-      for (let i = 0; i < stationTitle.length; i++) {
-        resArr.push(...getStation(10 + i*20, 20, i))
-      }
+      return resArr.concat([
+        {type: 'station_path_bottom_flow', x: 10, y: 20},
+        {type: 'station_path_bottom_flow', x: 10, y: 56},
+      ])
     }
-
-    return resArr.concat([
-      {type: 'station_path_bottom', x: 10, y: 20},
-      {type: 'station_path_bottom2', x: 10, y: 20},
-      {type: 'station_path_bottom1_2', x: 10, y: 20},
-      ...drawCommon.getThreeSwitch(25, 91),
-      ...drawCommon.getThreeSwitch(75, 91),
-      {type: 'flow_content5',x: 33, y: 50},
-      {type: 'flow_content6',x: 83, y: 50},
-    ])
-  }
+  },
 };
 
 const drawChart = (data) => {
   // debugger;
 
-  var nodes = drawStation.center(data);
+  const nodes = drawStation.center.staticView();
+  const nodesData = drawStation.center.dataView(data);
+  const nodesFlow = drawStation.center.flowView(data);
   // var Stat = G2.Stat;
   var chart = new G2.Chart({
     id: CHART_ID,
     // width: chartWidth || (chartWidth = document.getElementById(CHART_ID).offsetWidth) || 800,
+    animate: false,
     width: chartWidth,
     height: 500,
     plotCfg: {
@@ -520,18 +591,50 @@ const drawChart = (data) => {
   });
   // x,y的范围是0-100
   // 因为边的统计函数生成的数据范围默认是0-1，所以需要设置范围是 0-100 统一起点、边的数据范围
-  var defs = {
+  const defs = {
     x: {min: 0,max:100},
     y: {min: 0, max:100},
     '..x': {min: 0,max:100},
     '..y': {min: 0,max:100}
   };
   // 创建节点视图
-  var nodeView = chart.createView();
+  const nodeView = chart.createView();
   nodeView.coord().reflect(); // 从上到下
   nodeView.axis(false);
   nodeView.source(nodes, defs);
-  nodeView.point().position('x*y').color('steelblue')
+  nodeView.point().position('x*y')
+    .shape('type', function(val) {
+      return val;
+    });
+
+  // 创建管道 流动 视图
+  const flowView = chart.createView();
+
+  flowView.coord().reflect();
+  flowView.axis(false);
+  flowView.source(nodesFlow, defs);
+  flowView.point().position('x*y')
+    .shape('type', function(val) {
+      return val;
+    });
+
+  const drawFlow = () => {
+    flowView.changeData(drawStation.center.flowView(data));
+    // window.requestAnimationFrame(drawFlow);
+    // window.setTimeout(drawFlow, 100);
+  };
+  window.setInterval(drawFlow, 100);
+
+  //
+  // drawFlow();
+
+  // 创建可变数据视图
+  const dataView = chart.createView();
+
+  dataView.coord().reflect();
+  dataView.axis(false);
+  dataView.source(nodesData, defs);
+  dataView.point().position('x*y')
     .shape('type', function(val) {
       return val;
     });
