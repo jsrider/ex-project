@@ -3,10 +3,14 @@ import { Select, Button, Form } from 'antd';
 import { Link } from 'dva/router';
 import styles from './index.less';
 import G2 from 'g2';
+import * as stationObj from '../../utils/stations';
+import * as routerPath from '../../utils/routerPath';
 
-let chartCvs = {};
-let chartWidth = 932;
+const CHART_WIDTH = 932; // chart 图表总宽度
+const GET_DATA_TIMER = 5000; // 获取数据时间间隔
+const FLOW_SPEED = 2; // 管道水流速度
 const CHART_ID = 'flowChart';
+
 const static_img = {
   station: {
     src: require('../../img/station.png'),
@@ -59,8 +63,8 @@ const pan_line = {
 
   // 流动箭头
   flowArrow: {
-    lineDash: [20,10],
-    // lineWidth: 2,
+    // lineDash: [20,10],
+    lineWidth: 3,
     arrow: true,
     lineJoin: 'round',
     // stroke: '#0ce60c'
@@ -72,10 +76,11 @@ const pan_line = {
 };
 
 /**
- * @name 注册 图形
+ * @name 注册图形
  * x, y 为图形中心坐标
  */
 const registImg = {
+  // 站
   registStationImg: () => {
     G2.Shape.registShape('point', 'station', {
       drawShape: function(cfg, group) {
@@ -90,6 +95,45 @@ const registImg = {
             width: width,
             height,
             // rotate: '180',
+            img: src
+          }
+        });
+      }
+    });
+  },
+  // 罐子
+  registPotImg: () => {
+    G2.Shape.registShape('point', 'pot', {
+      drawShape: function(cfg, group) {
+        const { x, y } = cfg;
+        const { width, rate, src } = static_img.pot;
+        const height = width / rate;
+
+        return group.addShape('image', {
+          attrs: {
+            x: x - width/2,
+            y: y - height/2,
+            width: width,
+            height,
+            img: src
+          }
+        });
+      }
+    });
+  },
+  registPotsImg: () => {
+    G2.Shape.registShape('point', 'pots', {
+      drawShape: function(cfg, group) {
+        const { x, y } = cfg;
+        const { width, rate, src } = static_img.pots;
+        const height = width / rate;
+
+        return group.addShape('image', {
+          attrs: {
+            x: x - width/2,
+            y: y - height/2,
+            width: width,
+            height,
             img: src
           }
         });
@@ -162,7 +206,7 @@ const registImg = {
   //   });
   // },
   // 注册 流量计 的图形
-  registFlowImg: () => {
+  registFlowImg() {
     G2.Shape.registShape('point', 'flow', {
       drawShape: function(cfg, group) {
         const { x, y } = cfg;
@@ -182,7 +226,7 @@ const registImg = {
       }
     });
   },
-  registFlowImgVertical: () => {
+  registFlowImgVertical() {
     G2.Shape.registShape('point', 'flow_vertical', {
       drawShape: function(cfg, group) {
         const { x, y } = cfg;
@@ -202,7 +246,7 @@ const registImg = {
       }
     });
   },
-  all: () => {
+  all() {
     registImg.registStationImg();
     registImg.registSwitchImg();
     registImg.registSwitchImg(true);
@@ -219,27 +263,27 @@ const registImg = {
  */
 const registPath = {
   // x,y 起点; x2
-  addShape(group, panLine, { x, y, x2, y2, y3 }) {
+  addShape(group, panLine, point) {
 
-    let point = [
-      {type: 'L', x: x2, y: y2},
-    ];
-
-    if (y3) {
-      point.push(
-        {type: 'L', x: x2, y: y3},
-      )
-    }
-
-
-    if (y) {
-      point = [
-        {type: 'M', x: x, y: y},
-        {type: 'L', x: x, y: y2},
-      ].concat(point);
-    } else {
-      point.unshift({type: 'M', x: x, y: y2})
-    }
+    // let point = [
+    //   {type: 'L', x: x2, y: y2},
+    // ];
+    //
+    // if (y3) {
+    //   point.push(
+    //     {type: 'L', x: x2, y: y3},
+    //   )
+    // }
+    //
+    //
+    // if (y) {
+    //   point = [
+    //     {type: 'M', x: x, y: y},
+    //     {type: 'L', x: x, y: y2},
+    //   ].concat(point);
+    // } else {
+    //   point.unshift({type: 'M', x: x, y: y2})
+    // }
 
     return group.addShape('path', {
       attrs: {
@@ -281,7 +325,14 @@ const registPath = {
         const x2 = x-48;
         const y3 = y+30;
 
-        return registPath.addShape(group, pan_line.smallGreen, { x, y, x2, y2, y3 })
+        const point = [
+          {type: 'M', x: x, y: y},
+          {type: 'L', x: x, y: y2},
+          {type: 'L', x: x2, y: y2},
+          {type: 'L', x: x2, y: y3},
+        ];
+
+        return registPath.addShape(group, pan_line.smallGreen, point)
       }
     });
   },
@@ -293,7 +344,14 @@ const registPath = {
         const y2 = y+14;
         const y3 = y+53;
 
-        return registPath.addShape(group, pan_line.normal, { x, y, x2, y2, y3 })
+        const point = [
+          {type: 'M', x: x, y: y},
+          {type: 'L', x: x, y: y2},
+          {type: 'L', x: x2, y: y2},
+          {type: 'L', x: x2, y: y3},
+        ];
+
+        return registPath.addShape(group, pan_line.normal, point)
       }
     });
   },
@@ -389,7 +447,7 @@ const registText = {
 // 站 公共部分
 const drawCommon = {
 
-  getStation: (x, y) => {
+  getStation(x, y) {
     const y2 = y+5;
 
     return [
@@ -401,7 +459,11 @@ const drawCommon = {
     ]
   },
 
-  getThreeSwitch: (x, y) => {
+  getTextBySwitch(type, x, y) {
+    return {type, x: x+7, y: y-38}
+  },
+
+  getThreeSwitchFlow(x, y) {
     return [
       {type: 'switch',x, y},
       {type: 'flow',x: x+5, y: y-1.5},
@@ -409,7 +471,7 @@ const drawCommon = {
     ]
   },
 
-  getThreeSwitchFlow: (x, y) => {
+  getThreeSwitchFlowVertical(x, y) {
     return [
       {type: 'switch_vertical',x, y: y+3},
       {type: 'flow_vertical',x, y: y+8},
@@ -419,167 +481,426 @@ const drawCommon = {
 };
 
 // 所有 站  绘画方法
-const drawStation = {
-  center: {
-    staticView() {
-      const resArr = [];
+const drawStation = {};
 
-      const getStation = (x, y) => {
-        const y2 = y + 13;
-        const x2 = x + 6;
+drawStation[stationObj.zhongxinzhan] = {
+  staticView() {
+    const resArr = [];
 
-        return [
-          {type: 'station_path_right', x, y},
-          {type: 'station_path_right2', x, y},
-          ...drawCommon.getStation(x, y),
-          ...drawCommon.getThreeSwitchFlow(x2, y2),
-          {type: 'switch_vertical', x: x2 + 4, y: y2 + 8},
-        ]
-      };
+    const getStation = (x, y) => {
+      const y2 = y + 13;
+      const x2 = x + 6;
 
-      registImg.all();
-      registPath.all();
+      return [
+        ...drawCommon.getStation(x, y),
+        ...drawCommon.getThreeSwitchFlowVertical(x2, y2),
+        {type: 'switch_vertical', x: x2 + 4, y: y2 + 8},
+      ]
+    };
 
-      // 右1 管道
-      G2.Shape.registShape('point', 'station_path_right', {
-        drawShape: function (cfg, group) {
-          const {x, y} = cfg;
-          const x2 = x + 49;
-          const y2 = y - 66;
-          const y3 = y + 180;
+    registImg.all();
 
-          return registPath.addShape(group, pan_line.normal, {x, y, x2, y2, y3})
-        }
-      });
-      // 右2 管道
-      G2.Shape.registShape('point', 'station_path_right2', {
-        drawShape: function (cfg, group) {
-          let {x, y} = cfg;
-
-          x = x + 52;
-
-          const x2 = x + 34.5;
-          const y2 = y + 60;
-          const y3 = y + 180;
-
-          return registPath.addShape(group, pan_line.normal, {x, x2, y2, y3})
-        }
-      });
-      // 底1 管道
-      G2.Shape.registShape('point', 'station_path_bottom', {
-        drawShape: function (cfg, group) {
-          let {x, y} = cfg;
-
-          x = x + 15;
-
-          const x2 = x + 850;
-          const y2 = y + 180;
-          // const y3 = y+180;
-
-          return registPath.addShape(group, pan_line.normal, {x, x2, y2})
-        }
-      });
-      // 底2 底1 之间 管道
-      G2.Shape.registShape('point', 'station_path_bottom1_2', {
-        drawShape: function (cfg, group) {
-          let {x, y} = cfg;
-
-          x = 500;
-
-          const x2 = x;
-          const y2 = y + 180;
-          const y3 = y + 360;
-          // const y3 = y+180;
-
-          return registPath.addShape(group, pan_line.normal, {x, x2, y2, y3})
-        }
-      });
-
-
-      for (let i = 0; i < 5; i++) {
-        resArr.push(...getStation(10 + i * 20, 20, i))
-      }
-
-      return resArr.concat([
-        {type: 'station_path_bottom', x: 10, y: 20},
-        {type: 'station_path_bottom', x: 10, y: 56},
-        {type: 'station_path_bottom1_2', x: 10, y: 20},
-        ...drawCommon.getThreeSwitch(25, 91),
-        ...drawCommon.getThreeSwitch(75, 91),
-      ])
-    },
-    dataView({ data, params }) {
-      const { stationTitle, keyArr } = params || {};
-      const resArr = [];
-
-      const getStation = (x, y, idx) => {
-        registText.flowContent({dataObj: data[idx], title: stationTitle[idx], keyArr, idx});
-
-        return {type: `flow_content${idx}`,x, y}
-      };
-
-      // 底部文字
-      registText.flowContent({dataObj: data[5], title: stationTitle[5], keyArr, idx: 5});
-      registText.flowContent({dataObj: data[6], title: stationTitle[6], keyArr, idx: 6});
-
-      if (Array.isArray(stationTitle)) {
-        for (let i = 0; i < stationTitle.length; i++) {
-          resArr.push(getStation(10 + i*20, 20, i))
-        }
-      }
-
-      return resArr.concat([
-        {type: 'flow_content5',x: 33, y: 50},
-        {type: 'flow_content6',x: 83, y: 50},
-      ])
-    },
-    flowView({ data, params }) {
-      const { stationTitle, keyArr } = params || {};
-      const resArr = [];
-
-      // 底1 管道 流动
-      G2.Shape.registShape('point', 'station_path_bottom_flow', {
-        drawShape: function(cfg, group) {
-          let { x, y } = cfg;
-          const speed = 2;
-
-          x = x+15;
-
-          let x2 = new Date().getTime() % ((chartWidth - x) * speed);
-          // console.log(x2)
-
-          if (x2 < x + 50 || x2 > chartWidth) {
-            x2 = chartWidth;
-          }
-
-          // const x2 = x+ 850 * percent;
-          const y2 = y+180;
-          // const y3 = y+180;
-
-          return registPath.addArrowLine(group, pan_line.flowArrow, { x1: x, y1: y2, x2, y2 })
-        }
-      });
-
-      return resArr.concat([
-        {type: 'station_path_bottom_flow', x: 10, y: 20},
-        {type: 'station_path_bottom_flow', x: 10, y: 56},
-      ])
+    for (let i = 0; i < 5; i++) {
+      resArr.push(...getStation(10 + i * 20, 20))
     }
+
+    return resArr.concat([
+      ...drawCommon.getThreeSwitchFlow(25, 91),
+      ...drawCommon.getThreeSwitchFlow(75, 91),
+    ])
   },
+  staticViewPipeline() {
+    const resArr = [];
+
+    const getStation = (x, y) => {
+
+      return [
+        {type: 'station_path_right', x, y},
+        {type: 'station_path_right2', x, y},
+      ]
+    };
+
+    registPath.all();
+
+    // 右1 管道
+    G2.Shape.registShape('point', 'station_path_right', {
+      drawShape: function (cfg, group) {
+        const {x, y} = cfg;
+        const x2 = x + 49;
+        const y2 = y - 66;
+        const y3 = y + 180;
+
+        const point = [
+          {type: 'M', x: x, y: y},
+          {type: 'L', x: x, y: y2},
+          {type: 'L', x: x2, y: y2},
+          {type: 'L', x: x2, y: y3},
+        ];
+
+        return registPath.addShape(group, pan_line.normal, point)
+      }
+    });
+    // 右2 管道
+    G2.Shape.registShape('point', 'station_path_right2', {
+      drawShape: function (cfg, group) {
+        let {x, y} = cfg;
+
+        x = x + 52;
+
+        const x2 = x + 34.5;
+        const y2 = y + 60;
+        const y3 = y + 180;
+
+        const point = [
+          {type: 'M', x: x, y: y2},
+          {type: 'L', x: x2, y: y2},
+          {type: 'L', x: x2, y: y3},
+        ];
+
+        return registPath.addShape(group, pan_line.normal, point)
+      }
+    });
+    // 底1 管道
+    G2.Shape.registShape('point', 'station_path_bottom', {
+      drawShape: function (cfg, group) {
+        let {x, y} = cfg;
+
+        x = x + 15;
+
+        const x2 = x + 850;
+        const y2 = y + 180;
+        // const y3 = y+180;
+
+        const point = [
+          {type: 'M', x: x, y: y2},
+          {type: 'L', x: x2, y: y2},
+        ];
+
+        return registPath.addShape(group, pan_line.normal, point)
+      }
+    });
+    // 底2 底1 之间 管道
+    G2.Shape.registShape('point', 'station_path_bottom1_2', {
+      drawShape: function (cfg, group) {
+        let {x, y} = cfg;
+
+        x = 500;
+
+        const x2 = x;
+        const y2 = y + 180;
+        const y3 = y + 360;
+        // const y3 = y+180;
+
+        const point = [
+          {type: 'M', x: x, y: y2},
+          {type: 'L', x: x2, y: y2},
+          {type: 'L', x: x2, y: y3},
+        ];
+
+        return registPath.addShape(group, pan_line.normal, point)
+      }
+    });
+
+
+    for (let i = 0; i < 5; i++) {
+      resArr.push(...getStation(10 + i * 20, 20, i))
+    }
+
+    return resArr.concat([
+      {type: 'station_path_bottom', x: 10, y: 20},
+      {type: 'station_path_bottom', x: 10, y: 56},
+      {type: 'station_path_bottom1_2', x: 10, y: 20},
+    ])
+  },
+  dataView({ data, params }) {
+    const { stationTitle, keyArr } = params || {};
+    const resArr = [];
+
+    const getStation = (x, y, idx) => {
+      registText.flowContent({dataObj: data[idx], title: stationTitle[idx], keyArr, idx});
+
+      return {type: `flow_content${idx}`,x, y}
+    };
+
+    // 底部文字
+    registText.flowContent({dataObj: data[5], title: stationTitle[5], keyArr, idx: 5});
+    registText.flowContent({dataObj: data[6], title: stationTitle[6], keyArr, idx: 6});
+
+    if (Array.isArray(stationTitle)) {
+      for (let i = 0; i < stationTitle.length; i++) {
+        resArr.push(getStation(10 + i*20, 20, i))
+      }
+    }
+
+    return resArr.concat([
+      {type: 'flow_content5',x: 33, y: 50},
+      {type: 'flow_content6',x: 83, y: 50},
+    ])
+  },
+  flowView({ data, params }) {
+    const { stationTitle, keyArr } = params || {};
+    const resArr = [];
+
+    // 底1 管道 流动
+    G2.Shape.registShape('point', 'station_path_bottom_flow', {
+      drawShape: function(cfg, group) {
+        let { x, y } = cfg;
+
+        x = x+15;
+
+        let x2 = new Date().getTime() % ((CHART_WIDTH - x) * FLOW_SPEED);
+        // console.log(x2)
+
+        if (x2 < x + 50 || x2 > CHART_WIDTH) {
+          x2 = CHART_WIDTH;
+        }
+
+        // const x2 = x+ 850 * percent;
+        const y2 = y+180;
+        // const y3 = y+180;
+
+        return registPath.addArrowLine(group, pan_line.flowArrow, { x1: x, y1: y2, x2, y2 })
+      }
+    });
+
+    return resArr.concat([
+      {type: 'station_path_bottom_flow', x: 10, y: 20},
+      {type: 'station_path_bottom_flow', x: 10, y: 56},
+    ])
+  }
 };
 
-const drawChart = (data) => {
-  // debugger;
+drawStation[stationObj.tuoyizhan] = {
+  staticView() {
+    const resArr = [];
+    const y1 = 30;
+    const y2 = 62;
+    const y3 = 96;
 
-  const nodes = drawStation.center.staticView();
-  const nodesData = drawStation.center.dataView(data);
-  const nodesFlow = drawStation.center.flowView(data);
+    const getStation = (x, y) => {
+
+      return [
+        ...drawCommon.getStation(x, y),
+      ]
+    };
+
+    registImg.all();
+    registImg.registPotsImg();
+
+    resArr.push(...getStation(10, 20));
+
+    return resArr.concat([
+      ...drawCommon.getThreeSwitchFlow(30, y1),
+      ...drawCommon.getThreeSwitchFlow(70, y1),
+      ...drawCommon.getThreeSwitchFlow(10, y2),
+      ...drawCommon.getThreeSwitchFlow(30, y2),
+      ...drawCommon.getThreeSwitchFlow(70, y2),
+      ...drawCommon.getThreeSwitchFlow(10, y3-5),
+      ...drawCommon.getThreeSwitchFlow(30, y3),
+      ...drawCommon.getThreeSwitchFlow(70, y3),
+      {type: 'pots', x: 90, y: y1 + 4.6},
+    ])
+  },
+  staticViewPipeline() {
+    const resArr = [];
+
+    const getStation = (x, y) => {
+
+      return [
+        {type: 'station_path_right', x, y},
+      ]
+    };
+
+    registPath.all();
+
+    // 上1 管道
+    G2.Shape.registShape('point', 'station_path_right', {
+      drawShape: function (cfg, group) {
+        const {x, y} = cfg;
+        const x2 = x + 59;
+        const y2 = y - 66;
+        const y3 = y + 55;
+        const x3 = x2 + 700;
+
+        const point = [
+          {type: 'M', x: x, y: y},
+          {type: 'L', x: x, y: y2},
+          {type: 'L', x: x2, y: y2},
+          {type: 'L', x: x2, y: y3},
+          {type: 'L', x: x3, y: y3},
+        ];
+
+        return registPath.addShape(group, pan_line.normal, point)
+      }
+    });
+    // 罐子 管道
+    G2.Shape.registShape('point', 'pots_path', {
+      drawShape: function (cfg, group) {
+        const {x, y} = cfg;
+        const x2 = x - 60;
+        const y2 = y + 125;
+        const x3 = x2 - 740;
+
+        const point = [
+          {type: 'M', x: x, y: y},
+          {type: 'L', x: x2, y: y},
+          {type: 'L', x: x2, y: y2},
+          {type: 'L', x: x3, y: y2},
+        ];
+
+        return registPath.addShape(group, pan_line.normal, point)
+      }
+    });
+    // 罐子 管道 右
+    G2.Shape.registShape('point', 'pots_path_right', {
+      drawShape: function (cfg, group) {
+        const {x, y} = cfg;
+
+        const x2 = x + 325;
+        const y2 = y + 170;
+        const x3 = x - 240;
+
+        const point = [
+          {type: 'M', x: x, y: y},
+          {type: 'L', x: x, y: y2},
+          {type: 'L', x: x2, y: y2},
+          {type: 'L', x: x3, y: y2},
+        ];
+
+        return registPath.addShape(group, pan_line.normal, point)
+      }
+    });
+    // 罐子 管道 左
+    G2.Shape.registShape('point', 'pots_path_left', {
+      drawShape: function (cfg, group) {
+        const {x, y} = cfg;
+
+        const xDis = 190;
+        const y2 = y + 145;
+        const x3 = x - xDis;
+
+        const point = [
+          {type: 'M', x: x, y: y},
+          {type: 'L', x: x, y: y2},
+          {type: 'L', x: x3, y: y2},
+        ];
+
+        return registPath.addShape(group, pan_line.normal, point)
+      }
+    });
+
+    resArr.push(...getStation(10, 20));
+
+    return resArr.concat([
+      {type: 'pots_path', x: 90, y: 38},
+      {type: 'pots_path_right', x: 50, y: 63},
+      {type: 'pots_path_left', x: 25, y: 63},
+    ])
+  },
+  dataView({ data, params }) {
+    const { stationTitle, keyArr } = params || {};
+    const resArr = [];
+
+    const getStation = (x, y, idx) => {
+      registText.flowContent({dataObj: data[idx], title: stationTitle[idx], keyArr, idx});
+
+      return drawCommon.getTextBySwitch(`flow_content${idx}`, x, y)
+    };
+
+    const dataXY = [
+      {x: 30, y: 30},
+      {x: 70, y: 30},
+      {x: 10, y: 62},
+      {x: 30, y: 62},
+      {x: 70, y: 62},
+      {x: 10, y: 91},
+      {x: 30, y: 96},
+      {x: 70, y: 96},
+    ];
+
+    // 数据文字
+    if (Array.isArray(stationTitle)) {
+      for (let i = 0; i < stationTitle.length; i++) {
+        registText.flowContent({dataObj: data[i], title: stationTitle[i], keyArr, idx: i});
+
+        resArr.push(getStation(dataXY[i].x, dataXY[i].y, i))
+      }
+    }
+
+    return resArr
+  },
+  flowView({ data, params }) {
+    return [];
+    const { stationTitle, keyArr } = params || {};
+    const resArr = [];
+
+    // 底1 管道 流动
+    G2.Shape.registShape('point', 'station_path_bottom_flow', {
+      drawShape: function(cfg, group) {
+        let { x, y } = cfg;
+
+        x = x+15;
+
+        let x2 = new Date().getTime() % ((CHART_WIDTH - x) * FLOW_SPEED);
+        // console.log(x2)
+
+        if (x2 < x + 50 || x2 > CHART_WIDTH) {
+          x2 = CHART_WIDTH;
+        }
+
+        // const x2 = x+ 850 * percent;
+        const y2 = y+180;
+        // const y3 = y+180;
+
+        return registPath.addArrowLine(group, pan_line.flowArrow, { x1: x, y1: y2, x2, y2 })
+      }
+    });
+
+    return resArr.concat([
+      {type: 'station_path_bottom_flow', x: 10, y: 20},
+      {type: 'station_path_bottom_flow', x: 10, y: 56},
+    ])
+  }
+};
+
+
+// x,y的范围是0-100
+// 因为边的统计函数生成的数据范围默认是0-1，所以需要设置范围是 0-100 统一起点、边的数据范围
+const defs = {
+  x: {min: 0,max:100},
+  y: {min: 0, max:100},
+  '..x': {min: 0,max:100},
+  '..y': {min: 0,max:100}
+};
+
+const initView = (nodeView, nodes) => {
+  nodeView.coord().reflect(); // 从上到下
+  nodeView.axis(false);
+  nodeView.source(nodes, defs);
+  nodeView.point().position('x*y')
+    .shape('type', function(val) {
+      return val;
+    });
+};
+
+let drawFlowTimer = null;
+let getDataTimer = null;
+let chart = null;
+
+const drawChart = (data, station) => {
+  // debugger;
+  chart && chart.destroy();
+
+  const nodes = drawStation[station].staticView();
+  const nodesPipeline = drawStation[station].staticViewPipeline();
+  const nodesData = drawStation[station].dataView(data);
+  const nodesFlow = drawStation[station].flowView(data);
   // var Stat = G2.Stat;
-  var chart = new G2.Chart({
+  chart = new G2.Chart({
     id: CHART_ID,
-    // width: chartWidth || (chartWidth = document.getElementById(CHART_ID).offsetWidth) || 800,
+    // width: CHART_WIDTH || (CHART_WIDTH = document.getElementById(CHART_ID).offsetWidth) || 800,
     animate: false,
-    width: chartWidth,
+    width: CHART_WIDTH,
     height: 500,
     plotCfg: {
       margin: [0,0]
@@ -589,55 +910,34 @@ const drawChart = (data) => {
   chart.tooltip({
     title: null
   });
-  // x,y的范围是0-100
-  // 因为边的统计函数生成的数据范围默认是0-1，所以需要设置范围是 0-100 统一起点、边的数据范围
-  const defs = {
-    x: {min: 0,max:100},
-    y: {min: 0, max:100},
-    '..x': {min: 0,max:100},
-    '..y': {min: 0,max:100}
-  };
-  // 创建节点视图
-  const nodeView = chart.createView();
-  nodeView.coord().reflect(); // 从上到下
-  nodeView.axis(false);
-  nodeView.source(nodes, defs);
-  nodeView.point().position('x*y')
-    .shape('type', function(val) {
-      return val;
-    });
+  // 创建 管道 视图
+  const pipelineView = chart.createView();
 
   // 创建管道 流动 视图
   const flowView = chart.createView();
 
-  flowView.coord().reflect();
-  flowView.axis(false);
-  flowView.source(nodesFlow, defs);
-  flowView.point().position('x*y')
-    .shape('type', function(val) {
-      return val;
-    });
-
-  const drawFlow = () => {
-    flowView.changeData(drawStation.center.flowView(data));
-    // window.requestAnimationFrame(drawFlow);
-    // window.setTimeout(drawFlow, 100);
-  };
-  window.setInterval(drawFlow, 100);
-
-  //
-  // drawFlow();
+  // 创建节点视图
+  const nodeView = chart.createView();
 
   // 创建可变数据视图
   const dataView = chart.createView();
 
-  dataView.coord().reflect();
-  dataView.axis(false);
-  dataView.source(nodesData, defs);
-  dataView.point().position('x*y')
-    .shape('type', function(val) {
-      return val;
-    });
+
+  const drawFlow = () => {
+    flowView.changeData(nodesFlow);
+    // window.requestAnimationFrame(drawFlow);
+    // window.setTimeout(drawFlow, 100);
+  };
+
+  drawFlowTimer && clearInterval(drawFlowTimer);
+
+  drawFlowTimer = window.setInterval(drawFlow, 100);
+
+  initView(pipelineView, nodesPipeline);
+  initView(flowView, nodesFlow);
+  initView(nodeView, nodes);
+  initView(dataView, nodesData);
+  // drawFlow();
 
   chart
     .tooltip(false)
@@ -648,13 +948,27 @@ const drawChart = (data) => {
 function FlowChart(props) {
   console.log('FlowChartLayout', props);
 
-  // const { location, dispatch } = props;
-  const { flowData, loading } = props.pageData;
+  const { dispatch } = props;
+  const { flowData, loading, station } = props.pageData;
+
+  const getDataInterval = () => {
+    if (!window.location.hash.includes(routerPath.liuchengTu)) {
+      return window.clearInterval(getDataTimer);
+    }
+
+    dispatch({
+      type: 'flowChart/queryData',
+      station
+    })
+  };
+
+  window.clearInterval(getDataTimer);
+  getDataTimer = window.setInterval(getDataInterval, GET_DATA_TIMER);
 
   try {
-    loading || Array.isArray(flowData.data) && drawChart(flowData);
+    loading || Array.isArray(flowData.data) && drawChart(flowData, station);
   } catch (e) {
-    // alert(e.Message);
+    console.log('error:', e);
   }
 
   return (

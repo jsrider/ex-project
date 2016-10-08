@@ -25,7 +25,7 @@ const Page = (props) => {
     pageData: flowChart
   };
 
-  console.log('AlertPage', props, mainLayoutProps, flowChartLayoutProps);
+  console.log('FlowChartPage', props, mainLayoutProps, flowChartLayoutProps);
 
   return (
     <MainLayout { ...mainLayoutProps } >
