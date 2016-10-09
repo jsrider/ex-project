@@ -7,6 +7,7 @@ import * as stationObj from '../../utils/stations';
 import * as routerPath from '../../utils/routerPath';
 
 const CHART_WIDTH = 932; // chart 图表总宽度
+const CHART_HEIGHT = 500;
 const GET_DATA_TIMER = 5000; // 获取数据时间间隔
 const FLOW_SPEED = 2; // 管道水流速度
 const CHART_ID = 'flowChart';
@@ -293,28 +294,57 @@ const registPath = {
     });
   },
 
-  addArrowLine(group, panLine, { x1, y1, x2, y2 }) {
-    const middleX = (x2 - x1) / 2;
+  addArrowLine(group, panLine, { x1, y1, x2, y2, type, middleX, middleY, dataArr }) {
+    let distance = 0;
 
-    group.addShape('line', {
-      attrs: {
-        x1: x1,
-        y1: y1,
-        x2: x2,
-        y2: y2,
-        ...panLine
-      }
-    });
+    switch (type) {
+      case 'center':
+        if (middleX) {
+          distance = x2 - x1;
+          x2 = middleX + distance/2;
+          x1 = middleX - distance/2;
+        } else {
+        }
+        if (dataArr[0] > 0) {
+          group.addShape('line', {
+            attrs: {
+              x1: middleX || x1,
+              y1: middleY || y2,
+              x2: x1,
+              y2: y1,
+              ...panLine
+            }
+          });
+        }
 
-    // group.addShape('line', {
-    //   attrs: {
-    //     x1: middleX,
-    //     y1: y1,
-    //     x2: x2,
-    //     y2: y2,
-    //     ...panLine
-    //   }
-    // });
+        if (dataArr[1] > 0) {
+          group.addShape('line', {
+            attrs: {
+              x1: middleX || x1,
+              y1: middleY || y1,
+              x2: x2,
+              y2: y2,
+              ...panLine
+            }
+          });
+        }
+        break;
+
+      default:
+        const needDraw = Array.isArray(dataArr) ?
+          dataArr[0] > 0 :
+          true;
+
+        needDraw && group.addShape('line', {
+          attrs: {
+            x1: x1,
+            y1: y1,
+            x2: x2,
+            y2: y2,
+            ...panLine
+          }
+        });
+    }
   },
   // 注册 station path small green
   stationPathSmallGreen() {
@@ -352,6 +382,44 @@ const registPath = {
         ];
 
         return registPath.addShape(group, pan_line.normal, point)
+      }
+    });
+  },
+
+  // x,y station 的 x,y
+  registStationFlowArrow(dataObj, keyArr, idx) {
+
+    G2.Shape.registShape('point', `station_right_flow${idx}`, {
+      drawShape: function({x, y}, group) {
+
+        const y2 = y - 66;
+        const y3 = y + 180;
+
+        const xFlow = x + 49;
+
+        let yEnd = drawCommon.getFlowWidth({ y: y2, max: y3 });
+
+        // 瞬时流量
+        const dataArr = [drawCommon.getFlowNumByData(dataObj, keyArr)];
+
+        if (dataArr[0] > 0) {
+          // 罐子左下入口流量
+          const [enterX1, enterX2, enterY1, enterY2] = [x-62, x-28, y+53, y+14];
+          let enterXEnd = drawCommon.getFlowWidth({ x: enterX1, max: enterX2 });
+
+          console.log(enterXEnd);
+
+          let pan = { ...pan_line.flowArrow, ...{arrow: false, lineDash: parseInt(enterXEnd) % 2 === 1 ? [5, 5] : [10, 5, 5, 5]} };
+
+          registPath.addArrowLine(group, pan, { x1: enterX1, y1: enterY1, x2: enterX1, y2: enterY2 - 1.5 });
+          registPath.addArrowLine(group, pan_line.flowArrow, { x1: enterX1, y1: enterY2, x2: enterXEnd, y2: enterY2 });
+
+          // 罐子头部出口流量
+          registPath.addArrowLine(group, pan, { x1: x, y1: y, x2: x, y2: y2 });
+          registPath.addArrowLine(group, pan, { x1: x - 1.5, y1: y2, x2: xFlow + 1.5, y2: y2 });
+        }
+
+        return registPath.addArrowLine(group, pan_line.flowArrow, { x1: xFlow, y1: y2, x2: xFlow, y2: yEnd, dataArr })
       }
     });
   },
@@ -448,14 +516,18 @@ const registText = {
 const drawCommon = {
 
   getStation(x, y) {
-    const y2 = y+5;
-
     return [
-      {type: 'station_path_sg',x, y: y+5},
-      {type: 'station_path',x, y},
       {type: 'station',x, y},
       {type: 'switch_small',x: x-4,y: y+8},
       {type: 'switch_vertical',x: x-6,y: y+4},
+    ]
+  },
+
+  getStationPath(x, y) {
+    return [
+      {type: 'station_path_sg',x, y: y+5},
+      {type: 'station_path',x, y},
+      {type: 'station_path_right', x, y},
     ]
   },
 
@@ -477,7 +549,24 @@ const drawCommon = {
       {type: 'flow_vertical',x, y: y+8},
       {type: 'switch_vertical',x, y: y+13},
     ]
-  }
+  },
+
+  // 获取流动箭头 当前时间宽度
+  getFlowWidth({x, y, max}) {
+    const val = x ? x : y;
+
+    const speed = FLOW_SPEED * 1000;
+
+    let res = val + new Date().getTime() % speed / speed * (max - val);
+    // console.log(x2)
+
+    return Math.min(res + 6, max);
+  },
+
+  // 当前数据 瞬时流量 flow字段
+  getFlowNumByData(dataObj, keyArr) {
+    return dataObj[keyArr[2]]
+  },
 };
 
 // 所有 站  绘画方法
@@ -515,7 +604,7 @@ drawStation[stationObj.zhongxinzhan] = {
     const getStation = (x, y) => {
 
       return [
-        {type: 'station_path_right', x, y},
+        ...drawCommon.getStationPath(x, y),
         {type: 'station_path_right2', x, y},
       ]
     };
@@ -584,7 +673,7 @@ drawStation[stationObj.zhongxinzhan] = {
       drawShape: function (cfg, group) {
         let {x, y} = cfg;
 
-        x = 500;
+        x = 515;
 
         const x2 = x;
         const y2 = y + 180;
@@ -641,6 +730,11 @@ drawStation[stationObj.zhongxinzhan] = {
     const { stationTitle, keyArr } = params || {};
     const resArr = [];
 
+    const getStation = (x, y, idx) => {
+
+      return {type: `station_right_flow${idx}`, x, y};
+    };
+
     // 底1 管道 流动
     G2.Shape.registShape('point', 'station_path_bottom_flow', {
       drawShape: function(cfg, group) {
@@ -648,23 +742,25 @@ drawStation[stationObj.zhongxinzhan] = {
 
         x = x+15;
 
-        let x2 = new Date().getTime() % ((CHART_WIDTH - x) * FLOW_SPEED);
-        // console.log(x2)
-
-        if (x2 < x + 50 || x2 > CHART_WIDTH) {
-          x2 = CHART_WIDTH;
-        }
+        let x2 = drawCommon.getFlowWidth({ x, max: CHART_WIDTH });
 
         // const x2 = x+ 850 * percent;
         const y2 = y+180;
         // const y3 = y+180;
+        // 瞬时流量
+        const dataArr = [drawCommon.getFlowNumByData(data[5], keyArr), drawCommon.getFlowNumByData(data[6], keyArr)];
 
-        return registPath.addArrowLine(group, pan_line.flowArrow, { x1: x, y1: y2, x2, y2 })
+        return registPath.addArrowLine(group, pan_line.flowArrow, { x1: x, y1: y2, x2, y2, type: 'center', middleX: 517, dataArr })
       }
     });
 
+    for (let i = 0; i < 5; i++) {
+      registPath.registStationFlowArrow(data[i], keyArr, i);
+
+      resArr.push(getStation(10 + i * 20, 20, i))
+    }
+
     return resArr.concat([
-      {type: 'station_path_bottom_flow', x: 10, y: 20},
       {type: 'station_path_bottom_flow', x: 10, y: 56},
     ])
   }
@@ -707,7 +803,7 @@ drawStation[stationObj.tuoyizhan] = {
     const getStation = (x, y) => {
 
       return [
-        {type: 'station_path_right', x, y},
+        ...drawCommon.getStationPath(x, y),
       ]
     };
 
@@ -739,7 +835,7 @@ drawStation[stationObj.tuoyizhan] = {
         const {x, y} = cfg;
         const x2 = x - 60;
         const y2 = y + 125;
-        const x3 = x2 - 740;
+        const x3 = x2 - 780;
 
         const point = [
           {type: 'M', x: x, y: y},
@@ -939,7 +1035,7 @@ drawStation[stationObj.tuoerzhan] = {
     const getStation = (x, y) => {
 
       return [
-        {type: 'station_path_right', x, y},
+        ...drawCommon.getStationPath(x, y),
         {type: 'station_path_right2', x, y},
       ]
     };
@@ -1104,7 +1200,7 @@ const drawChart = (data, station) => {
     // width: CHART_WIDTH || (CHART_WIDTH = document.getElementById(CHART_ID).offsetWidth) || 800,
     animate: false,
     width: CHART_WIDTH,
-    height: 500,
+    height: CHART_HEIGHT,
     plotCfg: {
       margin: [0,0]
     }
