@@ -89,7 +89,7 @@ class FormLayout extends React.Component {
       return ;
     }
 
-    const { monitor_point, time_interval, time_date, time_month, time_range, station_point, unusual_value, data_info, tolerance_value } = formSelects;
+    const { monitor_point, time_interval, time_date, time_month, time_range, station_point, unusual_value, data_info, tolerance_value, alert_value } = formSelects;
 
     let dateItem = null;
 
@@ -155,6 +155,7 @@ class FormLayout extends React.Component {
           station_point,
           monitor_point,
           unusual_value,
+          alert_value,
         };
         break;
 

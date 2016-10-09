@@ -128,6 +128,10 @@ function SideMenu({ dispatch, menuKey, sideMenu, pageData }) {
           defaultOpenKeys={defaultOpenKeys}
           selectedKeys={[`${current}-${pageData.station}`]}
           mode="inline"
+          style={{
+            height: window.innerHeight - 100,
+            overflow: 'auto'
+          }}
     >
       <SubMenu key="menu" title={<span><Icon type="folder" /><span>{title}</span></span>}>
         {

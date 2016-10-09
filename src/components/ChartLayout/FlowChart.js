@@ -530,24 +530,27 @@ const drawCommon = {
     ]
   },
 
-  getTextBySwitch(type, x, y) {
+  getTextBySwitch(type, x, y, vertical) {
+    if (vertical) {
+      return {type, x: x-7, y: y-11}
+    }
     return {type, x: x+7, y: y-38}
   },
 
-  getThreeSwitchFlow(x, y) {
-    return [
-      {type: 'switch',x, y},
-      {type: 'flow',x: x+5, y: y-1.5},
-      {type: 'switch',x: x+10, y},
-    ]
-  },
-
-  getThreeSwitchFlowVertical(x, y) {
-    return [
-      {type: 'switch_vertical',x, y: y+3},
-      {type: 'flow_vertical',x, y: y+8},
-      {type: 'switch_vertical',x, y: y+13},
-    ]
+  getThreeSwitchFlow(x, y, vertical) {
+    if (vertical) {
+      return [
+        {type: 'switch_vertical',x, y: y+3},
+        {type: 'flow_vertical',x, y: y+8},
+        {type: 'switch_vertical',x, y: y+13},
+      ]
+    } else {
+      return [
+        {type: 'switch',x, y},
+        {type: 'flow',x: x+5, y: y-1.5},
+        {type: 'switch',x: x+10, y},
+      ]
+    }
   },
 
   // 获取流动箭头 当前时间宽度
@@ -581,7 +584,7 @@ drawStation[stationObj.zhongxinzhan] = {
 
       return [
         ...drawCommon.getStation(x, y),
-        ...drawCommon.getThreeSwitchFlowVertical(x2, y2),
+        ...drawCommon.getThreeSwitchFlow(x2, y2, true),
         {type: 'switch_vertical', x: x2 + 4, y: y2 + 8},
       ]
     };
@@ -767,7 +770,7 @@ drawStation[stationObj.zhongxinzhan] = {
 
 drawStation[stationObj.tuoyizhan] = {
   getSwitchData() {
-    const [x1, x2, x3] = [10, 30, 70];
+    const [x1, x2, x3] = [10, 40, 70];
     const [y1, y2, y3, y4] = [30, 62, 91, 96];
 
     return [
@@ -863,9 +866,9 @@ drawStation[stationObj.tuoyizhan] = {
       drawShape: function (cfg, group) {
         const {x, y} = cfg;
 
-        const x2 = x + 325;
+        const x2 = x + 300;
         const y2 = y + 170;
-        const x3 = x - 240;
+        const x3 = x - 300;
 
         const point = [
           {type: 'M', x: x, y: y},
@@ -900,7 +903,7 @@ drawStation[stationObj.tuoyizhan] = {
 
     return resArr.concat([
       {type: 'pots_path', x: 95, y: 38},
-      {type: 'pots_path_right', x: 50, y: 63},
+      {type: 'pots_path_right', x: 60, y: 63},
       {type: 'pots_path_left', x: 25, y: 63},
     ])
   },
@@ -969,11 +972,11 @@ drawStation[stationObj.tuoyizhan] = {
 
 drawStation[stationObj.tuoerzhan] = {
   getSwitchData() {
-    const [x1, x2, x4, x5] = [21, 37, 63, 78];
+    const [x1, x2, x3, x4, x5] = [21, 37, 50, 63, 78];
     const [y1, y2] = [30, 75];
 
     return [
-      {x: x5, y: y1},
+      {x: x3, y: y1},
       {x: x1, y: y2},
       {x: x2, y: y2},
       {x: x4, y: y2},
@@ -1020,10 +1023,6 @@ drawStation[stationObj.tuoerzhan] = {
     const switchDataXY = this.getSwitchData();
 
     // 数据文字
-    for (let el of switchDataXY) {
-      resArr = resArr.concat([...drawCommon.getThreeSwitchFlow(el.x, el.y)])
-    }
-
     if (Array.isArray(stationTitle)) {
       for (let i = 0; i < switchDataXY.length; i++) {
         registText.flowContent({dataObj: data[i], title: stationTitle[i], keyArr, idx: i});
@@ -1169,15 +1168,18 @@ drawStation[stationObj.tuoerzhan] = {
 
 drawStation[stationObj.tuosanzhan] = {
   getSwitchData() {
-    const [x1, x2, x4, x5] = [21, 37, 63, 78];
-    const [y1, y2] = [30, 75];
+    const [x1, x2, x3, x4] = [21, 52, 63, 73];
+    const [y1, y2, y3, y4] = [20, 30, 62, 96];
 
     return [
-      {x: x5, y: y1},
-      {x: x1, y: y2},
-      {x: x2, y: y2},
-      {x: x4, y: y2},
-      {x: x5, y: y2},
+      {x: x1, y: y3, vertical: false},
+      {x: x1, y: y4, vertical: false},
+      {x: x1, y: y2, vertical: false},
+      {x: x2, y: y1 - 13, vertical: true},
+      {x: x4, y: y3, vertical: false},
+      {x: x3, y: y2 + 5, vertical: true},
+      {x: x4, y: y4, vertical: false},
+      {x: 78, y: y1 - 13, vertical: true},
     ];
   },
   staticView() {
@@ -1198,20 +1200,18 @@ drawStation[stationObj.tuosanzhan] = {
     resArr.push(...getStation(10, 20));
 
     for (let el of switchDataXY) {
-      resArr = resArr.concat([...drawCommon.getThreeSwitchFlow(el.x, el.y)])
+      resArr = resArr.concat([...drawCommon.getThreeSwitchFlow(el.x, el.y, el.vertical)])
     }
 
-    return resArr.concat([
-      {type: 'pot', x: 55, y: 76.6},
-    ])
+    return resArr
   },
   dataView({ data, params }) {
     const { stationTitle, keyArr } = params || {};
 
-    const getStation = (x, y, idx) => {
+    const getStation = (x, y, idx, vertical) => {
       registText.flowContent({dataObj: data[idx], title: stationTitle[idx], keyArr, idx});
 
-      return drawCommon.getTextBySwitch(`flow_content${idx}`, x, y)
+      return drawCommon.getTextBySwitch(`flow_content${idx}`, x, y, vertical)
     };
 
     let resArr = [];
@@ -1219,15 +1219,11 @@ drawStation[stationObj.tuosanzhan] = {
     const switchDataXY = this.getSwitchData();
 
     // 数据文字
-    for (let el of switchDataXY) {
-      resArr = resArr.concat([...drawCommon.getThreeSwitchFlow(el.x, el.y)])
-    }
-
     if (Array.isArray(stationTitle)) {
       for (let i = 0; i < switchDataXY.length; i++) {
         registText.flowContent({dataObj: data[i], title: stationTitle[i], keyArr, idx: i});
 
-        resArr.push(getStation(switchDataXY[i].x, switchDataXY[i].y, i))
+        resArr.push(getStation(switchDataXY[i].x, switchDataXY[i].y, i, switchDataXY[i].vertical))
       }
     }
 
@@ -1240,7 +1236,6 @@ drawStation[stationObj.tuosanzhan] = {
 
       return [
         ...drawCommon.getStationPath(x, y),
-        {type: 'station_path_right2', x, y},
       ]
     };
 
@@ -1267,69 +1262,71 @@ drawStation[stationObj.tuosanzhan] = {
       }
     });
 
-    // 上2 管道
-    G2.Shape.registShape('point', 'station_path_right2', {
+    // 左下1 管道
+    G2.Shape.registShape('point', 'path_left1', {
       drawShape: function (cfg, group) {
         const {x, y} = cfg;
-        const x2 = x + 59;
-        const y2 = y + 280;
-        const x3 = x2 + 700;
+        const x2 = x - 280;
+        const y2 = y + 160;
+        const y3 = y2 + 170;
 
         const point = [
-          {type: 'M', x: x2, y: y},
+          {type: 'M', x: x, y: y},
+          {type: 'L', x: x, y: y2},
           {type: 'L', x: x2, y: y2},
-          {type: 'L', x: x3, y: y2},
+          {type: 'M', x: x, y: y2},
+          {type: 'L', x: x, y: y3},
+          {type: 'L', x: x2, y: y3},
         ];
 
         return registPath.addShape(group, pan_line.normal, point)
       }
     });
-    // 罐子 管道 左
-    // G2.Shape.registShape('point', 'pots_path_left', {
-    //   drawShape: function (cfg, group) {
-    //     const {x, y} = cfg;
-    //
-    //     const x2 = x - 100;
-    //     const y2 = y + 170;
-    //     const x3 = x - 380;
-    //
-    //     const point = [
-    //       {type: 'M', x: x, y: y},
-    //       {type: 'L', x: x2, y: y},
-    //       {type: 'L', x: x2, y: y2},
-    //       {type: 'L', x: x3, y: y2},
-    //     ];
-    //
-    //     return registPath.addShape(group, pan_line.normal, point)
-    //   }
-    // });
-    // // 罐子 管道 右
-    // G2.Shape.registShape('point', 'pots_path_right', {
-    //   drawShape: function (cfg, group) {
-    //     const {x, y} = cfg;
-    //
-    //     const x2 = x + 100;
-    //     const y2 = y + 170;
-    //     const x3 = x + 340;
-    //
-    //     const point = [
-    //       {type: 'M', x: x, y: y},
-    //       {type: 'L', x: x2, y: y},
-    //       {type: 'L', x: x2, y: y2},
-    //       {type: 'L', x: x3, y: y2},
-    //     ];
-    //
-    //     return registPath.addShape(group, pan_line.normal, point)
-    //   }
-    // });
+
+    // 右下1 管道
+    G2.Shape.registShape('point', 'path_right1', {
+      drawShape: function (cfg, group) {
+        const {x, y} = cfg;
+        const x2 = x + 280;
+        const y2 = y + 160;
+        const y3 = y2 + 170;
+
+        const point = [
+          {type: 'M', x: x, y: y},
+          {type: 'L', x: x, y: y2},
+          {type: 'L', x: x2, y: y2},
+          {type: 'M', x: x, y: y2},
+          {type: 'L', x: x, y: y3},
+          {type: 'L', x: x2, y: y3},
+        ];
+
+        return registPath.addShape(group, pan_line.normal, point)
+      }
+    });
+
+    // 上左 管道
+    G2.Shape.registShape('point', 'path_top_left', {
+      drawShape: function (cfg, group) {
+        const {x, y} = cfg;
+        const y2 = y - 150;
+
+        const point = [
+          {type: 'M', x: x, y: y},
+          {type: 'L', x: x, y: y2},
+        ];
+
+        return registPath.addShape(group, pan_line.normal, point)
+      }
+    });
 
     resArr.push(...getStation(10, 20));
 
-    return resArr
-    //   .concat([
-    //   {type: 'pots_path_left', x: 55, y: 63},
-    //   {type: 'pots_path_right', x: 55, y: 63},
-    // ])
+    return resArr.concat([
+      {type: 'path_left1', x: 40, y: 31},
+      {type: 'path_right1', x: 62.3, y: 31},
+      {type: 'path_top_left', x: 51.3, y: 31},
+      {type: 'path_top_left', x: 77.3, y: 31},
+    ])
   },
 
   flowView({ data, params }) {
@@ -1368,18 +1365,15 @@ drawStation[stationObj.tuosanzhan] = {
 
 drawStation[stationObj.tuosizhan] = {
   getSwitchData() {
-    const [x1, x2, x3] = [10, 30, 70];
+    const [x1, x2, x3] = [10, 30, 65];
     const [y1, y2, y3, y4] = [30, 62, 91, 96];
 
     return [
       {x: x2, y: y1},
       {x: x3, y: y1},
       {x: x3, y: y2},
-      {x: x1, y: y2},
-      // {x: x2, y: y2},
-      {x: x1, y: y3},
-      // {x: x2, y: y4},
-      // {x: x3, y: y4},
+      {x: x2, y: y2},
+      {x: x2, y: y3},
     ];
   },
   staticView() {
@@ -1464,7 +1458,7 @@ drawStation[stationObj.tuosizhan] = {
       drawShape: function (cfg, group) {
         const {x, y} = cfg;
 
-        const xDis = 190;
+        const xDis = 440;
         const y2 = y + 145;
         const x3 = x - xDis;
 
@@ -1483,7 +1477,7 @@ drawStation[stationObj.tuosizhan] = {
     return resArr.concat([
       {type: 'pots_path', x: 95, y: 38},
       // {type: 'pots_path_right', x: 50, y: 63},
-      {type: 'pots_path_left', x: 25, y: 63},
+      {type: 'pots_path_left', x: 52, y: 63},
     ])
   },
   dataView({ data, params }) {
@@ -1683,7 +1677,7 @@ drawStation[stationObj.tuowuzhan] = {
 
     // 数据文字
     if (Array.isArray(stationTitle)) {
-      for (let i = 0; i < stationTitle.length; i++) {
+      for (let i = 0; i < dataXY.length; i++) {
         registText.flowContent({dataObj: data[i], title: stationTitle[i], keyArr, idx: i});
 
         resArr.push(getStation(dataXY[i].x, dataXY[i].y, i))
@@ -1735,8 +1729,8 @@ drawStation[stationObj.tuowuzhan] = {
 
 drawStation[stationObj.tuoliuzhan] = {
   getSwitchData() {
-    const [x1, x2] = [20, 50];
-    const [y1, y2, y3] = [30, 62, 91];
+    const [x1, x2] = [30, 65];
+    const [y1, y2, y3] = [30, 62, 66];
 
     return [
       {x: x1, y: y1},
@@ -1752,7 +1746,7 @@ drawStation[stationObj.tuoliuzhan] = {
 
       return [
         ...drawCommon.getStation(x, y),
-        {type: 'switch_vertical', x: 80, y: 62},
+        {type: 'switch_vertical', x: 85.7, y: 45},
       ]
     };
 
@@ -1806,7 +1800,7 @@ drawStation[stationObj.tuoliuzhan] = {
     G2.Shape.registShape('point', 'pots_path_left', {
       drawShape: function (cfg, group) {
         const {x, y} = cfg;
-        const x2 = x - 260;
+        const x2 = x - 360;
         const y2 = y + 160;
 
         const point = [
@@ -1823,8 +1817,8 @@ drawStation[stationObj.tuoliuzhan] = {
       drawShape: function (cfg, group) {
         const {x, y} = cfg;
 
-        const y2 = y + 306;
-        const x2 = x - 350;
+        const y2 = y + 180;
+        const x2 = x - 658;
         // const x3 = x - 240;
 
         const point = [
@@ -1841,8 +1835,8 @@ drawStation[stationObj.tuoliuzhan] = {
     resArr.push(...getStation(10, 20));
 
     return resArr.concat([
-      {type: 'pots_path_left', x: 40, y: 31},
-      {type: 'pots_path_right', x: 79.3, y: 31},
+      {type: 'pots_path_left', x: 53, y: 31},
+      {type: 'pots_path_right', x: 85, y: 31},
       // {type: 'pots_path_left', x: 25, y: 63},
     ])
   },

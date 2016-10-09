@@ -1,7 +1,7 @@
 'use strict';
 
-const keyArr = ['altime', 'site', 'check', 'exception', 'dealtime', 'dealpeople', 'dealmsg'];
-const keyArrCN = ['报警时间', '站点', '检测点', '异常量', '处理时间', '处理人', '处理信息'];
+const keyArr = ['altime', 'site', 'check', 'exception', 'value', 'dealtime', 'dealpeople', 'dealmsg'];
+const keyArrCN = ['报警时间', '站点', '检测点', '异常量', '数值', '处理时间', '处理人', '处理信息'];
 
 const getData = () => {
   const data = [];
