@@ -8,7 +8,7 @@ import * as routerPath from '../../utils/routerPath';
 
 const CHART_WIDTH = 932; // chart 图表总宽度
 const CHART_HEIGHT = 500;
-const GET_DATA_TIMER = 5000; // 获取数据时间间隔
+const GET_DATA_TIMER = 300000; // 获取数据时间间隔
 const FLOW_SPEED = 2; // 管道水流速度
 const CHART_ID = 'flowChart';
 
@@ -2189,8 +2189,8 @@ function FlowChart(props) {
     })
   };
 
-  // window.clearInterval(getDataTimer);
-  // getDataTimer = window.setInterval(getDataInterval, GET_DATA_TIMER);
+  window.clearInterval(getDataTimer);
+  getDataTimer = window.setInterval(getDataInterval, GET_DATA_TIMER);
 
   try {
     loading || Array.isArray(flowData.data) && drawChart(flowData, station);
