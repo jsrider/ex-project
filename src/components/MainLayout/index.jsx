@@ -1,39 +1,36 @@
 import React, { PropTypes } from 'react';
-import { Row, Col } from 'antd';
+import { Row, Col, Table } from 'antd';
 import styles from './index.less';
 import Header from './Header';
 import SideMenu from './SideMenu';
 import ModalForm from '../modalForm';
 
+let alertDialogTimer = null;
+
 class MainLayout extends React.Component {
   constructor() {
     super();
 
-    this.state = {
-      modalOption: {
-        password: ''
-      },
-    };
-
-    this.modifySetting = {
-      password: {
-        modifyType: 'password',
-        title: '密码: '
-      }
-    };
-    this.elementsFields = ['password'];
+    this.state = {};
   }
 
+  // 密码校验弹窗
   getModalForm() {
-    const { modalOption, modalVisible } = this.state;
     const { dispatch, userCenter } = this.props;
 
     const modalProps = {
-      options: modalOption,
+      options: {
+        password: ''
+      },
       title: '请输入登录密码',
       visible: !userCenter.login || false,
-      modifySetting: this.modifySetting || {},
-      elementsFields: this.elementsFields,
+      modifySetting: {
+        password: {
+          modifyType: 'password',
+          title: '密码: '
+        }
+      },
+      elementsFields: ['password'],
       cancel: false,
       handleOk: (values) => {
         // console.log('handleOk:', values);
@@ -49,6 +46,84 @@ class MainLayout extends React.Component {
     };
 
     return <ModalForm {...modalProps} />;
+  };
+
+  // 报警弹窗
+  getModalFormAlert() {
+    const { dispatch, alertDialog } = this.props;
+
+    let { data, params, pagination, title, alert } = alertDialog || {};
+
+    if (!alertDialogTimer) {
+      const dialogFetch = () => {
+        dispatch({
+          type: 'alertDialog/fetchAlertDialog',
+        });
+
+        // throttle(fetchDialog, 5000);
+      };
+
+      dialogFetch();
+
+      alertDialogTimer = window.setInterval(dialogFetch, 300000);
+    }
+
+
+    const modalProps = {
+      options: {},
+      title: title || '报警',
+      visible: alert == 1 || false,
+      modifySetting: {
+        handle_person: {
+          title: '处理人: '
+        },
+        handle_tips: {
+          modifyType: 'textarea',
+          title: '处理信息: '
+        }
+      },
+      width: 800,
+      elementsFields: ['handle_person', 'handle_tips'],
+      handleOk: (values) => {
+        // console.log('handleOk:', values);
+
+        return dispatch({
+          type: 'alertDialog/fetchDialogSubmit',
+          values,
+        });
+      },
+      handleCancel: () => {
+        return dispatch({
+          type: 'alertDialog/closeDialog',
+        });
+      }
+    };
+
+    const columns = [];
+
+    if (Array.isArray(data) && data.length && params) {
+
+      const { keyArr, keyArrCN } = params;
+      const len = keyArr.length;
+
+      for (let i = 0; i < len; i++) {
+        columns.push({
+          title: keyArrCN[i] || keyArr[i],
+          dataIndex: keyArr[i],
+        })
+      }
+    } else {
+      data = []
+    }
+
+    return <ModalForm {...modalProps}>
+      <Table
+        rowKey={(record, index) => index}
+        columns={columns}
+        dataSource={data}
+        pagination={pagination}
+      />
+    </ModalForm>;
   };
 
   render() {
@@ -79,6 +154,7 @@ class MainLayout extends React.Component {
             </Row>
           </div>
           {this.getModalForm()}
+          {this.getModalFormAlert()}
         </div>
       </div>
     );

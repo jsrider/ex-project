@@ -67,12 +67,13 @@ class ModalForm extends React.Component {
   render() {
     const props = this.props;
     const state = this.state;
-    const { options, visible, handleCancel, title, disableKeys, modifySetting, elementsFields, cancel } = props;
+    const { options, visible, handleCancel, title, disableKeys, modifySetting, elementsFields, cancel, width, children } = props;
     const { getFieldDecorator } = props.form;
     console.log('ModalForm: ', this.props, this.state);
 
     const modalProps = {
-      visible
+      visible,
+      width,
     };
 
     if (cancel === false) {
@@ -89,6 +90,7 @@ class ModalForm extends React.Component {
                onCancel={handleCancel}
                { ...modalProps }
         >
+          {children}
           <QueueAnim component={Form} horizontal type="bottom">
             {
               visible ?
@@ -126,6 +128,10 @@ class ModalForm extends React.Component {
 
                       case 'password':
                         children = <Input type="password" />;
+                        break;
+
+                      case 'textarea':
+                        children = <Input type="textarea" rows="3" />;
                         break;
 
                       default:

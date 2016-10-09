@@ -8,7 +8,7 @@ import getMenuKeyFromUrl from '../utils/getMenuKeyFromUrl';
 
 const Page = (props) => {
 
-  const { location, dispatch, sideMenu, flowChart, userCenter } = props;
+  const { location, dispatch, sideMenu, flowChart, userCenter, alertDialog } = props;
   const menuKey = getMenuKeyFromUrl(location.pathname);
 
   const mainLayoutProps = {
@@ -16,7 +16,8 @@ const Page = (props) => {
     sideMenu,
     menuKey,
     userCenter,
-    pageData: flowChart
+    pageData: flowChart,
+    alertDialog
   };
 
   const flowChartLayoutProps = {
