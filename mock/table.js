@@ -51,8 +51,8 @@ module.exports = {
             keyArrCN
           },
           pagination: {
-            current: 1,
-            pageSize: 20
+            pageSize: 20,
+            total: 70,
           }
         },
         message: ''

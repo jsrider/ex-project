@@ -53,6 +53,7 @@ export default {
           type: 'querySuccess',
           data,
           apiType: menuType,
+          current: payloadObj.current || 1,
         });
       }
     },
@@ -62,13 +63,15 @@ export default {
     showLoading(state, { station }) {
       return { ...state, loading: true, station };
     },
-    querySuccess(state, { data, apiType }) {
+    querySuccess(state, { data, apiType, current }) {
       const res = {};
 
       res[`${apiType}Data`] = {
         ...state[`${apiType}Data`],
         ...data.data
       };
+
+      current > 1 && (res.tableData.pagination.current = current);
 
       return { ...state, loading: false, ...res };
     },

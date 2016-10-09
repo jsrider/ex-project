@@ -13,7 +13,8 @@ export default {
     tableData: {
       pagination: {
         current: 1,
-        pageSize: 10
+        pageSize: 10,
+        total: 20,
       }
     }
   },
@@ -47,6 +48,7 @@ export default {
         yield put({
           type: 'querySuccess',
           data,
+          current: payloadObj.current || 1
           // apiType: menuType,
         });
       }
@@ -73,13 +75,15 @@ export default {
     showLoading(state) {
       return { ...state, loading: true };
     },
-    querySuccess(state, { data }) {
+    querySuccess(state, { data, current }) {
       const res = {};
 
       res.tableData = {
         ...state.tableData,
-        ...data.data
+        ...data.data,
       };
+
+      res.tableData.pagination.current = current;
 
       return { ...state, loading: false, ...res };
     },
