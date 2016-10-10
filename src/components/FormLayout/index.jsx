@@ -20,7 +20,7 @@ const RangePicker = DatePicker.RangePicker;
 const selectWidth = '150px';
 
 const formatValue = (val) => {
-  const formatStr = 'YYYY/MM/DD';
+  const formatStr = 'YYYY/M/D';
 
   if (Array.isArray(val)) {
     return val.map(el => el.format(formatStr)).join(',')
