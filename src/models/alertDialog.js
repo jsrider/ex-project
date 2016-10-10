@@ -11,7 +11,7 @@ export default {
     params: {},
     pagination: {
       current: 1,
-      pageSize: 10,
+      pageSize: 1,
       total: 20,
     }
   },

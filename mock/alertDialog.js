@@ -10,7 +10,7 @@ const getData = () => {
     let res = {
       altime: '10:' + Math.ceil(Math.random() * 60),
       site: Math.ceil(Math.random() * 100),
-      check: '西湖区湖底公园1号西湖区湖底公园1号西湖区湖底公园1号西湖区湖底公园1号西湖区湖底公园1号西湖区湖底公园1号西湖区湖底公园1号',
+      check: '西湖区湖',
       exception: Math.ceil(Math.random() * 100),
       value: Math.ceil(Math.random() * 100),
     };
@@ -39,8 +39,8 @@ module.exports = {
             keyArrCN
           },
           pagination: {
-            pageSize: 10,
-            total: 90,
+            pageSize: 1,
+            total: 30,
           }
         },
         message: ''

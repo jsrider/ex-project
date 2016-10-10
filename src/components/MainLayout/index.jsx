@@ -82,7 +82,7 @@ class MainLayout extends React.Component {
           title: '处理信息: '
         }
       },
-      width: 800,
+      width: 500,
       elementsFields: ['handle_person', 'handle_tips'],
       handleOk: (values) => {
         // console.log('handleOk:', values);
@@ -110,6 +110,7 @@ class MainLayout extends React.Component {
         columns.push({
           title: keyArrCN[i] || keyArr[i],
           dataIndex: keyArr[i],
+          // width: '80px'
         })
       }
     } else {
