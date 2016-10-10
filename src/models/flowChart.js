@@ -49,7 +49,7 @@ export default {
 
       const { data } = yield call(query, { station }, 'flowChart');
 
-      if (typeof data === 'object' && data.success) {
+      if (typeof data === 'object' && data.success == 1) {
         yield put({
           type: 'querySuccess',
           data,

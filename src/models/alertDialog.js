@@ -22,7 +22,7 @@ export default {
       // debugger;
       const { data } = yield call(query, payload, 'alertDialog');
       //
-      if (typeof data === 'object' && data.success) {
+      if (typeof data === 'object' && data.success == 1) {
 
         yield put({
           type: 'fetchSuccess',
@@ -35,7 +35,7 @@ export default {
       // debugger;
       const { data } = yield call(query, values, 'alertDialogSubmit');
       //
-      if (typeof data === 'object' && data.success) {
+      if (typeof data === 'object' && data.success == 1) {
 
         yield put({
           type: 'fetchSuccess',

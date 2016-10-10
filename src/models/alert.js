@@ -44,7 +44,7 @@ export default {
 
       const { data } = yield call(query, { ...pageParams.queryParams, ...payloadObj, type: menuTitle}, menuType);
 
-      if (typeof data === 'object' && data.success) {
+      if (typeof data === 'object' && data.success == 1) {
         yield put({
           type: 'querySuccess',
           data,
@@ -59,7 +59,7 @@ export default {
 
       const { data } = yield call(query, { payloadObj, type: opType }, 'setting');
 
-      if (typeof data === 'object' && data.success) {
+      if (typeof data === 'object' && data.success == 1) {
         messageHide();
 
         yield put({
