@@ -45,10 +45,10 @@ module.exports = {
       res.json({
         success: 1,
         data: {
-          title: '中心站流程图',
+          // title: '中心站流程图', // 可传,不传 用页面默认标题
           data: getData(),
           params: {
-            stationTitle,
+            // stationTitle, // 可传,不传 用页面默认站点名称
             keyArr,
             alert: 1 // 1报警 0 不报警
           }

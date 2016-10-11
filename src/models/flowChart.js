@@ -10,7 +10,7 @@ export default {
     init: false,
     loading: false,
     flowData: {
-      title: '中心站流程图',
+      // title: '中心站流程图',
       data: []
     }
   },
