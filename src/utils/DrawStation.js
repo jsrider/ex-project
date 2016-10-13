@@ -37,6 +37,18 @@ const static_img = {
     src: require('../img/flow.png'),
     rate: 255/853,
     width: 12,
+  },
+  arrow_s: {
+    src: require('../img/arrow-s.png'),
+    rate: 40/8,
+    height: 8,
+    width: 40, // 单个箭头宽度
+  },
+  arrow_l: {
+    src: require('../img/arrow-l.png'),
+    rate: 100/14,
+    height: 14,
+    width: 100,
   }
 };
 
@@ -88,9 +100,85 @@ const registImg = {
           attrs: {
             x: x - width/2,
             y: y - height/2,
-            width: width,
+            width,
             height,
             // rotate: '180',
+            img: src
+          }
+        });
+      }
+    });
+  },
+  registArrowImg: (small) => {
+    G2.Shape.registShape('point', `flow_arrow_${small ? 's' : 'l'}`, {
+      drawShape: function(cfg, group) {
+        const { x, y } = cfg;
+        const { height, rate, src, width } = small ? static_img.arrow_s : static_img.arrow_l;
+
+        group.addShape('image', {
+          attrs: {
+            x: x,
+            y: y - height/2,
+            width,
+            height,
+            // rotate: '180',
+            img: src
+          }
+        });
+      }
+    });
+  },
+  registArrowImgLeft: (small) => {
+    G2.Shape.registShape('point', `flow_arrow_${small ? 's' : 'l'}_left`, {
+      drawShape: function(cfg, group) {
+        const { x, y } = cfg;
+        const { height, rate, src, width } = small ? static_img.arrow_s : static_img.arrow_l;
+
+        group.addShape('image', {
+          attrs: {
+            x: x,
+            y: y + height/2,
+            width,
+            height,
+            rotate: '180',
+            img: src
+          }
+        });
+      }
+    });
+  },
+  registArrowImgVertical: (small) => {
+    G2.Shape.registShape('point', `flow_arrow_${small ? 's' : 'l'}_vertical`, {
+      drawShape: function(cfg, group) {
+        const { x, y } = cfg;
+        const { height, src, width } = small ? static_img.arrow_s : static_img.arrow_l;
+
+        group.addShape('image', {
+          attrs: {
+            x: x - height / 2,
+            y: y + height,
+            width,
+            height,
+            rotate: '-90',
+            img: src
+          }
+        });
+      }
+    });
+  },
+  registArrowImgVerticalDown: (small) => {
+    G2.Shape.registShape('point', `flow_arrow_${small ? 's' : 'l'}_vertical_down`, {
+      drawShape: function(cfg, group) {
+        const { x, y } = cfg;
+        const { height, src, width } = small ? static_img.arrow_s : static_img.arrow_l;
+
+        group.addShape('image', {
+          attrs: {
+            x: x + height / 2,
+            y: y - height,
+            width,
+            height,
+            rotate: '90',
             img: src
           }
         });
@@ -243,12 +331,20 @@ const registImg = {
     });
   },
   all() {
-    registImg.registStationImg();
-    registImg.registSwitchImg();
-    registImg.registSwitchImg(true);
-    registImg.registSwitchImgVertical();
-    registImg.registFlowImgVertical();
-    registImg.registFlowImg();
+    this.registArrowImg();
+    this.registArrowImg(true);
+    this.registArrowImgLeft();
+    this.registArrowImgLeft(true);
+    this.registArrowImgVertical();
+    this.registArrowImgVertical(true);
+    this.registArrowImgVerticalDown();
+    this.registArrowImgVerticalDown(true);
+    this.registStationImg();
+    this.registSwitchImg();
+    this.registSwitchImg(true);
+    this.registSwitchImgVertical();
+    this.registFlowImgVertical();
+    this.registFlowImg();
   }
 };
 
@@ -484,8 +580,12 @@ class DrawStation {
 
     this.initStationTitle();
 
-    if (typeof this.params === 'object' && Array.isArray(this.params.stationTitle)) {
-      this.stationTitle = this.params.stationTitle
+    if (typeof this.params === 'object') {
+      this.keyArr = this.params.keyArr;
+
+      if (Array.isArray(this.params.stationTitle)) {
+        this.stationTitle = this.params.stationTitle;
+      }
     }
   }
 }
@@ -519,9 +619,109 @@ DrawStation.prototype = {
 
     return resArr
   },
-  flowView() {
-    return [];
+  /**
+   *
+   * @param x
+   * @param y
+   * @param nums 方向上 箭头个数
+   * @param vertical {Boolean}
+   * @param small {Boolean}
+   * @param plus {Boolean} true 坐标增加方向运动
+     * @returns {Array}
+     */
+
+   getFlowArrow({x, y, nums, vertical, small, plus}) {
+    const me = this;
+    const res = [];
+
+    let distance = small ? static_img.arrow_s.width : static_img.arrow_l.width;
+    let type = small ? 'flow_arrow_s' : 'flow_arrow_l';
+
+    type = vertical ?
+      (plus ? `${type}_vertical_down` : `${type}_vertical`) :
+      (plus ? type : `${type}_left`);
+
+    distance = vertical ? distance * 1.5 : distance;
+
+    const plusFun = (a, b) => plus ? a + b : a - b;
+
+    // return x + static_img.arrow_l.wid
+    const val = vertical ? y : x;
+
+    for (let i = 0; i < nums; i++) {
+      const end = plusFun(me.getFlowWidth({ distance }), distance * i) / CHART_WIDTH * 100;
+      const resVal = plusFun(val, end);
+
+      if (vertical) {
+        res.push(
+          {type, x, y: resVal}
+        )
+      } else {
+        res.push(
+          {type, x: resVal, y}
+        )
+      }
+    }
+
+    return res;
   },
+  getStationFlowArrow({x, y, nums}) {
+    const me = this;
+
+    const res = me.getFlowArrow({ nums, small: true, plus: true, x: x-1, y: y-13.2 });
+
+    x -= 7.8;
+    y += 2.8;
+
+    const opt = {x, y, nums, small: true, plus: true};
+
+    // return x + static_img.arrow_l.wid
+    return res.concat(
+      [
+        ...me.getFlowArrow(opt),
+        ...me.getFlowArrow({...opt, x: x + 1.2, y: y + 8.5, vertical: true, plus: false}),
+      ]
+    )
+  },
+
+
+  flowView() {
+    const { data } = this;
+    const me = this;
+    const resArr = [];
+
+    resArr.push(
+      ...me.getFlowArrow({x: 12, y: 56, nums: 3, small: false, plus: true, vertical: false}),
+      ...me.getFlowArrow({x: 77, y: 56, nums: 3, small: false, plus: false, vertical: false}),
+      ...me.getFlowArrow({x: 55.26, y: 58, nums: 4, small: true, plus: true, vertical: true}),
+    );
+
+    for (let i = 0; i < 5; i++) {
+      if (me.getFlowNumByData(data[i]) > 0) {
+        resArr.push(
+          ...me.getStationFlowArrow({x: 10 + i * 20, y: 20, nums: 1, plus: true}),
+          ...me.getFlowArrow({x: 15.3 + i * 20, y: 7, nums: 2, small: false, plus: true, vertical: true}),
+        );
+      }
+    }
+
+    // 坨一汇东
+    if (me.getFlowNumByData(data[5]) > 0) {
+      resArr.push(
+        ...me.getFlowArrow({x: 30, y: 92, nums: 4, small: false, plus: false, vertical: false}),
+      );
+    }
+
+    // 镇政府
+    if (me.getFlowNumByData(data[6]) > 0) {
+      resArr.push(
+        ...me.getFlowArrow({x: 48, y: 92, nums: 4, small: false, plus: true, vertical: false}),
+      );
+    }
+
+    return resArr;
+  },
+
   // 各个站点 名称定义
   initStationTitle() {
     let stationTitle, title;
@@ -613,20 +813,19 @@ DrawStation.prototype = {
   },
 
   // 获取流动箭头 当前时间宽度
-  getFlowWidth({x, y, max}) {
-    const val = x ? x : y;
+  getFlowWidth({start, end, distance}) {
 
     const speed = FLOW_SPEED * 1000;
 
-    let res = val + new Date().getTime() % speed / speed * (max - val);
-    // console.log(x2)
+    let res = new Date().getTime() % speed / speed * (distance);
+    // console.log(res)
 
-    return Math.min(res + 6, max);
+    return res;
   },
 
   // 当前数据 瞬时流量 flow字段
-  getFlowNumByData(dataObj, keyArr) {
-    return dataObj[keyArr[2]]
+  getFlowNumByData(dataObj) {
+    return dataObj[this.keyArr[2]]
   },
 
 
@@ -830,47 +1029,6 @@ stationsObj[stationObj.zhongxinzhan] = {
       {type: 'flow_content6',x: 83, y: 50},
     ])
   },
-  flowView() {
-    const { data, params } = this;
-    const me = this;
-
-    const { keyArr } = params || {};
-    const resArr = [];
-
-    const getStation = (x, y, idx) => {
-
-      return {type: `station_right_flow${idx}`, x, y};
-    };
-
-    // 底1 管道 流动
-    G2.Shape.registShape('point', 'station_path_bottom_flow', {
-      drawShape: function(cfg, group) {
-        let { x, y } = cfg;
-
-        x = x+15;
-
-        let x2 = me.getFlowWidth({ x, max: CHART_WIDTH });
-
-        // const x2 = x+ 850 * percent;
-        const y2 = y+180;
-        // const y3 = y+180;
-        // 瞬时流量
-        const dataArr = [me.getFlowNumByData(data[5], keyArr), me.getFlowNumByData(data[6], keyArr)];
-
-        return registPath.addArrowLine(group, pan_line.flowArrow, { x1: x, y1: y2, x2, y2, type: 'center', middleX: 517, dataArr })
-      }
-    });
-
-    for (let i = 0; i < 5; i++) {
-      this.registStationFlowArrow(data[i], keyArr, i);
-
-      resArr.push(getStation(10 + i * 20, 20, i))
-    }
-
-    return resArr.concat([
-      {type: 'station_path_bottom_flow', x: 10, y: 56},
-    ])
-  },
 };
 
 stationsObj[stationObj.tuoyizhan] = {
@@ -1014,6 +1172,79 @@ stationsObj[stationObj.tuoyizhan] = {
       {type: 'pots_path_left', x: 25, y: 63},
     ])
   },
+  flowView() {
+    const { data } = this;
+    const me = this;
+    const resArr = [];
+
+    resArr.push(
+      // ...me.getFlowArrow({x: 5, y: 63, nums: 7, plus: false}),
+      ...me.getFlowArrow({x: 60, y: 65, nums: 4, small: true, plus: true, vertical: true}),
+    );
+
+    // 坨一产气
+    if (me.getFlowNumByData(data[0]) > 0) {
+      resArr.push(
+        ...me.getStationFlowArrow({x: 10, y: 20, nums: 1, plus: true }),
+        ...me.getFlowArrow({x: 16.35, y: 7, nums: 3, small: true, plus: true, vertical: true}),
+        ...me.getFlowArrow({x: 16, y: 31, nums: 3, small: false, plus: true, vertical: false}),
+      );
+    }
+
+    // 轻烃进口
+    if (me.getFlowNumByData(data[1]) > 0) {
+      resArr.push(
+        ...me.getFlowArrow({x: 50, y: 31, nums: 3, small: false, plus: true, vertical: false}),
+      );
+    }
+
+    // 轻烃出口
+    if (me.getFlowNumByData(data[2]) > 0) {
+      resArr.push(
+        ...me.getFlowArrow({x: 23, y: 63, nums: 2, small: false, plus: false, vertical: false}),
+      );
+    }
+
+    // 去宁海
+    if (me.getFlowNumByData(data[3]) > 0) {
+      resArr.push(
+        ...me.getFlowArrow({x: 45, y: 63, nums: 3, small: false, plus: false, vertical: false}),
+      );
+    }
+
+    // 坨一外供
+    if (me.getFlowNumByData(data[4]) > 0) {
+      resArr.push(
+        ...me.getFlowArrow({x: 88.6, y: 40, nums: 3, small: true, plus: true, vertical: true}),
+        ...me.getFlowArrow({x: 79, y: 63, nums: 2, small: false, plus: false, vertical: false}),
+      );
+    }
+
+    // 坨一自用
+    if (me.getFlowNumByData(data[5]) > 0) {
+      resArr.push(
+        ...me.getFlowArrow({x: 25, y: 65, nums: 3, small: true, plus: true, vertical: true}),
+        ...me.getFlowArrow({x: 12, y: 92, nums: 4, small: true, plus: false, vertical: false}),
+      );
+    }
+
+    // 坨一汇东
+    if (me.getFlowNumByData(data[6]) > 0) {
+      resArr.push(
+        ...me.getFlowArrow({x: 48, y: 97, nums: 2, small: false, plus: false, vertical: false}),
+      );
+    }
+
+    // 镇政府
+    if (me.getFlowNumByData(data[7]) > 0) {
+      resArr.push(
+        ...me.getFlowArrow({x: 60, y: 97, nums: 2, small: false, plus: true, vertical: false}),
+      );
+    }
+
+    return resArr;
+  },
+
 };
 
 
@@ -1055,32 +1286,6 @@ stationsObj[stationObj.tuoerzhan] = {
     return resArr.concat([
       {type: 'pot', x: 55, y: 76.6},
     ])
-  },
-  dataView() {
-    const { data, params } = this;
-    let { keyArr } = params || {};
-    const resArr = [];
-    const me = this;
-    const stationTitle = this.stationTitle;
-
-    const getStation = (x, y, idx) => {
-      registText.flowContent({dataObj: data[idx], title: stationTitle[idx], keyArr, idx});
-
-      return me.getTextBySwitch(`flow_content${idx}`, x, y)
-    };
-
-    const dataXY = this.getSwitchData();
-
-    // 数据文字
-    if (Array.isArray(stationTitle)) {
-      for (let i = 0; i < stationTitle.length; i++) {
-        registText.flowContent({dataObj: data[i], title: stationTitle[i], keyArr, idx: i});
-
-        resArr.push(getStation(dataXY[i].x, dataXY[i].y, i))
-      }
-    }
-
-    return resArr
   },
   staticViewPipeline() {
     const resArr = [];
@@ -1134,52 +1339,65 @@ stationsObj[stationObj.tuoerzhan] = {
         return registPath.addShape(group, pan_line.normal, point)
       }
     });
-    // 罐子 管道 左
-    // G2.Shape.registShape('point', 'pots_path_left', {
-    //   drawShape: function (cfg, group) {
-    //     const {x, y} = cfg;
-    //
-    //     const x2 = x - 100;
-    //     const y2 = y + 170;
-    //     const x3 = x - 380;
-    //
-    //     const point = [
-    //       {type: 'M', x: x, y: y},
-    //       {type: 'L', x: x2, y: y},
-    //       {type: 'L', x: x2, y: y2},
-    //       {type: 'L', x: x3, y: y2},
-    //     ];
-    //
-    //     return registPath.addShape(group, pan_line.normal, point)
-    //   }
-    // });
-    // // 罐子 管道 右
-    // G2.Shape.registShape('point', 'pots_path_right', {
-    //   drawShape: function (cfg, group) {
-    //     const {x, y} = cfg;
-    //
-    //     const x2 = x + 100;
-    //     const y2 = y + 170;
-    //     const x3 = x + 340;
-    //
-    //     const point = [
-    //       {type: 'M', x: x, y: y},
-    //       {type: 'L', x: x2, y: y},
-    //       {type: 'L', x: x2, y: y2},
-    //       {type: 'L', x: x3, y: y2},
-    //     ];
-    //
-    //     return registPath.addShape(group, pan_line.normal, point)
-    //   }
-    // });
 
     resArr.push(...getStation(10, 20));
 
     return resArr
-    //   .concat([
-    //   {type: 'pots_path_left', x: 55, y: 63},
-    //   {type: 'pots_path_right', x: 55, y: 63},
-    // ])
+  },
+  flowView() {
+    const { data } = this;
+    const me = this;
+    const resArr = [];
+
+    // resArr.push(
+      // ...me.getFlowArrow({x: 5, y: 63, nums: 7, plus: false}),
+      // ...me.getFlowArrow({x: 60, y: 65, nums: 4, small: false, plus: true, vertical: true}),
+    // );
+
+    // station
+    resArr.push(
+      ...me.getStationFlowArrow({x: 10, y: 20, nums: 1, plus: true }),
+      ...me.getFlowArrow({x: 16.4, y: 5, nums: 1, small: false, plus: true, vertical: true}),
+      ...me.getFlowArrow({x: 16, y: 31, nums: 2, small: false, plus: true, vertical: false}),
+    );
+
+    // 坨二自用
+    if (me.getFlowNumByData(data[0]) > 0) {
+      resArr.push(
+        ...me.getFlowArrow({x: 50, y: 31, nums: 3, small: false, plus: true, vertical: false}),
+      );
+    }
+
+    // 坨二产气
+    if (me.getFlowNumByData(data[1]) > 0) {
+      resArr.push(
+        ...me.getFlowArrow({x: 16.4, y: 28, nums: 2, small: false, plus: true, vertical: true}),
+        ...me.getFlowArrow({x: 16.4, y: 76, nums: 1, small: false, plus: true, vertical: false}),
+      );
+    }
+
+    // 轻烃进口
+    if (me.getFlowNumByData(data[2]) > 0) {
+      resArr.push(
+        ...me.getFlowArrow({x: 31.4, y: 76, nums: 1, small: false, plus: true, vertical: false}),
+      );
+    }
+
+    // 轻烃进口
+    if (me.getFlowNumByData(data[3]) > 0) {
+      resArr.push(
+        ...me.getFlowArrow({x: 57.4, y: 76, nums: 1, small: false, plus: true, vertical: false}),
+      );
+    }
+
+    // 轻烃进口
+    if (me.getFlowNumByData(data[4]) > 0) {
+      resArr.push(
+        ...me.getFlowArrow({x: 72.4, y: 76, nums: 1, small: false, plus: true, vertical: false}),
+      );
+    }
+
+    return resArr;
   },
 };
 
@@ -1189,7 +1407,7 @@ stationsObj[stationObj.tuosanzhan] = {
     const [y1, y2, y3, y4] = [20, 30, 62, 96];
 
     return [
-      {x: x1, y: y3, vertical: false},
+      {x: x1, y: y3 - 4, vertical: false},
       {x: x1, y: y4, vertical: false},
       {x: x1, y: y2, vertical: false},
       {x: x2, y: y1 - 13, vertical: true},
@@ -1221,7 +1439,9 @@ stationsObj[stationObj.tuosanzhan] = {
       resArr = resArr.concat([...me.getThreeSwitchFlow(el.x, el.y, el.vertical)])
     }
 
-    return resArr
+    return resArr.concat([
+      {type: 'switch_vertical', x: 40.7, y: 61},
+    ])
   },
   staticViewPipeline() {
     const resArr = [];
@@ -1262,13 +1482,19 @@ stationsObj[stationObj.tuosanzhan] = {
       drawShape: function (cfg, group) {
         const {x, y} = cfg;
         const x2 = x - 280;
-        const y2 = y + 160;
-        const y3 = y2 + 170;
+        const y2 = y + 140;
+        const y3 = y2 + 190;
+
+        const x21 = x2 + 50;
+        const y21 = y2 + 50;
 
         const point = [
           {type: 'M', x: x, y: y},
           {type: 'L', x: x, y: y2},
           {type: 'L', x: x2, y: y2},
+          {type: 'M', x: x21, y: y2},
+          {type: 'L', x: x21, y: y21},
+          {type: 'L', x: x, y: y21},
           {type: 'M', x: x, y: y2},
           {type: 'L', x: x, y: y3},
           {type: 'L', x: x2, y: y3},
@@ -1324,6 +1550,78 @@ stationsObj[stationObj.tuosanzhan] = {
     ])
   },
 
+  flowView() {
+    const { data } = this;
+    const me = this;
+    const resArr = [];
+
+    resArr.push(
+      ...me.getFlowArrow({x: 38, y: 31, nums: 4, small: false, plus: true, vertical: false}),
+      ...me.getFlowArrow({x: 62.3, y: 53, nums: 2, small: false, plus: true, vertical: true}),
+      ...me.getFlowArrow({x: 40, y: 33, nums: 3, small: false, plus: true, vertical: true}),
+      ...me.getFlowArrow({x: 38, y: 69, nums: 1, small: false, plus: false, vertical: false}),
+    );
+
+    // 坨三供轻烃
+    if (me.getFlowNumByData(data[0]) > 0) {
+      resArr.push(
+        ...me.getFlowArrow({x: 29, y: 59, nums: 2, small: false, plus: false, vertical: false}),
+      );
+    }
+
+    // 坨三稳定
+    if (me.getFlowNumByData(data[1]) > 0) {
+      resArr.push(
+        ...me.getFlowArrow({x: 29, y: 97, nums: 2, small: false, plus: false, vertical: false}),
+      );
+    }
+
+    // 坨三产气
+    if (me.getFlowNumByData(data[2]) > 0) {
+      resArr.push(
+        ...me.getStationFlowArrow({x: 10, y: 20, nums: 1, plus: true}),
+        ...me.getFlowArrow({x: 16.35, y: 7, nums: 3, small: true, plus: true, vertical: true}),
+        ...me.getFlowArrow({x: 16, y: 31, nums: 2, small: false, plus: true, vertical: false}),
+      );
+    }
+
+    // 坨三自用
+    if (me.getFlowNumByData(data[3]) > 0) {
+      resArr.push(
+        ...me.getFlowArrow({x: 51.3, y: 31, nums: 1, small: false, plus: false, vertical: true}),
+      );
+    }
+
+    // 看守所
+    if (me.getFlowNumByData(data[4]) > 0) {
+      resArr.push(
+        ...me.getFlowArrow({x: 62, y: 63, nums: 2, small: false, plus: true, vertical: false}),
+      );
+    }
+
+    // 坨三外供
+    if (me.getFlowNumByData(data[5]) > 0) {
+      resArr.push(
+        ...me.getFlowArrow({x: 62.3, y: 31, nums: 1, small: false, plus: true, vertical: true}),
+      );
+    }
+
+    // 殡仪馆
+    if (me.getFlowNumByData(data[6]) > 0) {
+      resArr.push(
+        ...me.getFlowArrow({x: 62, y: 97, nums: 2, small: false, plus: true, vertical: false}),
+      );
+    }
+
+    // 坨三外输
+    if (me.getFlowNumByData(data[7]) > 0) {
+      resArr.push(
+        ...me.getFlowArrow({x: 77.3, y: 31, nums: 1, small: false, plus: false, vertical: true}),
+      );
+    }
+
+    return resArr;
+  },
 };
 
 stationsObj[stationObj.tuosizhan] = {
@@ -1444,6 +1742,54 @@ stationsObj[stationObj.tuosizhan] = {
       // {type: 'pots_path_right', x: 50, y: 63},
       {type: 'pots_path_left', x: 52, y: 63},
     ])
+  },
+  flowView() {
+    const { data } = this;
+    const me = this;
+    const resArr = [];
+
+
+    // 坨四产气
+    if (me.getFlowNumByData(data[0]) > 0) {
+      resArr.push(
+        ...me.getStationFlowArrow({x: 10, y: 20, nums: 1, plus: true}),
+        ...me.getFlowArrow({x: 16.35, y: 7, nums: 3, small: true, plus: true, vertical: true}),
+        ...me.getFlowArrow({x: 16, y: 31, nums: 3, small: false, plus: true, vertical: false}),
+      );
+    }
+
+    // 轻烃进口
+    if (me.getFlowNumByData(data[1]) > 0) {
+      resArr.push(
+        ...me.getFlowArrow({x: 48, y: 31, nums: 3, small: false, plus: true, vertical: false}),
+      );
+    }
+
+    // 轻烃出口
+    if (me.getFlowNumByData(data[2]) > 0) {
+      resArr.push(
+        ...me.getFlowArrow({x: 68, y: 63, nums: 3, small: false, plus: false, vertical: false}),
+        ...me.getFlowArrow({x: 88.6, y: 38.5, nums: 3, small: true, plus: true, vertical: true}),
+      );
+    }
+
+
+    // 坨四自用
+    if (me.getFlowNumByData(data[3]) > 0) {
+      resArr.push(
+        ...me.getFlowArrow({x: 30, y: 63, nums: 3, small: false, plus: false, vertical: false}),
+      );
+    }
+
+    // 去总外输
+    if (me.getFlowNumByData(data[4]) > 0) {
+      resArr.push(
+        ...me.getFlowArrow({x: 52, y: 63, nums: 1, small: false, plus: true, vertical: true}),
+        ...me.getFlowArrow({x: 30, y: 92, nums: 3, small: false, plus: false, vertical: false}),
+      );
+    }
+
+    return resArr;
   },
 };
 
@@ -1568,6 +1914,70 @@ stationsObj[stationObj.tuowuzhan] = {
       // {type: 'pots_path_left', x: 25, y: 63},
     ])
   },
+
+  flowView() {
+    const { data } = this;
+    const me = this;
+    const resArr = [];
+
+    resArr.push(
+      ...me.getFlowArrow({x: 75, y: 33, nums: 1, plus: true, vertical: true}),
+    );
+
+    // 坨三来气
+    if (me.getFlowNumByData(data[0]) > 0) {
+      resArr.push(
+        ...me.getFlowArrow({x: 25, y: 63, nums: 1, small: false, plus: false, vertical: false}),
+      );
+    }
+
+    // 坨五产气
+    if (me.getFlowNumByData(data[1]) > 0) {
+      resArr.push(
+        ...me.getStationFlowArrow({x: 10, y: 20, nums: 1, plus: true}),
+        ...me.getFlowArrow({x: 16.35, y: 7, nums: 3, small: true, plus: true, vertical: true}),
+        ...me.getFlowArrow({x: 16, y: 31, nums: 5, small: false, plus: true, vertical: false}),
+      );
+    }
+
+    // 轻烃进口
+    if (me.getFlowNumByData(data[2]) > 0) {
+      resArr.push(
+        ...me.getFlowArrow({x: 45, y: 63, nums: 1, small: false, plus: false, vertical: false}),
+      );
+    }
+
+    // 轻烃出口
+    if (me.getFlowNumByData(data[3]) > 0) {
+      resArr.push(
+        ...me.getFlowArrow({x: 75, y: 63, nums: 1, small: false, plus: false, vertical: false}),
+      );
+    }
+
+    // 垦化
+    if (me.getFlowNumByData(data[4]) > 0) {
+      resArr.push(
+        ...me.getFlowArrow({x: 75, y: 63, nums: 2, small: false, plus: true, vertical: false}),
+      );
+    }
+
+    // 坨五外输
+    if (me.getFlowNumByData(data[5]) > 0) {
+      resArr.push(
+        ...me.getFlowArrow({x: 77, y: 31, nums: 1, small: false, plus: true, vertical: false}),
+      );
+    }
+
+    // 坨五备用
+    if (me.getFlowNumByData(data[6]) > 0) {
+      resArr.push(
+        ...me.getFlowArrow({x: 75, y: 63, nums: 1, small: false, plus: true, vertical: true}),
+        ...me.getFlowArrow({x: 75, y: 92, nums: 2, small: false, plus: true, vertical: false}),
+      );
+    }
+
+    return resArr;
+  },
 };
 
 stationsObj[stationObj.tuoliuzhan] = {
@@ -1685,6 +2095,44 @@ stationsObj[stationObj.tuoliuzhan] = {
       // {type: 'pots_path_left', x: 25, y: 63},
     ])
   },
+  flowView() {
+    const { data } = this;
+    const me = this;
+    const resArr = [];
+
+    // 坨六产气
+    if (me.getFlowNumByData(data[0]) > 0) {
+      resArr.push(
+        ...me.getStationFlowArrow({x: 10, y: 20, nums: 1, plus: true}),
+        ...me.getFlowArrow({x: 16.35, y: 7, nums: 3, small: true, plus: true, vertical: true}),
+        ...me.getFlowArrow({x: 16, y: 31, nums: 3, small: false, plus: true, vertical: false}),
+      );
+    }
+
+    // 鲁胜
+    if (me.getFlowNumByData(data[1]) > 0) {
+      resArr.push(
+        ...me.getFlowArrow({x: 85, y: 34, nums: 1, small: false, plus: true, vertical: true}),
+        ...me.getFlowArrow({x: 33, y: 67, nums: 6, small: false, plus: false, vertical: false}),
+      );
+    }
+
+    // 坨六外输
+    if (me.getFlowNumByData(data[2]) > 0) {
+      resArr.push(
+        ...me.getFlowArrow({x: 50, y: 31, nums: 3, small: false, plus: true, vertical: false}),
+      );
+    }
+    // 坨六自用
+    if (me.getFlowNumByData(data[3]) > 0) {
+      resArr.push(
+        ...me.getFlowArrow({x: 53, y: 31, nums: 1, small: false, plus: true, vertical: true}),
+        ...me.getFlowArrow({x: 33, y: 63, nums: 3, small: false, plus: false, vertical: false}),
+      );
+    }
+
+    return resArr;
+  },
 };
 
 stationsObj[stationObj.ninghaizhan] = {
@@ -1787,7 +2235,7 @@ stationsObj[stationObj.ninghaizhan] = {
 
         const y2 = y + 306;
         const x2 = x + 250;
-        const yM = y + 157;
+        const yM = y + 159;
         // const x3 = x - 240;
 
         const point = [
@@ -1810,6 +2258,64 @@ stationsObj[stationObj.ninghaizhan] = {
       {type: 'pots_path_right', x: 65, y: 31},
       // {type: 'pots_path_left', x: 25, y: 63},
     ])
+  },
+
+  flowView() {
+    const { data } = this;
+    const me = this;
+    const resArr = [];
+
+    resArr.push(
+      ...me.getFlowArrow({x: 65, y: 32, nums: 1, small: false, plus: true, vertical: true}),
+    );
+
+    // 宁海稳定
+    if (me.getFlowNumByData(data[0]) > 0) {
+      resArr.push(
+        ...me.getFlowArrow({x: 33.55, y: 40, nums: 2, small: false, plus: true, vertical: true}),
+        ...me.getFlowArrow({x: 22, y: 92, nums: 2, small: false, plus: false, vertical: false}),
+      );
+    }
+
+    // 宁海产气
+    if (me.getFlowNumByData(data[1]) > 0) {
+      resArr.push(
+        ...me.getStationFlowArrow({x: 10, y: 20, nums: 1, plus: true}),
+        ...me.getFlowArrow({x: 16.35, y: 7, nums: 3, small: true, plus: true, vertical: true}),
+        ...me.getFlowArrow({x: 16, y: 31, nums: 1, small: false, plus: true, vertical: false}),
+      );
+    }
+
+    // 轻烃出口
+    if (me.getFlowNumByData(data[2]) > 0) {
+      resArr.push(
+        ...me.getFlowArrow({x: 45, y: 31, nums: 1, small: false, plus: true, vertical: false}),
+      );
+    }
+
+    // 宁海自用
+    if (me.getFlowNumByData(data[3]) > 0) {
+      resArr.push(
+        ...me.getFlowArrow({x: 63, y: 62.8, nums: 2, small: false, plus: true, vertical: false}),
+      );
+    }
+
+    // 发电
+    if (me.getFlowNumByData(data[4]) > 0) {
+      resArr.push(
+        ...me.getFlowArrow({x: 63, y: 31, nums: 2, small: false, plus: true, vertical: false}),
+      );
+    }
+
+    // 坨一来气
+    if (me.getFlowNumByData(data[5]) > 0) {
+      resArr.push(
+        ...me.getFlowArrow({x: 65, y: 62, nums: 1, small: false, plus: true, vertical: true}),
+        ...me.getFlowArrow({x: 63, y: 92.2, nums: 2, small: false, plus: true, vertical: false}),
+      );
+    }
+
+    return resArr;
   },
 };
 

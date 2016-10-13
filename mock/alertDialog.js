@@ -31,7 +31,7 @@ module.exports = {
         success: 1,
         data: {
           title: '报警!',
-          alert: 1, // 1 显示报警, 0:不报警
+          alert: 0, // 1 显示报警, 0:不报警
           data: getData(),
           params: {
             // width: "1500",

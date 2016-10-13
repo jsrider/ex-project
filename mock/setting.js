@@ -45,6 +45,9 @@ module.exports = {
               id: {
                 disabled: 1, // 1 禁止用户修改
                 title: 'ID'
+              },
+              "key": {
+                // ....
               }
             }
           },
