@@ -130,7 +130,7 @@ function SideMenu({ dispatch, menuKey, sideMenu, pageData }) {
           mode="inline"
           style={{
             height: window.innerHeight - 100,
-            overflow: 'auto'
+            overflowY: 'auto'
           }}
     >
       <SubMenu key="menu" title={<span><Icon type="folder" /><span>{title}</span></span>}>
