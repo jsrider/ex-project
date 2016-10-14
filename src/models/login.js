@@ -26,13 +26,13 @@ export default {
   },
 
   effects: {
-    *loginFetch({ values }, { put, call}) {
+    *loginFetch({ values, menuKey }, { put, call}) {
       // debugger;
-      // const menuType = menuKey.split('-')[1];
+      const menuType = menuKey.split('-')[1];
 
       // const [menuTitle, menuType] = typeof menuKey === 'string' ? menuKey.split('-') : [];
 
-      const { data } = yield call(query, { password: values.password }, 'login');
+      const { data } = yield call(query, { password: values.password }, `${menuType}Login`);
       //
       if (typeof data === 'object' && data.success == 1) {
         message.success('密码验证成功!', 4);

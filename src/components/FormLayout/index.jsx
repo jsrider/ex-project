@@ -75,6 +75,19 @@ class FormLayout extends React.Component {
 
   };
 
+  onSelectChange (e) {
+    const { dispatch, form, menuKey } = this.props;
+    const { getFieldValue } = form;
+
+    if (menuKey === routerPath.dealAlert || menuKey === routerPath.setSetting) {
+
+      dispatch({
+        type: 'formSelects/queryData',
+        station: getFieldValue('station_point'),
+      });
+    }
+  };
+
   render() {
 
     console.log('FormLayout', this.props);
@@ -197,6 +210,15 @@ class FormLayout extends React.Component {
           Object.keys(selects).map((key, index) => {
             const selectEl = selects[key];
 
+            const selectProps = {
+              placeholder: `请选择${selectEl.label}`,
+              style: {width: selectWidth},
+            };
+
+            if (key === 'station_point') {
+              selectProps.onBlur = this.onSelectChange.bind(this)
+            }
+
             if (!selectEl) {
               return;
             }
@@ -210,7 +232,7 @@ class FormLayout extends React.Component {
                 {getFieldDecorator(key, {
                   initialValue: selectEl.init
                 })(
-                  <Select placeholder={`请选择${selectEl.label}`} style={{width: selectWidth}}>
+                  <Select { ...selectProps } >
                     {
                       selectEl.data.map((el, i) => <Option key={i} value={el.value}>{el.title || el.value}</Option>)
                     }

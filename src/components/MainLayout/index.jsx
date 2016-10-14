@@ -16,7 +16,7 @@ class MainLayout extends React.Component {
 
   // 密码校验弹窗
   getModalForm() {
-    const { dispatch, userCenter } = this.props;
+    const { dispatch, userCenter, menuKey } = this.props;
 
     const modalProps = {
       options: {
@@ -38,6 +38,7 @@ class MainLayout extends React.Component {
         dispatch({
           type: 'userCenter/loginFetch',
           values,
+          menuKey,
         });
       },
       handleCancel: () => {
