@@ -96,6 +96,7 @@ const initView = (nodeView, nodes) => {
 };
 
 let drawFlowTimer = null;
+let reloadTimer = null;
 let getDataTimer = null;
 let chart = null;
 
@@ -169,6 +170,8 @@ const drawChart = (data, station) => {
     .tooltip(false)
     .render();
 
+  reloadTimer && window.clearInterval(reloadTimer);
+
   return drawStation;
 };
 
@@ -196,6 +199,8 @@ function FlowChart(props) {
     loading || flowData && drawChart(flowData, station)
   } catch (e) {
     console.log('error:', e);
+    reloadTimer = window.setTimeout(() => {drawChart(flowData, station)}, 500);
+    // location.reload();
   }
 
   return (

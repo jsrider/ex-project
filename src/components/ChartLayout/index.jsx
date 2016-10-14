@@ -7,6 +7,7 @@ import G2 from 'g2';
 let chartCvs = {};
 let chartWidth = 0;
 const CHART_ID = 'c1';
+let reloadTimer = null;
 
 function FormLayout(props) {
   console.log('ChartLayout', props);
@@ -32,7 +33,7 @@ function FormLayout(props) {
       }
       chartCvs[dataKey] = new G2.Chart({
         id: 'c1',
-        width: chartWidth || (chartWidth = document.getElementById(CHART_ID).offsetWidth) || 800,
+        width: chartWidth || (chartWidth = document.getElementById(CHART_ID) && document.getElementById(CHART_ID).offsetWidth) || 952,
         height,
         plotCfg: {
           margin: [20, 80, 100, 80]
@@ -74,7 +75,13 @@ function FormLayout(props) {
 
   };
 
-  loading || chartData.data && drawChart(chartData.data);
+  try {
+    loading || chartData.data && drawChart(chartData.data);
+  } catch (e) {
+    console.log('error:', e);
+    reloadTimer = window.setTimeout(() => {drawChart(chartData.data)}, 500);
+    // location.reload();
+  }
 
   return (
     <div>

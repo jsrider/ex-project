@@ -93,10 +93,6 @@ class FormLayout extends React.Component {
 
     let dateItem = null;
 
-    if (menuType === 'table') {
-      monitor_point && (monitor_point.hide = 1)
-    }
-
     let format = 'YYYY-MM-DD';
 
     // 根据不同的 类型 显示对应控件
@@ -167,9 +163,15 @@ class FormLayout extends React.Component {
         break;
 
       default:
-        selects = {
-          monitor_point,
-          data_info
+        if (menuType === 'chart') {
+          selects = {
+            monitor_point,
+            data_info
+          }
+        } else {
+          selects = {
+            data_info
+          }
         }
     }
 
@@ -184,6 +186,7 @@ class FormLayout extends React.Component {
         ...selects
       }
     }
+
 
     return (
       <Form inline onSubmit={this.handleSubmit.bind(this)}>
