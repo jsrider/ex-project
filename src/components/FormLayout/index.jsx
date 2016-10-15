@@ -102,7 +102,7 @@ class FormLayout extends React.Component {
       return ;
     }
 
-    const { monitor_point, time_interval, time_date, time_month, time_range, station_point, unusual_value, data_info, tolerance_value, alert_value } = formSelects;
+    const { monitor_point, time_interval, time_date, time_month, time_range, station_point, unusual_value, data_info, alert_value } = formSelects;
 
     let dateItem = null;
 
@@ -188,12 +188,7 @@ class FormLayout extends React.Component {
         }
     }
 
-    if (menuTitle === 'ri' || menuTitle === 'yue') {
-      selects = {
-        tolerance_value,
-        ...selects
-      }
-    } else if (menuTitle === 'lishi' || menuTitle === 'shishi') {
+    if (menuTitle === 'lishi' || menuTitle === 'shishi') {
       selects = {
         time_interval,
         ...selects
