@@ -32,7 +32,7 @@ export default {
 
       // const [menuTitle, menuType] = typeof menuKey === 'string' ? menuKey.split('-') : [];
 
-      const { data } = yield call(query, { password: values.password }, `${menuType}Login`);
+      const { data } = yield call(query, { password: values.password }, `${menuType === 'setting' ? 'setting' : 'alert'}Login`);
       //
       if (typeof data === 'object' && data.success == 1) {
         message.success('密码验证成功!', 4);

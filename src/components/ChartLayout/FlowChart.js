@@ -149,15 +149,24 @@ const drawChart = (data, station) => {
   // 创建可变数据视图
   const dataView = chart.createView();
 
-
+  // function stop() {
+  //   if (requestId) {
+  //     window.cancelRequestAnimationFrame(requestId);
+  //     requestId = undefined;
+  //   }
+  // }
   const drawFlow = () => {
     flowView.changeData(drawStation.flowView(flowData));
-    // window.requestAnimationFrame(drawFlow);
+
     // window.setTimeout(drawFlow, 100);
   };
 
-  drawFlowTimer && clearInterval(drawFlowTimer);
+  // drawFlowTimer && window.cancelAnimationFrame(drawFlowTimer);
+  // if (!drawFlowTimer) {
+  //   drawFlowTimer = window.requestAnimationFrame(drawFlow);
+  // }
 
+  drawFlowTimer && clearInterval(drawFlowTimer);
   drawFlowTimer = flowView && window.setInterval(drawFlow, 100);
 
   initView(pipelineView, nodesPipeline);
