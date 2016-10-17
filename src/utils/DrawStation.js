@@ -502,8 +502,10 @@ const unicodeText = {
 };
 
 const registText = {
-  flowContent({ dataObj, title, idx, keyArr }) {
-    G2.Shape.registShape('point', `flow_content${idx}`, {
+  flowContent({ dataObj, title, idx, keyArr, vertical }) {
+    const name = vertical ? `flow_content${idx}_vertical` : `flow_content${idx}`;
+
+    G2.Shape.registShape('point', name, {
       drawShape: function(cfg, group) {
         const { x, y } = cfg;
         // debugger;
@@ -543,24 +545,29 @@ const registText = {
           });
         });
 
-        group.addShape('text', {
-          attrs: {
-            x: x2,
-            y: y2,
-            text: title,
-            ...textConfig,
-          }
-        });
+        // title
+        if (vertical) {
+          group.addShape('text', {
+            attrs: {
+              x: x2,
+              y: y2,
+              text: title,
+              ...textConfig,
+            }
+          });
+        } else {
 
-        // group.addShape('rect', {
-        //   attrs: {
-        //     x: x2 - 60,
-        //     y: y2 - 5,
-        //     width: 80,
-        //     height: 110,
-        //     stroke: 'blue'
-        //   }
-        // });
+          group.addShape('text', {
+            attrs: {
+              x: x - 19,
+              y: y2 + 144,
+              text: title,
+              ...textConfig,
+              textAlign: 'center',
+            }
+          });
+        }
+
       }
     });
   },
@@ -601,9 +608,11 @@ DrawStation.prototype = {
     const stationTitle = this.stationTitle;
 
     const getStation = (x, y, idx, vertical) => {
-      registText.flowContent({dataObj: data[idx], title: stationTitle[idx], keyArr, idx});
+      const name = vertical ? `flow_content${idx}_vertical` : `flow_content${idx}`;
 
-      return me.getTextBySwitch(`flow_content${idx}`, x, y, vertical)
+      registText.flowContent({dataObj: data[idx], title: stationTitle[idx], keyArr, idx, vertical});
+
+      return me.getTextBySwitch(name, x, y, vertical)
     };
 
     const dataXY = this.getSwitchData();
@@ -611,7 +620,7 @@ DrawStation.prototype = {
     // 数据文字
     if (Array.isArray(stationTitle)) {
       for (let i = 0; i < stationTitle.length; i++) {
-        registText.flowContent({dataObj: data[i], title: stationTitle[i], keyArr, idx: i});
+        registText.flowContent({dataObj: data[i], title: stationTitle[i], keyArr, idx: i, vertical: dataXY[i].vertical});
 
         resArr.push(getStation(dataXY[i].x, dataXY[i].y, i, dataXY[i].vertical))
       }
@@ -1009,9 +1018,9 @@ stationsObj[stationObj.zhongxinzhan] = {
     const stationTitle = this.stationTitle;
 
     const getStation = (x, y, idx) => {
-      registText.flowContent({dataObj: data[idx], title: stationTitle[idx], keyArr, idx});
+      registText.flowContent({dataObj: data[idx], title: stationTitle[idx], keyArr, idx, vertical: true});
 
-      return {type: `flow_content${idx}`,x, y}
+      return {type: `flow_content${idx}_vertical`,x, y}
     };
 
     // 底部文字
@@ -1025,8 +1034,8 @@ stationsObj[stationObj.zhongxinzhan] = {
     }
 
     return resArr.concat([
-      {type: 'flow_content5',x: 33, y: 50},
-      {type: 'flow_content6',x: 83, y: 50},
+      {type: 'flow_content5',x: 33, y: 53},
+      {type: 'flow_content6',x: 83, y: 53},
     ])
   },
 };
@@ -1034,17 +1043,17 @@ stationsObj[stationObj.zhongxinzhan] = {
 stationsObj[stationObj.tuoyizhan] = {
   getSwitchData() {
     const [x1, x2, x3] = [10, 40, 70];
-    const [y1, y2, y3, y4] = [30, 62, 91, 96];
+    const [y1, y2, y3, y4] = [30, 60, 89, 92];
 
     return [
       {x: x2, y: y1},
       {x: x3, y: y1},
-      {x: x1, y: y2},
-      {x: x2, y: y2},
       {x: x3, y: y2},
-      {x: x1, y: y3},
-      {x: x2, y: y4},
       {x: x3, y: y4},
+      {x: x2, y: y2},
+      {x: x2, y: y4},
+      {x: x1, y: y2},
+      {x: x1, y: y3},
     ];
   },
   staticView() {
@@ -1113,7 +1122,7 @@ stationsObj[stationObj.tuoyizhan] = {
       drawShape: function (cfg, group) {
         const {x, y} = cfg;
         const x2 = x - 60;
-        const y2 = y + 125;
+        const y2 = y + 115;
         const x3 = x2 - 780;
 
         const point = [
@@ -1132,7 +1141,7 @@ stationsObj[stationObj.tuoyizhan] = {
         const {x, y} = cfg;
 
         const x2 = x + 300;
-        const y2 = y + 170;
+        const y2 = y + 160;
         const x3 = x - 300;
 
         const point = [
@@ -1168,8 +1177,8 @@ stationsObj[stationObj.tuoyizhan] = {
 
     return resArr.concat([
       {type: 'pots_path', x: 95, y: 38},
-      {type: 'pots_path_right', x: 60, y: 63},
-      {type: 'pots_path_left', x: 25, y: 63},
+      {type: 'pots_path_right', x: 60, y: 61},
+      {type: 'pots_path_left', x: 25, y: 61},
     ])
   },
   flowView() {
@@ -1201,14 +1210,14 @@ stationsObj[stationObj.tuoyizhan] = {
     // 轻烃出口
     if (me.getFlowNumByData(data[2]) > 0) {
       resArr.push(
-        ...me.getFlowArrow({x: 23, y: 63, nums: 2, small: false, plus: false, vertical: false}),
+        ...me.getFlowArrow({x: 23, y: 61, nums: 2, small: false, plus: false, vertical: false}),
       );
     }
 
     // 去宁海
     if (me.getFlowNumByData(data[3]) > 0) {
       resArr.push(
-        ...me.getFlowArrow({x: 45, y: 63, nums: 3, small: false, plus: false, vertical: false}),
+        ...me.getFlowArrow({x: 45, y: 61, nums: 3, small: false, plus: false, vertical: false}),
       );
     }
 
@@ -1216,7 +1225,7 @@ stationsObj[stationObj.tuoyizhan] = {
     if (me.getFlowNumByData(data[4]) > 0) {
       resArr.push(
         ...me.getFlowArrow({x: 88.6, y: 40, nums: 3, small: true, plus: true, vertical: true}),
-        ...me.getFlowArrow({x: 79, y: 63, nums: 2, small: false, plus: false, vertical: false}),
+        ...me.getFlowArrow({x: 79, y: 61, nums: 2, small: false, plus: false, vertical: false}),
       );
     }
 
@@ -1224,21 +1233,21 @@ stationsObj[stationObj.tuoyizhan] = {
     if (me.getFlowNumByData(data[5]) > 0) {
       resArr.push(
         ...me.getFlowArrow({x: 25, y: 65, nums: 3, small: true, plus: true, vertical: true}),
-        ...me.getFlowArrow({x: 12, y: 92, nums: 4, small: true, plus: false, vertical: false}),
+        ...me.getFlowArrow({x: 12, y: 90, nums: 4, small: true, plus: false, vertical: false}),
       );
     }
 
     // 坨一汇东
     if (me.getFlowNumByData(data[6]) > 0) {
       resArr.push(
-        ...me.getFlowArrow({x: 48, y: 97, nums: 2, small: false, plus: false, vertical: false}),
+        ...me.getFlowArrow({x: 48, y: 93, nums: 2, small: false, plus: false, vertical: false}),
       );
     }
 
     // 镇政府
     if (me.getFlowNumByData(data[7]) > 0) {
       resArr.push(
-        ...me.getFlowArrow({x: 60, y: 97, nums: 2, small: false, plus: true, vertical: false}),
+        ...me.getFlowArrow({x: 60, y: 93, nums: 2, small: false, plus: true, vertical: false}),
       );
     }
 
@@ -1404,7 +1413,7 @@ stationsObj[stationObj.tuoerzhan] = {
 stationsObj[stationObj.tuosanzhan] = {
   getSwitchData() {
     const [x1, x2, x3, x4] = [21, 52, 63, 73];
-    const [y1, y2, y3, y4] = [20, 30, 62, 96];
+    const [y1, y2, y3, y4] = [20, 30, 62, 92];
 
     return [
       {x: x1, y: y3 - 4, vertical: false},
@@ -1414,7 +1423,7 @@ stationsObj[stationObj.tuosanzhan] = {
       {x: x4, y: y3, vertical: false},
       {x: x3, y: y2 + 5, vertical: true},
       {x: x4, y: y4, vertical: false},
-      {x: 78, y: y1 - 13, vertical: true},
+      {x: 92.15, y: y1 - 13, vertical: true},
     ];
   },
   staticView() {
@@ -1464,6 +1473,7 @@ stationsObj[stationObj.tuosanzhan] = {
         const y2 = y - 66;
         const y3 = y + 55;
         const x3 = x2 + 700;
+        const y4 = y - 150;
 
         const point = [
           {type: 'M', x: x, y: y},
@@ -1471,6 +1481,7 @@ stationsObj[stationObj.tuosanzhan] = {
           {type: 'L', x: x2, y: y2},
           {type: 'L', x: x2, y: y3},
           {type: 'L', x: x3, y: y3},
+          {type: 'L', x: x3, y: y4},
         ];
 
         return registPath.addShape(group, pan_line.normal, point)
@@ -1483,7 +1494,7 @@ stationsObj[stationObj.tuosanzhan] = {
         const {x, y} = cfg;
         const x2 = x - 280;
         const y2 = y + 140;
-        const y3 = y2 + 190;
+        const y3 = y2 + 170;
 
         const x21 = x2 + 50;
         const y21 = y2 + 50;
@@ -1495,8 +1506,10 @@ stationsObj[stationObj.tuosanzhan] = {
           {type: 'M', x: x21, y: y2},
           {type: 'L', x: x21, y: y21},
           {type: 'L', x: x, y: y21},
+          {type: 'L', x: x, y: y2},
           {type: 'M', x: x, y: y2},
-          {type: 'L', x: x, y: y3},
+          {type: 'L', x: x+50, y: y2},
+          {type: 'L', x: x+50, y: y3},
           {type: 'L', x: x2, y: y3},
         ];
 
@@ -1510,7 +1523,7 @@ stationsObj[stationObj.tuosanzhan] = {
         const {x, y} = cfg;
         const x2 = x + 280;
         const y2 = y + 160;
-        const y3 = y2 + 170;
+        const y3 = y2 + 150;
 
         const point = [
           {type: 'M', x: x, y: y},
@@ -1546,7 +1559,7 @@ stationsObj[stationObj.tuosanzhan] = {
       {type: 'path_left1', x: 40, y: 31},
       {type: 'path_right1', x: 62.3, y: 31},
       {type: 'path_top_left', x: 51.3, y: 31},
-      {type: 'path_top_left', x: 77.3, y: 31},
+      // {type: 'path_top_left', x: 91.3, y: 31.8},
     ])
   },
 
@@ -1558,7 +1571,7 @@ stationsObj[stationObj.tuosanzhan] = {
     resArr.push(
       ...me.getFlowArrow({x: 38, y: 31, nums: 4, small: false, plus: true, vertical: false}),
       ...me.getFlowArrow({x: 62.3, y: 53, nums: 2, small: false, plus: true, vertical: true}),
-      ...me.getFlowArrow({x: 40, y: 33, nums: 3, small: false, plus: true, vertical: true}),
+      ...me.getFlowArrow({x: 40, y: 33, nums: 1, small: false, plus: true, vertical: true}),
       ...me.getFlowArrow({x: 38, y: 69, nums: 1, small: false, plus: false, vertical: false}),
     );
 
@@ -1572,7 +1585,9 @@ stationsObj[stationObj.tuosanzhan] = {
     // 坨三稳定
     if (me.getFlowNumByData(data[1]) > 0) {
       resArr.push(
-        ...me.getFlowArrow({x: 29, y: 97, nums: 2, small: false, plus: false, vertical: false}),
+        ...me.getFlowArrow({x: 46.7, y: 59, nums: 1, small: true, plus: false, vertical: false}),
+        ...me.getFlowArrow({x: 45.35, y: 90, nums: 1, small: false, plus: false, vertical: true}),
+        ...me.getFlowArrow({x: 10, y: 93, nums: 2, small: false, plus: true, vertical: false}),
       );
     }
 
@@ -1609,14 +1624,14 @@ stationsObj[stationObj.tuosanzhan] = {
     // 殡仪馆
     if (me.getFlowNumByData(data[6]) > 0) {
       resArr.push(
-        ...me.getFlowArrow({x: 62, y: 97, nums: 2, small: false, plus: true, vertical: false}),
+        ...me.getFlowArrow({x: 62, y: 93, nums: 2, small: false, plus: true, vertical: false}),
       );
     }
 
     // 坨三外输
     if (me.getFlowNumByData(data[7]) > 0) {
       resArr.push(
-        ...me.getFlowArrow({x: 77.3, y: 31, nums: 1, small: false, plus: false, vertical: true}),
+        ...me.getFlowArrow({x: 91.45, y: 31, nums: 1, small: false, plus: false, vertical: true}),
       );
     }
 
@@ -1927,7 +1942,7 @@ stationsObj[stationObj.tuowuzhan] = {
     // 坨三来气
     if (me.getFlowNumByData(data[0]) > 0) {
       resArr.push(
-        ...me.getFlowArrow({x: 25, y: 63, nums: 1, small: false, plus: false, vertical: false}),
+        ...me.getFlowArrow({x: 7, y: 63, nums: 1, small: false, plus: true, vertical: false}),
       );
     }
 
@@ -1943,14 +1958,14 @@ stationsObj[stationObj.tuowuzhan] = {
     // 轻烃进口
     if (me.getFlowNumByData(data[2]) > 0) {
       resArr.push(
-        ...me.getFlowArrow({x: 45, y: 63, nums: 1, small: false, plus: false, vertical: false}),
+        ...me.getFlowArrow({x: 25, y: 63, nums: 1, small: false, plus: true, vertical: false}),
       );
     }
 
     // 轻烃出口
     if (me.getFlowNumByData(data[3]) > 0) {
       resArr.push(
-        ...me.getFlowArrow({x: 75, y: 63, nums: 1, small: false, plus: false, vertical: false}),
+        ...me.getFlowArrow({x: 55, y: 63, nums: 1, small: false, plus: true, vertical: false}),
       );
     }
 
@@ -2073,7 +2088,7 @@ stationsObj[stationObj.tuoliuzhan] = {
         const {x, y} = cfg;
 
         const y2 = y + 180;
-        const x2 = x - 658;
+        const x2 = x - 320;
         // const x3 = x - 240;
 
         const point = [
@@ -2112,8 +2127,8 @@ stationsObj[stationObj.tuoliuzhan] = {
     // 鲁胜
     if (me.getFlowNumByData(data[1]) > 0) {
       resArr.push(
-        ...me.getFlowArrow({x: 85, y: 34, nums: 1, small: false, plus: true, vertical: true}),
-        ...me.getFlowArrow({x: 33, y: 67, nums: 6, small: false, plus: false, vertical: false}),
+        ...me.getFlowArrow({x: 85, y: 64, nums: 1, small: false, plus: false, vertical: true}),
+        ...me.getFlowArrow({x: 56, y: 67, nums: 2, small: false, plus: true, vertical: false}),
       );
     }
 
@@ -2272,8 +2287,8 @@ stationsObj[stationObj.ninghaizhan] = {
     // 宁海稳定
     if (me.getFlowNumByData(data[0]) > 0) {
       resArr.push(
-        ...me.getFlowArrow({x: 33.55, y: 40, nums: 2, small: false, plus: true, vertical: true}),
-        ...me.getFlowArrow({x: 22, y: 92, nums: 2, small: false, plus: false, vertical: false}),
+        ...me.getFlowArrow({x: 33.55, y: 76, nums: 2, small: false, plus: false, vertical: true}),
+        ...me.getFlowArrow({x: 0, y: 92, nums: 2, small: false, plus: true, vertical: false}),
       );
     }
 
@@ -2310,8 +2325,8 @@ stationsObj[stationObj.ninghaizhan] = {
     // 坨一来气
     if (me.getFlowNumByData(data[5]) > 0) {
       resArr.push(
-        ...me.getFlowArrow({x: 65, y: 62, nums: 1, small: false, plus: true, vertical: true}),
-        ...me.getFlowArrow({x: 63, y: 92.2, nums: 2, small: false, plus: true, vertical: false}),
+        ...me.getFlowArrow({x: 65, y: 92, nums: 1, small: false, plus: false, vertical: true}),
+        ...me.getFlowArrow({x: 83, y: 92.2, nums: 2, small: false, plus: false, vertical: false}),
       );
     }
 

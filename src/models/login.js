@@ -45,12 +45,22 @@ export default {
           // apiType: menuType,
         });
       } else {
-        message.error(data.message, 9)
+        if (typeof data === 'object' && typeof data.message === 'string') {
+          message.error(data.message);
+        } else {
+          message.error('请求失败,请确保网络通畅,接口正确!');
+        }
+        yield put({
+          type: 'timeOut',
+        });
       }
     },
   },
 
   reducers: {
+    timeOut(state) {
+      return { ...state, loading: false };
+    },
     loginSuccess(state) {
       return { ...state, login: true };
     },

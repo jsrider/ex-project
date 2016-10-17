@@ -164,7 +164,7 @@ class FormLayout extends React.Component {
           station_point,
           monitor_point,
           unusual_value,
-          alert_value,
+          // alert_value,
         };
         break;
 

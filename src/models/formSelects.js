@@ -1,5 +1,6 @@
 import { query } from '../services/formSelects';
 import * as routerPath from '../utils/routerPath';
+import { message } from 'antd';
 
 export default {
   namespace: 'formSelects',
@@ -45,11 +46,23 @@ export default {
           data,
           // apiType: menuType,
         });
+      } else {
+        if (typeof data === 'object' && typeof data.message === 'string') {
+          message.error(data.message);
+        } else {
+          message.error('请求失败,请确保网络通畅,接口正确!');
+        }
+        yield put({
+          type: 'timeOut',
+        });
       }
     },
   },
 
   reducers: {
+    timeOut(state) {
+      return { ...state, loading: false };
+    },
     querySuccess(state, { data }) {
 
       return { ...state, ...data.data };

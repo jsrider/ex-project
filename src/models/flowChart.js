@@ -2,6 +2,7 @@ import { query } from '../services/formSelects';
 import { pageParams } from '../utils/pageParams';
 import * as routerPath from '../utils/routerPath';
 import getMenuKeyFromUrl from '../utils/getMenuKeyFromUrl';
+import { message } from 'antd';
 
 export default {
   namespace: 'flowChart',
@@ -55,6 +56,15 @@ export default {
           data,
           // apiType: menuType,
         });
+      } else {
+        if (typeof data === 'object' && typeof data.message === 'string') {
+          message.error(data.message);
+        } else {
+          message.error('请求失败,请确保网络通畅,接口正确!');
+        }
+        yield put({
+          type: 'timeOut',
+        });
       }
     },
   },
@@ -62,6 +72,9 @@ export default {
   reducers: {
     showLoading(state, { station }) {
       return { ...state, loading: true, station, init: false };
+    },
+    timeOut(state) {
+      return { ...state, loading: false };
     },
     querySuccess(state, { data }) {
 

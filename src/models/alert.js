@@ -51,6 +51,15 @@ export default {
           current: payloadObj.current || 1
           // apiType: menuType,
         });
+      } else {
+        if (typeof data === 'object' && typeof data.message === 'string') {
+          message.error(data.message);
+        } else {
+          message.error('请求失败,请确保网络通畅,接口正确!');
+        }
+        yield put({
+          type: 'timeOut',
+        });
       }
     },
     *operateRecord({ payloadObj, opType }, { put, call}) {
@@ -67,6 +76,15 @@ export default {
           data,
           // apiType: menuType,
         });
+      } else {
+        if (typeof data === 'object' && typeof data.message === 'string') {
+          message.error(data.message);
+        } else {
+          message.error('请求失败,请确保网络通畅,接口正确!');
+        }
+        yield put({
+          type: 'timeOut',
+        });
       }
     },
   },
@@ -74,6 +92,9 @@ export default {
   reducers: {
     showLoading(state) {
       return { ...state, loading: true };
+    },
+    timeOut(state) {
+      return { ...state, loading: false };
     },
     querySuccess(state, { data, current }) {
       const res = {};

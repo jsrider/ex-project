@@ -1,4 +1,5 @@
 import { query } from '../services/formSelects';
+import { message } from 'antd';
 
 export default {
 
@@ -29,6 +30,16 @@ export default {
           data,
           // apiType: menuType,
         });
+      } else {
+
+        if (typeof data === 'object' && typeof data.message === 'string') {
+          message.error(data.message);
+        } else {
+          message.error('请求失败,请确保网络通畅,接口正确!');
+        }
+        yield put({
+          type: 'timeOut',
+        });
       }
     },
     *fetchDialogSubmit({ values }, { put, call}) {
@@ -41,6 +52,15 @@ export default {
           type: 'fetchSuccess',
           data,
           // apiType: menuType,
+        });
+      } else {
+        if (typeof data === 'object' && typeof data.message === 'string') {
+          message.error(data.message);
+        } else {
+          message.error('请求失败,请确保网络通畅,接口正确!');
+        }
+        yield put({
+          type: 'timeOut',
         });
       }
     },
@@ -57,6 +77,9 @@ export default {
   reducers: {
     close(state) {
       return { ...state, alert: 0 }
+    },
+    timeOut(state) {
+      return { ...state, loading: false };
     },
     fetchSuccess(state, { data }) {
 
