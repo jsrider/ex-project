@@ -49,6 +49,32 @@ class MainLayout extends React.Component {
     return <ModalForm {...modalProps} />;
   };
 
+  // 阻止使用弹窗
+  getKeyFile() {
+    const { userCenter } = this.props;
+
+    const modalProps = {
+      options: {
+        password: ''
+      },
+      title: '需要 key 文件激活产品',
+      visible: userCenter.needKey || false,
+      modifySetting: {
+      },
+      elementsFields: [],
+      cancel: false,
+      handleOk: (values) => {
+        // console.log('handleOk:', values);
+        return alert('需要 key 文件激活产品,才能继续使用!');
+      },
+      handleCancel: () => {
+        return false;
+      }
+    };
+
+    return <ModalForm {...modalProps} />;
+  };
+
   // 报警弹窗
   getModalFormAlert() {
     const { dispatch, alertDialog } = this.props;
@@ -157,6 +183,7 @@ class MainLayout extends React.Component {
           </div>
           {this.getModalForm()}
           {this.getModalFormAlert()}
+          {this.getKeyFile()}
         </div>
       </div>
     );

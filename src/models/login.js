@@ -4,13 +4,17 @@ import lsCache from '../utils/cache';
 import * as routerPath from '../utils/routerPath';
 
 const cache = lsCache('user_login', true);
+const cacheKey = lsCache('user_key', false);
+const alertTime = 1480521600000; // key value 12-1
+const deadLineTime = 1483056000000; // 12-30
 
 export default {
 
   namespace: 'userCenter',
 
   state: {
-    login: cache.getValue() == 1 || false
+    login: cache.getValue() == 1 || false,
+    needKey: false
   },
 
   subscriptions: {
@@ -19,6 +23,12 @@ export default {
         if (pathname.includes(routerPath.setSetting)) {
           dispatch({
             type: 'needLogin'
+          })
+        }
+
+        if (new Date().getTime() > alertTime && cacheKey.getValue() != alertTime) {
+          dispatch({
+            type: 'getKeyFile'
           })
         }
       });
@@ -55,6 +65,29 @@ export default {
         });
       }
     },
+    *getKeyFile({ key }, { put, call}) {
+
+      const { data } = yield call(query, {}, 'getKey');
+      // debugger;
+
+      if (typeof data === 'object' && data.success == 1 && data.data == alertTime) {
+        cacheKey.setValue(alertTime);
+      } else {
+        if (typeof data === 'object' && typeof data.message === 'string') {
+          alert(`msg: ${data.message}`);
+        } else {
+          alert('need key file')
+        }
+
+        //  deadLine
+        if (new Date().getTime() > deadLineTime) {
+          yield put({
+            type: 'needKey'
+          });
+          alert('you can not use this product without key file!')
+        }
+      }
+    },
   },
 
   reducers: {
@@ -66,6 +99,9 @@ export default {
     },
     needLogin(state) {
       return { ...state, login: false };
+    },
+    needKey(state) {
+      return { ...state, needKey: true };
     },
   },
 
