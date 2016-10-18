@@ -41,7 +41,7 @@ function FormLayout(props) {
       title: '时间',
       dataIndex: 'time',
       key: 'time',
-      width: 100,
+      width: 120,
       render: getRealHtml,
       fixed: 'left',
     },
@@ -49,7 +49,7 @@ function FormLayout(props) {
 
   if (Array.isArray(data) && data.length && params) {
 
-    const { groupArr, groupArrCN, keyArr, keyArrCN } = params;
+    const { groupArr, groupArrCN, keyArr, keyArrCN, widthArr } = params;
     const len = groupArr.length;
 
     for (let i = 0; i < len; i++) {
@@ -58,12 +58,12 @@ function FormLayout(props) {
         children: []
       };
 
-      obj.children = keyArr.map(el => {
+      obj.children = keyArr.map((el, idx) => {
         return {
           title: keyArrCN[el],
           dataIndex: `${groupArr[i]}${el}`,
           key: `${groupArr[i]}${el}`,
-          width: 100,
+          width: widthArr[idx],
           render: getRealHtml
         }
       });

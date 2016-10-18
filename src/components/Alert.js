@@ -16,13 +16,14 @@ const Alert = (props) => {
 
   if (Array.isArray(data) && data.length && params) {
 
-    const { keyArr, keyArrCN } = params;
+    const { keyArr, keyArrCN, widthArr } = params;
     const len = keyArr.length;
 
     for (let i = 0; i < len; i++) {
       columns.push({
         title: keyArrCN[i] || keyArr[i],
         dataIndex: keyArr[i],
+        width: widthArr[i],
       })
     }
   } else {
