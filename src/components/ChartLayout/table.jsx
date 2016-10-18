@@ -42,8 +42,8 @@ function FormLayout(props) {
       dataIndex: 'time',
       key: 'time',
       width: 100,
-      render: getRealHtml
-      // fixed: 'left',
+      render: getRealHtml,
+      fixed: 'left',
     },
   ];
 
