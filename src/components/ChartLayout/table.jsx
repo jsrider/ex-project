@@ -63,7 +63,7 @@ function FormLayout(props) {
           title: keyArrCN[el],
           dataIndex: `${groupArr[i]}${el}`,
           key: `${groupArr[i]}${el}`,
-          width: widthArr[idx],
+          width: widthArr ? widthArr[idx] : 0,
           render: getRealHtml
         }
       });

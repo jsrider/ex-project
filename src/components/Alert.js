@@ -23,7 +23,7 @@ const Alert = (props) => {
       columns.push({
         title: keyArrCN[i] || keyArr[i],
         dataIndex: keyArr[i],
-        width: widthArr[i],
+        width: widthArr ? widthArr[i] : 0,
       })
     }
   } else {

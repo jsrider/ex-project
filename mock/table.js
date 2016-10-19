@@ -3,7 +3,7 @@
 const groupArr = ['one', 'two', 'three', 'four', 'five'];
 const groupArrCN = ['一', '二', '三', '四', '五'];
 const keyArr = ['template', 'pressure', 'flow', 'total', 'tolerance'];
-const widthArr = [100, 100, 100, 100, 150];
+const widthArr = [100, 100, 100, 100, 0]; // 0 自适应
 const keyArrCN = {
   template: '温度',
   pressure: '压力',

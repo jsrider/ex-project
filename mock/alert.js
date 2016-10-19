@@ -2,7 +2,7 @@
 
 const keyArr = ['altime', 'site', 'check', 'exception', 'value', 'dealtime', 'dealpeople', 'dealmsg'];
 const keyArrCN = ['报警时间', '站点', '检测点', '异常量', '数值', '处理时间', '处理人', '处理信息'];
-const widthArr = [150, 100, 100, 80, 100, 100, 100, 200];
+const widthArr = [150, 100, 100, 80, 100, 100, 100, 0]; // 0 自适应
 
 const getData = () => {
   const data = [];
