@@ -45,7 +45,7 @@ module.exports = {
           title: '总览日曲线',
           data: getData(),
           params: {
-            width: "2500",
+            width: "3000",
             groupArr,
             groupArrCN,
             keyArr,
