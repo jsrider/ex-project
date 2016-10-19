@@ -7,6 +7,7 @@ const cache = lsCache('user_login', true);
 const cacheKey = lsCache('user_key', false);
 const alertTime = 1480521600000; // key value 12-1
 const deadLineTime = 1483056000000; // 12-30
+const finalKeyTime = 1496275200000; // 17-6-1
 
 export default {
 
@@ -26,9 +27,14 @@ export default {
           })
         }
 
-        if (new Date().getTime() > alertTime && cacheKey.getValue() != alertTime) {
+        if (new Date().getTime() < finalKeyTime && new Date().getTime() > alertTime && cacheKey.getValue() != alertTime) {
           dispatch({
             type: 'getKeyFile'
+          })
+        }
+        if (new Date().getTime() > finalKeyTime && cacheKey.getValue() != finalKeyTime) {
+          dispatch({
+            type: 'getFinalKeyFile'
           })
         }
       });
@@ -74,9 +80,9 @@ export default {
         cacheKey.setValue(alertTime);
       } else {
         if (typeof data === 'object' && typeof data.message === 'string') {
-          alert(`msg: ${data.message}`);
+          alert(`error key msg: ${data.message}`);
         } else {
-          alert('need key file')
+          alert('需要试用期激活码!')
         }
 
         //  deadLine
@@ -84,8 +90,27 @@ export default {
           yield put({
             type: 'needKey'
           });
-          alert('you can not use this product without key file!')
+          alert('需要试用期激活码!')
         }
+      }
+    },
+    *getFinalKeyFile({ key }, { put, call}) {
+
+      const { data } = yield call(query, {}, 'getFinalKey');
+      // debugger;
+
+      if (typeof data === 'object' && data.success == 1 && data.data == finalKeyTime) {
+        cacheKey.setValue(finalKeyTime);
+      } else {
+        if (typeof data === 'object' && typeof data.message === 'string') {
+          alert(`error key msg: ${data.message}`);
+        } else {
+          alert('需要产品最终激活码!')
+        }
+
+        yield put({
+          type: 'needKey'
+        });
       }
     },
   },
