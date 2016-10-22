@@ -488,7 +488,7 @@ const registPath = {
  * x, y 为图形中心坐标
  */
 const textConfig = {
-  // fontFamily: 'Hiragino Sans GB',
+  fontFamily: '"Microsoft YaHei", SimSun, sans-serif, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Helvetica, "PingFang SC", "Hiragino Sans GB", Hiragino Sans GB',
   fontSize: 14,
   textAlign: 'right',
   textBaseline: 'top',
@@ -541,6 +541,7 @@ const registText = {
               text: flagArr[i],
               ...textConfig,
               textAlign: 'left',
+              fontWeight: 'bold'
             }
           });
         });
@@ -553,6 +554,7 @@ const registText = {
               y: y2,
               text: title,
               ...textConfig,
+              fontWeight: 'bold'
             }
           });
         } else {
@@ -564,6 +566,7 @@ const registText = {
               text: title,
               ...textConfig,
               textAlign: 'center',
+              fontWeight: 'bold',
             }
           });
         }
