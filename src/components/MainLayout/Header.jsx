@@ -11,32 +11,14 @@ function getMenuKeyFromUrl(pathname) {
   } catch (e) {}
   return key;
 }
+const titleImg = require("../../img/header-title.png");
 
 function Header({ location }) {
   return (
-    <div className={styles.header}></div>
+    <div className={styles.header}>
+      <img src={titleImg} width="456" height="28" alt="天然气自动计量监控系统"/>
+    </div>
   )
-
-  return (
-    <Menu
-      selectedKeys={[getMenuKeyFromUrl(location.pathname)]}
-      mode="horizontal"
-      theme="dark"
-    >
-      <Menu.Item key="users">
-        <Link to="/users"><Icon type="bars" />Users</Link>
-      </Menu.Item>
-      <Menu.Item key="home">
-        <Link to="/"><Icon type="home" />Home</Link>
-      </Menu.Item>
-      <Menu.Item key="404">
-        <Link to="/page-you-dont-know"><Icon type="frown-circle" />404</Link>
-      </Menu.Item>
-      <Menu.Item key="antd">
-        <a href="https://github.com/dvajs/dva" target="_blank">dva</a>
-      </Menu.Item>
-    </Menu>
-  );
 }
 
 Header.propTypes = {

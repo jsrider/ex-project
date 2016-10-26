@@ -60,7 +60,8 @@ class FormLayout extends React.Component {
   }
 
   handleSubmit (e) {
-    const { dispatch, menuKey, dispatchType } = this.props;
+    const { dispatch, menuKey, dispatchType, pageData } = this.props;
+    const { station } = pageData;
 
     e && e.preventDefault();
 
@@ -71,6 +72,7 @@ class FormLayout extends React.Component {
       type: dispatchType,
       payloadObj: valueObj,
       menuKey,
+      station
     });
 
   };
@@ -87,6 +89,24 @@ class FormLayout extends React.Component {
       });
     }
   };
+
+  getSelectItem(select) {
+    const { getFieldDecorator } = this.props.form;
+
+    return <FormItem
+      label={select.label}
+    >
+      {getFieldDecorator('data_info', {
+        initialValue: select.init
+      })(
+        <Select placeholder={`请选择${select.label}`} style={{width: selectWidth}} >
+          {
+            select.data.map((el, i) => <Option key={i} value={el.value}>{el.title || el.value}</Option>)
+          }
+        </Select>
+      )}
+    </FormItem>;
+  }
 
   render() {
 
@@ -105,6 +125,8 @@ class FormLayout extends React.Component {
     const { monitor_point, time_interval, time_lishi, time_date, time_month, time_range, station_point, unusual_value, data_info, alert_value } = formSelects;
 
     let dateItem = null;
+    let dataInfoItem = null;
+    let monitorItem = null;
 
     let format = 'YYYY-MM-DD';
 
@@ -156,13 +178,14 @@ class FormLayout extends React.Component {
       </FormItem>
     }
 
+    monitorItem = this.getSelectItem(monitor_point);
+
     let selects = null;
 
     switch (menuKey) {
       case routerPath.dealAlert:
         selects = {
           station_point,
-          monitor_point,
           unusual_value,
           // alert_value,
         };
@@ -171,20 +194,13 @@ class FormLayout extends React.Component {
       case routerPath.setSetting:
         selects = {
           station_point,
-          monitor_point,
         };
         break;
 
       default:
-        if (menuType === 'chart') {
-          selects = {
-            monitor_point,
-            data_info
-          }
-        } else {
-          selects = {
-            data_info
-          }
+        selects = null;
+        if (menuType === 'table') {
+          dataInfoItem = this.getSelectItem(data_info);
         }
     }
 
@@ -200,6 +216,40 @@ class FormLayout extends React.Component {
       }
     }
 
+    const selectInput = selects ? Object.keys(selects).map((key, index) => {
+      const selectEl = selects[key];
+
+      const selectProps = {
+        placeholder: `请选择${selectEl.label}`,
+        style: {width: selectWidth},
+      };
+
+      if (key === 'station_point') {
+        selectProps.onBlur = this.onSelectChange.bind(this)
+      }
+
+      if (!selectEl) {
+        return;
+      }
+
+      return (
+        <FormItem
+          label={selectEl.label}
+          key={index}
+        >
+          {getFieldDecorator(key, {
+            initialValue: selectEl.init
+          })(
+            <Select { ...selectProps } >
+              {
+                selectEl.data.map((el, i) => <Option key={i} value={el.value}>{el.title || el.value}</Option>)
+              }
+            </Select>
+          )}
+        </FormItem>
+      )
+    }) : null;
+
 
     return (
       <Form inline onSubmit={this.handleSubmit.bind(this)}>
@@ -207,39 +257,13 @@ class FormLayout extends React.Component {
           dateItem
         }
         {
-          Object.keys(selects).map((key, index) => {
-            const selectEl = selects[key];
-
-            const selectProps = {
-              placeholder: `请选择${selectEl.label}`,
-              style: {width: selectWidth},
-            };
-
-            if (key === 'station_point') {
-              selectProps.onBlur = this.onSelectChange.bind(this)
-            }
-
-            if (!selectEl) {
-              return;
-            }
-
-            return selectEl.hide == 1 ?
-              null :
-              <FormItem
-                label={selectEl.label}
-                key={index}
-              >
-                {getFieldDecorator(key, {
-                  initialValue: selectEl.init
-                })(
-                  <Select { ...selectProps } >
-                    {
-                      selectEl.data.map((el, i) => <Option key={i} value={el.value}>{el.title || el.value}</Option>)
-                    }
-                  </Select>
-                )}
-              </FormItem>
-          })
+          selectInput
+        }
+        {
+          dataInfoItem
+        }
+        {
+          monitorItem
         }
 
         <Button type="primary" className={styles.opButton} htmlType="submit" loading={loading}>查询</Button>

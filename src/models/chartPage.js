@@ -55,6 +55,7 @@ export default {
           data,
           apiType: menuType,
           current: payloadObj.current || 1,
+          station,
         });
       } else {
         if (typeof data === 'object' && typeof data.message === 'string') {
@@ -64,6 +65,7 @@ export default {
         }
         yield put({
           type: 'timeOut',
+          station,
         });
       }
     },
@@ -73,10 +75,10 @@ export default {
     showLoading(state, { station }) {
       return { ...state, loading: true, station };
     },
-    timeOut(state) {
-      return { ...state, loading: false };
+    timeOut(state, { station }) {
+      return { ...state, loading: false, station };
     },
-    querySuccess(state, { data, apiType, current }) {
+    querySuccess(state, { data, apiType, current, station }) {
       const res = {};
 
       res[`${apiType}Data`] = {
@@ -86,7 +88,7 @@ export default {
 
       current > 1 && (res.tableData.pagination.current = current);
 
-      return { ...state, loading: false, ...res };
+      return { ...state, loading: false, ...res, station };
     },
   },
 };
