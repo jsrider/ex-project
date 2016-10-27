@@ -90,13 +90,13 @@ class FormLayout extends React.Component {
     }
   };
 
-  getSelectItem(select) {
+  getSelectItem(select, key) {
     const { getFieldDecorator } = this.props.form;
 
     return <FormItem
       label={select.label}
     >
-      {getFieldDecorator('data_info', {
+      {getFieldDecorator(key, {
         initialValue: select.init
       })(
         <Select placeholder={`请选择${select.label}`} style={{width: selectWidth}} >
@@ -178,7 +178,7 @@ class FormLayout extends React.Component {
       </FormItem>
     }
 
-    monitorItem = this.getSelectItem(monitor_point);
+    monitorItem = this.getSelectItem(monitor_point, 'monitor_point');
 
     let selects = null;
 
@@ -199,8 +199,10 @@ class FormLayout extends React.Component {
 
       default:
         selects = null;
+
         if (menuType === 'table') {
-          dataInfoItem = this.getSelectItem(data_info);
+          monitorItem = null;
+          dataInfoItem = this.getSelectItem(data_info, 'data_info');
         }
     }
 
