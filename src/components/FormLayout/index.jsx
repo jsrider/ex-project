@@ -202,8 +202,8 @@ class FormLayout extends React.Component {
 
         if (menuType === 'table') {
           monitorItem = null;
-          dataInfoItem = this.getSelectItem(data_info, 'data_info');
         }
+        dataInfoItem = this.getSelectItem(data_info, 'data_info');
     }
 
     if (menuTitle === 'lishi') {
@@ -262,10 +262,10 @@ class FormLayout extends React.Component {
           selectInput
         }
         {
-          dataInfoItem
+          monitorItem
         }
         {
-          monitorItem
+          dataInfoItem
         }
 
         <Button type="primary" className={styles.opButton} htmlType="submit" loading={loading}>查询</Button>
