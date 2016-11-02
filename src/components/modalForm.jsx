@@ -4,7 +4,7 @@
  * @date 2016-10-6
  **/
 import React, { PropTypes } from 'react';
-import { Modal, Input, Button, Form, Select, Radio } from 'antd';
+import { Modal, Input, Button, Form, Select, Radio, message } from 'antd';
 import QueueAnim from 'rc-queue-anim';
 
 const FormItem = Form.Item;
@@ -14,6 +14,12 @@ const RadioGroup = Radio.Group;
 const formItemLayoutDefault = {
   labelCol: { span: 6 },
   wrapperCol: { span: 14 },
+};
+const validateStatusObj = {
+  error: 'error',
+  success: 'success',
+  warning: 'warning',
+  validating: 'validating'
 };
 
 class ModalForm extends React.Component {
@@ -47,7 +53,11 @@ class ModalForm extends React.Component {
     props.form.validateFields((errors, values) => {
       if (!!errors) {
         console.log('Errors in form!!!');
-        return;
+        this.setState({
+          confirmLoading: false,
+        });
+
+        return message.error('请检查表单再提交!');
       }
 
       // debugger;
@@ -68,7 +78,7 @@ class ModalForm extends React.Component {
     const props = this.props;
     const state = this.state;
     const { options, visible, handleCancel, title, disableKeys, modifySetting, elementsFields, cancel, width, children } = props;
-    const { getFieldDecorator } = props.form;
+    const { getFieldDecorator, getFieldError } = props.form;
     console.log('ModalForm: ', this.props, this.state);
 
     const modalProps = {
@@ -99,7 +109,7 @@ class ModalForm extends React.Component {
                   //   return <Input key={idx} type="hidden"  />
                   // }
                   let children;
-                  const { modifyType, modifyValue, modifyText, title, disabled } = modifySetting[key] || {};
+                  const { modifyType, modifyValue, modifyText, title, disabled, required } = modifySetting[key] || {};
 
 
                   if (Array.isArray(disableKeys) && disableKeys.includes(key)) {
@@ -144,9 +154,19 @@ class ModalForm extends React.Component {
                       {...formItemLayoutDefault}
                       label={title || key}
                       key={idx}
+                      required={required}
+                      validateStatus={getFieldError(key) ? validateStatusObj.error : ''}
+                      help={(getFieldError(key) || []).join(', ')}
                     >
                       {
-                        getFieldDecorator(key, {initialValue: options[key]})(children)
+                        getFieldDecorator(key, {
+                          initialValue: options[key],
+                          rules: required ? [{
+                            required: true,
+                            whitespace: true,
+                            message: "不能为空",
+                          }] : [],
+                        })(children)
                       }
                     </FormItem>
                   )

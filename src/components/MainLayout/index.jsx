@@ -102,11 +102,13 @@ class MainLayout extends React.Component {
       visible: alert == 1 || false,
       modifySetting: {
         handle_person: {
-          title: '处理人: '
+          title: '处理人: ',
+          required: true
         },
         handle_tips: {
           modifyType: 'textarea',
-          title: '处理信息: '
+          title: '处理信息: ',
+          required: true
         }
       },
       width: 500,

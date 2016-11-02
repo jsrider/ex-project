@@ -66,7 +66,7 @@ export default {
       // debugger;
       const messageHide = message.loading('请求中...', 9);
 
-      const { data } = yield call(query, { payloadObj, type: opType }, 'setting');
+      const { data } = yield call(query, { ...pageParams.queryParams, payloadObj, type: opType }, 'settingSubmit');
 
       if (typeof data === 'object' && data.success == 1) {
         messageHide();
