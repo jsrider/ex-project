@@ -36,14 +36,15 @@ function FormLayout(props) {
     });
   };
 
+  const timeWidth = 120;
+  let sumWidth = timeWidth;
   const columns = [
     {
       title: '时间',
       dataIndex: 'time',
       key: 'time',
-      width: 120,
+      width: timeWidth,
       render: getRealHtml,
-      fixed: 'left',
     },
   ];
 
@@ -58,21 +59,36 @@ function FormLayout(props) {
         children: []
       };
 
+
       obj.children = keyArr.map((el, idx) => {
+        const colWidth = widthArr ? widthArr[idx] : 0;
+
+        sumWidth += colWidth;
+
         return {
           title: keyArrCN[el],
           dataIndex: `${groupArr[i]}${el}`,
           key: `${groupArr[i]}${el}`,
-          width: widthArr ? widthArr[idx] : 0,
+          width: colWidth,
           render: getRealHtml
         }
       });
+
+      // obj.children[0].width = 0;
+
 
       columns.push(obj)
     }
   } else {
     data = []
   }
+
+  if (sumWidth > 950) {
+    columns[0].fixed = 'left';
+  }
+
+  debugger;
+
 
   return (
     <div>
