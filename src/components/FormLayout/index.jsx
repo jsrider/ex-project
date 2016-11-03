@@ -85,7 +85,7 @@ class FormLayout extends React.Component {
 
       dispatch({
         type: 'formSelects/queryData',
-        station: getFieldValue('station_point'),
+        station: getFieldValue('station'),
       });
     }
   };
@@ -113,7 +113,7 @@ class FormLayout extends React.Component {
     console.log('FormLayout', this.props);
 
     const { menuKey, formSelects, pageData, form } = this.props;
-    const { loading, station, tableData } = pageData;
+    const { loading, tableData } = pageData;
     const { getFieldDecorator } = form;
     const menuTitle = menuKey.split('-')[0];
     const menuType = menuKey.split('-')[1];
@@ -122,7 +122,7 @@ class FormLayout extends React.Component {
       return ;
     }
 
-    const { monitor_point, time_interval, time_lishi, time_date, time_month, time_range, station_point, unusual_value, data_info, alert_value } = formSelects;
+    const { monitor_point, time_interval, time_lishi, time_date, time_month, time_range, station, unusual_value, data_info, alert_value } = formSelects;
 
     let dateItem = null;
     let dataInfoItem = null;
@@ -185,7 +185,7 @@ class FormLayout extends React.Component {
     switch (menuKey) {
       case routerPath.dealAlert:
         selects = {
-          station_point,
+          station,
           unusual_value,
           // alert_value,
         };
@@ -193,7 +193,7 @@ class FormLayout extends React.Component {
 
       case routerPath.setSetting:
         selects = {
-          station_point,
+          station,
         };
         break;
 
@@ -226,7 +226,7 @@ class FormLayout extends React.Component {
         style: {width: selectWidth},
       };
 
-      if (key === 'station_point') {
+      if (key === 'station') {
         selectProps.onBlur = this.onSelectChange.bind(this)
       }
 
@@ -282,7 +282,7 @@ class FormLayout extends React.Component {
               <Button type="primary" className={styles.opButton} >打印</Button>
 
               <Button type="primary" className={styles.opButton}>
-                <Link to={`/${menuTitle}-${menuType === 'chart' ? 'table' : 'chart'}?station=${station}`}>
+                <Link to={`/${menuTitle}-${menuType === 'chart' ? 'table' : 'chart'}?station=${pageData.station}`}>
                   {
                     menuType === 'chart' ?
                       '报表':

@@ -7,28 +7,28 @@ export default {
 
   state: {},
 
-  subscriptions: {
-    setup({ dispatch, history }) {
-      history.listen(({ pathname, search }) => {
-        if (pathname.includes(routerPath.dealAlert) || pathname.includes(routerPath.setSetting) || pathname.includes('chart')) {
-          const station = search && search.match(/station=([^\/]*)/i)[1] || 'zhongxinzhan';
-
-          // pageParams.addQueryParams({station});
-
-          // dispatch({
-          //   type: 'setStation',
-          //   station
-          // });
-          dispatch({
-            type: 'queryData',
-            // payloadObj: pageParams.queryParams,
-            // menuKey: getMenuKeyFromUrl(pathname),
-            station
-          });
-        }
-      });
-    },
-  },
+  // subscriptions: {
+  //   setup({ dispatch, history }) {
+  //     history.listen(({ pathname, search }) => {
+  //       if (pathname.includes(routerPath.dealAlert) || pathname.includes(routerPath.setSetting) || pathname.includes('chart')) {
+  //         const station = search && search.match(/station=([^\/]*)/i)[1] || 'zhongxinzhan';
+  //
+  //         // pageParams.addQueryParams({station});
+  //
+  //         // dispatch({
+  //         //   type: 'setStation',
+  //         //   station
+  //         // });
+  //         dispatch({
+  //           type: 'queryData',
+  //           // payloadObj: pageParams.queryParams,
+  //           // menuKey: getMenuKeyFromUrl(pathname),
+  //           station
+  //         });
+  //       }
+  //     });
+  //   },
+  // },
 
 
   effects: {

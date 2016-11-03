@@ -114,11 +114,14 @@ class MainLayout extends React.Component {
       width: 500,
       elementsFields: ['handle_person', 'handle_tips'],
       handleOk: (values) => {
-        // console.log('handleOk:', values);
+        // console.log('handleOk:', values, curTableData);
 
         return dispatch({
           type: 'alertDialog/fetchDialogSubmit',
-          values,
+          values: {
+            ...curTableData,
+            ...values,
+          },
         });
       },
       handleCancel: () => {
@@ -126,6 +129,10 @@ class MainLayout extends React.Component {
           type: 'alertDialog/closeDialog',
         });
       }
+    };
+
+    const tableChange = (pagination) => {
+      curTableData = data[pagination.current - 1];
     };
 
     const columns = [];
@@ -146,12 +153,15 @@ class MainLayout extends React.Component {
       data = []
     }
 
+    let curTableData = data[0];
+
     return <ModalForm {...modalProps}>
       <Table
         rowKey={(record, index) => index}
         columns={columns}
         dataSource={data}
         pagination={pagination}
+        onChange={tableChange}
       />
     </ModalForm>;
   };

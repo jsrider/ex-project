@@ -42,7 +42,7 @@ export default {
 
       const [menuTitle, menuType] = typeof menuKey === 'string' ? menuKey.split('-') : [];
 
-      const { data } = yield call(query, { ...pageParams.queryParams, ...payloadObj, type: menuTitle}, menuType);
+      const { data } = yield call(query, { ...payloadObj, type: menuTitle}, menuType);
 
       if (typeof data === 'object' && data.success == 1) {
         yield put({
@@ -66,7 +66,7 @@ export default {
       // debugger;
       const messageHide = message.loading('请求中...', 9);
 
-      const { data } = yield call(query, { ...pageParams.queryParams, payloadObj, type: opType }, 'settingSubmit');
+      const { data } = yield call(query, { payloadObj, type: opType }, 'settingSubmit');
 
       if (typeof data === 'object' && data.success == 1) {
         messageHide();
