@@ -1,5 +1,6 @@
 'use strict';
 
+// 17-06-1 用的 最终key
 module.exports = {
 
   'GET /api/getFinalKey': function (req, res) {
