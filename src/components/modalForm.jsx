@@ -4,7 +4,7 @@
  * @date 2016-10-6
  **/
 import React, { PropTypes } from 'react';
-import { Modal, Input, Button, Form, Select, Radio, message } from 'antd';
+import { Modal, Input, Button, Form, Select, Radio, message, InputNumber } from 'antd';
 import QueueAnim from 'rc-queue-anim';
 
 const FormItem = Form.Item;
@@ -20,6 +20,15 @@ const validateStatusObj = {
   success: 'success',
   warning: 'warning',
   validating: 'validating'
+};
+
+const requiredValidate = (rule, value, callback) => {
+  value = String(value).trim();
+
+  if (!value || value === 'undefined') {
+    callback(rule.message);
+  }
+  callback()
 };
 
 class ModalForm extends React.Component {
@@ -111,6 +120,8 @@ class ModalForm extends React.Component {
                   let children;
                   const { modifyType, modifyValue, modifyText, title, disabled, required } = modifySetting[key] || {};
 
+                  const isRequired = typeof required === 'string' ? required === 'true' : !!required;
+
 
                   if (Array.isArray(disableKeys) && disableKeys.includes(key)) {
                     children = <Input key={idx} disabled={true}  />
@@ -144,6 +155,10 @@ class ModalForm extends React.Component {
                         children = <Input type="textarea" rows="3" />;
                         break;
 
+                      case 'number':
+                        children = <InputNumber />;
+                        break;
+
                       default:
                         children = <Input disabled={disabled == 1} />;
                     }
@@ -154,18 +169,16 @@ class ModalForm extends React.Component {
                       {...formItemLayoutDefault}
                       label={title || key}
                       key={idx}
-                      required={required}
+                      required={isRequired}
                       validateStatus={getFieldError(key) ? validateStatusObj.error : ''}
                       help={(getFieldError(key) || []).join(', ')}
                     >
                       {
                         getFieldDecorator(key, {
                           initialValue: options[key],
-                          rules: required ? [{
-                            required: true,
-                            whitespace: true,
-                            message: "不能为空",
-                          }] : [],
+                          rules: isRequired ? [
+                            { validator: requiredValidate, message: '不能为空哦!' },
+                          ] : [],
                         })(children)
                       }
                     </FormItem>

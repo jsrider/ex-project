@@ -1,5 +1,5 @@
 import React, { PropTypes } from 'react';
-import { Row, Col, Table } from 'antd';
+import { Row, Col, Table, message } from 'antd';
 import styles from './index.less';
 import Header from './Header';
 import SideMenu from './SideMenu';
@@ -90,7 +90,7 @@ class MainLayout extends React.Component {
         // throttle(fetchDialog, 5000);
       };
 
-      dialogFetch();
+      // dialogFetch();
 
       alertDialogTimer = window.setInterval(dialogFetch, 300000);
     }
@@ -116,6 +116,7 @@ class MainLayout extends React.Component {
       handleOk: (values) => {
         // console.log('handleOk:', values, curTableData);
 
+        message.success('处理成功!');
         return dispatch({
           type: 'alertDialog/fetchDialogSubmit',
           values: {
@@ -157,6 +158,7 @@ class MainLayout extends React.Component {
 
     return <ModalForm {...modalProps}>
       <Table
+        className="alert-talbe"
         rowKey={(record, index) => index}
         columns={columns}
         dataSource={data}

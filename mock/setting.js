@@ -42,6 +42,20 @@ module.exports = {
                 modifyText: '开,关', // value 对应的中文值你
                 title: '开关'
               },
+              value: {
+                disabled: 1, // 1 禁止用户修改
+                title: '测量量'
+              },
+              setup: {
+                modifyType: 'number', // radio: 单选框; select: 下拉框
+                title: '上限',
+                required: true,
+              },
+              setdown: {
+                modifyType: 'number', // radio: 单选框; select: 下拉框
+                title: '下限',
+                required: true,
+              },
               id: {
                 disabled: 1, // 1 禁止用户修改
                 title: 'ID'

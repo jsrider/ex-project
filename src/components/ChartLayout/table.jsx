@@ -87,13 +87,11 @@ function FormLayout(props) {
     columns[0].fixed = 'left';
   }
 
-  debugger;
-
-
   return (
     <div>
       <h1 className={styles.title}>{title || '报表'}</h1>
       <Table
+        className="report-table"
         rowKey={(record, index) => index}
         columns={columns}
         dataSource={data || []}

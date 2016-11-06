@@ -9,21 +9,23 @@ let chartWidth = 0;
 const CHART_ID = 'c1';
 let reloadTimer = null;
 
-function FormLayout(props) {
-  console.log('ChartLayout', props);
+class ChartLayout extends React.Component {
 
-  // const { location, dispatch } = props;
-  const { chartData, loading } = props.pageData;
-
-  const drawChart = (dataObj) => {
-    // debugger;
-    for (let key in chartCvs) {
-      if (chartCvs.hasOwnProperty(key)) {
-        if (chartCvs[key]) {
-          chartCvs[key].destroy();
-        }
+  componentDidMount() {
+    this.chart = new G2.Chart({
+      id: 'c1',
+      width: chartWidth || (chartWidth = document.getElementById(CHART_ID) && document.getElementById(CHART_ID).offsetWidth) || 952,
+      height: 220,
+      plotCfg: {
+        margin: [20, 80, 100, 80]
       }
-    }
+    });
+  }
+
+  drawChart() {
+  // debugger;
+    const { chartData } = this.props.pageData;
+    const dataObj = chartData.data;
 
     Object.keys(dataObj).forEach((dataKey, index) => {
       const { data, config } = dataObj[dataKey];
@@ -33,14 +35,11 @@ function FormLayout(props) {
         return;
       }
 
-      chartCvs[dataKey] = new G2.Chart({
-        id: 'c1',
-        width: chartWidth || (chartWidth = document.getElementById(CHART_ID) && document.getElementById(CHART_ID).offsetWidth) || 952,
-        height,
-        plotCfg: {
-          margin: [20, 80, 100, 80]
-        }
-      });
+      if (chartCvs[dataKey]) {
+        chartCvs[dataKey].destroy();
+        // } else {
+        //   chartCvs[dataKey].clear();
+      }
 
       chartCvs[dataKey].source(data, {
         time: {
@@ -75,26 +74,34 @@ function FormLayout(props) {
       chartCvs[dataKey].render();
     })
 
-  };
-
-  try {
-    loading || chartData.data && drawChart(chartData.data);
-  } catch (e) {
-    console.log('error:', e);
-    reloadTimer = window.setTimeout(() => {drawChart(chartData.data)}, 500);
-    // location.reload();
   }
 
-  return (
-    <div>
-      <h1 className={styles.title}>{chartData.title}</h1>
-    </div>
-  )
+  render () {
+    console.log('ChartLayout', this.props);
+
+    // const { location, dispatch } = props;
+    const { chartData, loading } = this.props.pageData;
+
+    try {
+      loading || chartData.data && this.chart && this.drawChart();
+    } catch (e) {
+      console.log('error:', e);
+      reloadTimer = window.setTimeout(() => {this.drawChart()}, 500);
+      // location.reload();
+    }
+
+    return (
+      <div>
+        <h1 className={styles.title}>{chartData.title}</h1>
+      </div>
+    )
+  }
 }
 
-FormLayout.propTypes = {
+
+ChartLayout.propTypes = {
   location: PropTypes.object,
   pageData: PropTypes.object.isRequired
 };
 
-export default FormLayout;
+export default ChartLayout;

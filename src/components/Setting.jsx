@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button, Select, Table, Popconfirm } from 'antd';
+import { Button, Select, Table, Popconfirm, message } from 'antd';
 import ModalForm from './modalForm';
 
 class Setting extends React.Component {
@@ -36,7 +36,8 @@ class Setting extends React.Component {
         this.setState({
           modalVisible: false,
         });
-        console.log('handleOk:', values)
+        // console.log('handleOk:', values)
+        message.success('修改成功!')
       },
       handleCancel: () => {
         this.setState({

@@ -33,6 +33,12 @@ export default {
             menuKey: getMenuKeyFromUrl(pathname),
             station
           });
+          dispatch({
+            type: 'formSelects/queryData',
+            // payloadObj: pageParams.queryParams,
+            // menuKey: getMenuKeyFromUrl(pathname),
+            station
+          });
         }
       });
     },
