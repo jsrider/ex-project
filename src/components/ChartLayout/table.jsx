@@ -13,7 +13,7 @@ function FormLayout(props) {
   console.log('TableLayout', props);
 
   const { dispatch, pageData, dispatchType, menuKey} = props;
-  const { tableData, loading } = pageData;
+  const { tableData, loading, station } = pageData;
 
   // if (!tableData) {
   //   return;
@@ -32,7 +32,8 @@ function FormLayout(props) {
       type: dispatchType,
       // type: 'formSelects/submit',
       payloadObj,
-      menuKey
+      menuKey,
+      station
     });
   };
 
