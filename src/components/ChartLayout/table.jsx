@@ -100,7 +100,7 @@ function FormLayout(props) {
         bordered
         pagination={pagination}
         onChange={onChange}
-        scroll={{ x: params && Number(params.width) || 1500, y: 500 }}
+        scroll={{ x: params && Number(params.width) || 1500 }}
       />
     </div>
   )
