@@ -24,7 +24,7 @@ module.exports = {
               ],
               config: {
                 height: 220,
-                formatDate: 'HH:mm',
+                formatDate: 'HH:MM',
                 guideLine: {
                   start: ['2015-03-01T12:00:00.000Z',5],
                   end: ['2015-03-01T20:00:00.000Z',5],
@@ -84,7 +84,7 @@ module.exports = {
               ],
               config: {
                 height: 220,
-                formatDate: 'mm-dd HH:mm',
+                formatDate: 'mm-dd HH:MM',
                 guideRect: {
                   start: ['2015-03-01T12:00:00.000Z', 80],
                   end: ['2015-03-01T20:00:00.000Z',120],
