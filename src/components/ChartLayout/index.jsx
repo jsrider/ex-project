@@ -45,7 +45,7 @@ function FormLayout(props) {
       chartCvs[dataKey].source(data, {
         time: {
           type: 'time',
-          mask: formatDate || 'mm-dd hh:mm',
+          mask: formatDate || 'mm-dd HH:mm',
           alias: '时间',
         },
         value: {
