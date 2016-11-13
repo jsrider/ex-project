@@ -84,9 +84,10 @@ class FormLayout extends React.Component {
     var aElement = document.createElement("a");
 
     aElement.href = `${window.location.host}/api/getExcel?${qs.stringify(valueObj)}`;
-    // document.body.appendChild(pElement);
-
     aElement.target = '_blank';
+    aElement.download = "excel";
+    document.body.appendChild(aElement);
+
     aElement.click();
   }
 
