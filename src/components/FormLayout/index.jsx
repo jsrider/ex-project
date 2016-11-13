@@ -4,7 +4,8 @@ import { Link } from 'dva/router';
 import styles from './index.less';
 import { pageParams } from '../../utils/pageParams';
 import * as routerPath from '../../utils/routerPath';
-import downTable from '../../utils/downTable';
+// import downTable from '../../utils/downTable';
+const qs = require('qs');
 
 import moment from 'moment';
 import 'moment/locale/zh-cn';
@@ -76,6 +77,18 @@ class FormLayout extends React.Component {
     });
 
   };
+
+  downtable() {
+    const valueObj = this.getFormData();
+
+    var aElement = document.createElement("a");
+
+    aElement.href = `${window.location.host}/api/getExcel?${qs.stringify(valueObj)}`;
+    // document.body.appendChild(pElement);
+
+    aElement.target = '_blank';
+    aElement.click();
+  }
 
   onSelectChange (e) {
     const { dispatch, form, menuKey } = this.props;
@@ -276,7 +289,7 @@ class FormLayout extends React.Component {
             <div className={styles.opWrap}>
               {
                 menuType === 'table' ?
-                  <Button type="primary" className={styles.opButton} onClick={downTable.bind(this, tableData)} >导出Excel</Button> :
+                  <Button type="primary" className={styles.opButton} onClick={this.downtable.bind(this)}>导出Excel</Button> :
                   null
               }
               <Button type="primary" className={styles.opButton} >打印</Button>
