@@ -80,18 +80,18 @@ class FormLayout extends React.Component {
 
   downtable() {
     const valueObj = this.getFormData();
-    const { dispatch, menuKey, dispatchType, pageData } = this.props;
+    const { menuKey, pageData } = this.props;
     const { station } = pageData;
 
     var aElement = document.createElement("a");
 
-    aElement.href = `${window.location.host}/api/getExcel?${qs.stringify({
+    aElement.href = `${window.location.protocol}//${window.location.host}/api/getExcel?${qs.stringify({
       ...valueObj,
       station,
       type: menuKey && menuKey.split('-')[0]
     })}`;
     aElement.target = '_blank';
-    aElement.download = "excel";
+    // aElement.download = "excel";
     document.body.appendChild(aElement);
 
     console.log('下载链接:',aElement.href);
