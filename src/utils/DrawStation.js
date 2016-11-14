@@ -530,6 +530,7 @@ const registText = {
               text: dataObj[el] || '0',
               ...textConfig,
               fill: 'blue',
+              fontWeight: 'bold'
             }
           });
 

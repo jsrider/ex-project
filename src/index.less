@@ -12,10 +12,20 @@
         text-align: center;
       }
     }
-    .report-table .ant-table tr {
+    .report-table .ant-table {
+      border: 1px solid #2E2E2E;
 
-      th, td {
-        padding: 0 3px;
+      tr {
+
+        th, td {
+          padding: 0 3px;
+          border-right: 1px solid #2E2E2E;
+          border-bottom: 1px solid #2E2E2E;
+        }
+
+        &:last-child td {
+          border-bottom: none;
+        }
       }
     }
 
