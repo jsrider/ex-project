@@ -36,7 +36,8 @@ module.exports = {
           params: {
             // width: "1500",
             keyArr,
-            keyArrCN
+            keyArrCN,
+            audioTimer: '5000' // 报警持续时间 ms
           },
           pagination: {
             pageSize: 1,

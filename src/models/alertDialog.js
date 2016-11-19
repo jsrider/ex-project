@@ -1,6 +1,18 @@
 import { query } from '../services/formSelects';
 import { message } from 'antd';
 
+const audioSrcLoc = location.host + '/alarm_sound.mp3';
+const audioSrc = 'http://sm01.alicdn.com/L1/272/6837/static/web/chitu/others/alarm_sound.mp3';
+const audio = new Audio(audioSrcLoc);
+
+audio.onerror = () => {
+  audio.src = audioSrc
+};
+
+// console.log( audio);
+audio.loop = true;
+// audio.play();
+
 export default {
 
   namespace: 'alertDialog',
@@ -20,10 +32,14 @@ export default {
 
   effects: {
     *fetchAlertDialog({ payload }, { put, call}) {
-      // debugger;
       const { data } = yield call(query, payload, 'alertDialog');
       //
       if (typeof data === 'object' && data.success == 1) {
+        audio.play();
+
+        setTimeout(() => {
+          audio.pause()
+        }, data.data && data.data.params && data.data.params.audioTimer || 15000);
 
         yield put({
           type: 'fetchSuccess',
