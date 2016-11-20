@@ -1,7 +1,7 @@
 import { query } from '../services/formSelects';
 import { message } from 'antd';
 
-const audioSrcLoc = location.host + '/alarm_sound.mp3';
+const audioSrcLoc = 'http://' + location.host + '/alarm_sound.mp3';
 const audioSrc = 'http://sm01.alicdn.com/L1/272/6837/static/web/chitu/others/alarm_sound.mp3';
 const audio = new Audio(audioSrcLoc);
 
