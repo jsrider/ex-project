@@ -34,12 +34,13 @@ export default {
     *fetchAlertDialog({ payload }, { put, call}) {
       const { data } = yield call(query, payload, 'alertDialog');
       //
-      if (typeof data === 'object' && data.success == 1) {
+      if (typeof data === 'object' && data.success == 1 && data.data && data.data.alert == 1) {
+
         audio.play();
 
         setTimeout(() => {
           audio.pause()
-        }, data.data && data.data.params && data.data.params.audioTimer || 15000);
+        }, data.data.params && data.data.params.audioTimer || 15000);
 
         yield put({
           type: 'fetchSuccess',
