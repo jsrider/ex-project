@@ -1214,46 +1214,47 @@ stationsObj[stationObj.tuoyizhan] = {
     // 轻烃出口
     if (me.getFlowNumByData(data[2]) > 0) {
       resArr.push(
-        ...me.getFlowArrow({x: 23, y: 61, nums: 2, small: false, plus: false, vertical: false}),
+        ...me.getFlowArrow({x: 88.6, y: 40, nums: 3, small: true, plus: true, vertical: true}),
+        ...me.getFlowArrow({x: 79, y: 61, nums: 2, small: false, plus: false, vertical: false}),
       );
     }
 
     // 去宁海
     if (me.getFlowNumByData(data[3]) > 0) {
       resArr.push(
-        ...me.getFlowArrow({x: 45, y: 61, nums: 3, small: false, plus: false, vertical: false}),
+        ...me.getFlowArrow({x: 60, y: 93, nums: 2, small: false, plus: true, vertical: false}),
       );
     }
 
     // 坨一外供
     if (me.getFlowNumByData(data[4]) > 0) {
       resArr.push(
-        ...me.getFlowArrow({x: 88.6, y: 40, nums: 3, small: true, plus: true, vertical: true}),
-        ...me.getFlowArrow({x: 79, y: 61, nums: 2, small: false, plus: false, vertical: false}),
+        ...me.getFlowArrow({x: 45, y: 61, nums: 3, small: false, plus: false, vertical: false}),
       );
     }
 
     // 坨一自用
     if (me.getFlowNumByData(data[5]) > 0) {
       resArr.push(
-        ...me.getFlowArrow({x: 25, y: 65, nums: 3, small: true, plus: true, vertical: true}),
-        ...me.getFlowArrow({x: 12, y: 90, nums: 4, small: true, plus: false, vertical: false}),
+        ...me.getFlowArrow({x: 48, y: 93, nums: 2, small: false, plus: false, vertical: false}),
       );
     }
 
     // 坨一汇东
     if (me.getFlowNumByData(data[6]) > 0) {
       resArr.push(
-        ...me.getFlowArrow({x: 48, y: 93, nums: 2, small: false, plus: false, vertical: false}),
+        ...me.getFlowArrow({x: 23, y: 61, nums: 2, small: false, plus: false, vertical: false}),
       );
     }
 
     // 镇政府
     if (me.getFlowNumByData(data[7]) > 0) {
       resArr.push(
-        ...me.getFlowArrow({x: 60, y: 93, nums: 2, small: false, plus: true, vertical: false}),
+        ...me.getFlowArrow({x: 25, y: 65, nums: 3, small: true, plus: true, vertical: true}),
+        ...me.getFlowArrow({x: 12, y: 90, nums: 4, small: true, plus: false, vertical: false}),
       );
     }
+
 
     return resArr;
   },
