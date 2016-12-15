@@ -4,8 +4,11 @@
  * @date 2016-10-6
  **/
 import React, { PropTypes } from 'react';
-import { Modal, Input, Button, Form, Select, Radio, message, InputNumber } from 'antd';
+import { Modal, Input, Button, Form, Select, Radio, message, InputNumber, DatePicker } from 'antd';
 import QueueAnim from 'rc-queue-anim';
+import moment from 'moment';
+
+const dateFormat = 'YYYY/MM/DD';
 
 const FormItem = Form.Item;
 const Option = Select.Option;
@@ -159,6 +162,10 @@ class ModalForm extends React.Component {
                         children = <InputNumber />;
                         break;
 
+                      case 'date':
+                        children = <DatePicker format={dateFormat} />;
+                        break;
+
                       default:
                         children = <Input disabled={disabled == 1} />;
                     }
@@ -175,9 +182,9 @@ class ModalForm extends React.Component {
                     >
                       {
                         getFieldDecorator(key, {
-                          initialValue: options[key],
+                          initialValue: modifyType === 'date' ? moment(options[key], dateFormat): options[key],
                           rules: isRequired ? [
-                            { validator: requiredValidate, message: '不能为空哦!' },
+                            { validator: requiredValidate, message: '不能为空哦!', type: modifyType === 'date' ? 'object' : '' },
                           ] : [],
                         })(children)
                       }

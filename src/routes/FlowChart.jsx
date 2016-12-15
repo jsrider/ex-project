@@ -4,6 +4,8 @@ import { connect } from 'dva';
 import MainLayout from '../components/MainLayout';
 import FlowChart from '../components/ChartLayout/FlowChart';
 import getMenuKeyFromUrl from '../utils/getMenuKeyFromUrl';
+import FlowChartDialog from '../components/ChartLayout/FlowChartDialog';
+
 // import * as routerPath from '../utils/routerPath';
 
 const Page = (props) => {
@@ -33,6 +35,7 @@ const Page = (props) => {
       <div>
         <FlowChart { ...flowChartLayoutProps } />
         <div id="flowChart" />
+        <FlowChartDialog dispatch={dispatch} station={flowChart.station} flowChartMonitorData={flowChart.flowChartMonitorData} monitorSubmitSuccess={flowChart.monitorSubmitSuccess} />
       </div>
     </MainLayout>
   );

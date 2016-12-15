@@ -13,7 +13,9 @@ export default {
     flowData: {
       // title: '中心站流程图',
       data: []
-    }
+    },
+    flowChartMonitorData: {},
+    monitorSubmitSuccess: false
   },
 
   subscriptions: {
@@ -30,6 +32,12 @@ export default {
           // });
           dispatch({
             type: 'queryData',
+            // payloadObj: pageParams.queryParams,
+            // menuKey: getMenuKeyFromUrl(pathname),
+            station
+          });
+          dispatch({
+            type: 'queryMonitorData',
             // payloadObj: pageParams.queryParams,
             // menuKey: getMenuKeyFromUrl(pathname),
             station
@@ -67,6 +75,53 @@ export default {
         });
       }
     },
+
+    *queryMonitorData({ station }, { put, call}) {
+      // debugger;
+
+      const { data } = yield call(query, { station }, 'flowChartDialog');
+
+      if (typeof data === 'object' && data.success == 1) {
+        yield put({
+          type: 'queryMonitorSuccess',
+          data,
+          // apiType: menuType,
+        });
+      } else {
+        if (typeof data === 'object' && typeof data.message === 'string') {
+          message.error(data.message);
+        } else {
+          message.error('请求失败,请确保网络通畅,接口正确!');
+        }
+        yield put({
+          type: 'timeOut',
+        });
+      }
+    },
+    *monitorSubmit({ values }, { put, call}) {
+      // debugger;
+
+      const { data } = yield call(query, values, 'flowChartDialogSubmit');
+      //
+      if (typeof data === 'object' && data.success == 1) {
+        message.success('修改成功!', 4);
+
+        yield put({
+          type: 'submitSuccess',
+          // data,
+          // apiType: menuType,
+        });
+      } else {
+        if (typeof data === 'object' && typeof data.message === 'string') {
+          message.error(data.message);
+        } else {
+          message.error('请求失败,请确保网络通畅,接口正确!');
+        }
+        yield put({
+          type: 'timeOut',
+        });
+      }
+    },
   },
 
   reducers: {
@@ -79,6 +134,14 @@ export default {
     querySuccess(state, { data }) {
 
       return { ...state, loading: false, flowData: data.data, init: true };
+    },
+    queryMonitorSuccess(state, { data }) {
+
+      return { ...state, flowChartMonitorData: data.data, monitorSubmitSuccess: false };
+    },
+    submitSuccess(state, { data }) {
+
+      return { ...state, monitorSubmitSuccess: true };
     },
   },
 };
