@@ -15,7 +15,9 @@ export default {
       data: []
     },
     flowChartMonitorData: {},
-    monitorSubmitSuccess: false
+    monitorSubmitSuccess: false,
+    monitor: '',
+    station: '',
   },
 
   subscriptions: {
@@ -32,12 +34,6 @@ export default {
           // });
           dispatch({
             type: 'queryData',
-            // payloadObj: pageParams.queryParams,
-            // menuKey: getMenuKeyFromUrl(pathname),
-            station
-          });
-          dispatch({
-            type: 'queryMonitorData',
             // payloadObj: pageParams.queryParams,
             // menuKey: getMenuKeyFromUrl(pathname),
             station
@@ -76,15 +72,16 @@ export default {
       }
     },
 
-    *queryMonitorData({ station }, { put, call}) {
+    *queryMonitorData({ station, monitor }, { put, call}) {
       // debugger;
 
-      const { data } = yield call(query, { station }, 'flowChartDialog');
+      const { data } = yield call(query, { station, monitor }, 'flowChartDialog');
 
       if (typeof data === 'object' && data.success == 1) {
         yield put({
           type: 'queryMonitorSuccess',
           data,
+          monitor,
           // apiType: menuType,
         });
       } else {
@@ -133,15 +130,15 @@ export default {
     },
     querySuccess(state, { data }) {
 
-      return { ...state, loading: false, flowData: data.data, init: true };
+      return { ...state, loading: false, flowData: data.data, init: true, monitorSubmitSuccess: false };
     },
-    queryMonitorSuccess(state, { data }) {
+    queryMonitorSuccess(state, { data, monitor }) {
 
-      return { ...state, flowChartMonitorData: data.data, monitorSubmitSuccess: false };
+      return { ...state, flowChartMonitorData: data.data, monitorSubmitSuccess: true, monitor };
     },
     submitSuccess(state, { data }) {
 
-      return { ...state, monitorSubmitSuccess: true };
+      return { ...state, monitorSubmitSuccess: false };
     },
   },
 };

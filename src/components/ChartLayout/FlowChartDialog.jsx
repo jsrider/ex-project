@@ -7,7 +7,7 @@ class Setting extends React.Component {
     super();
 
     this.state = {
-      modalVisible: true,
+      modalVisible: false,
       modalOption: null
     };
 
@@ -18,6 +18,10 @@ class Setting extends React.Component {
   componentWillReceiveProps(nextProps) {
     if (nextProps.monitorSubmitSuccess) {
       this.setState({
+        modalVisible: true
+      })
+    } else {
+      this.setState({
         modalVisible: false
       })
     }
@@ -26,7 +30,7 @@ class Setting extends React.Component {
 
   render () {
     console.log('FlowChartDialog', this.props);
-    const { station, flowChartMonitorData, dispatch } = this.props;
+    const { station, flowChartMonitorData, dispatch, monitor } = this.props;
     const { modalVisible } = this.state;
 
     // 流量计点击弹窗
@@ -41,18 +45,25 @@ class Setting extends React.Component {
     const modalProps = {
       options: {
         station,
+        monitor,
         ...options,
       },
       title: flowChartMonitorData.title || '传感器详情',
       visible: modalVisible,
       modifySetting: {
         ...settings,
-        station: {
-          modifyType: 'text',
-          title: '站点: '
-        },
+        // station: {
+        //   modifyType: 'text',
+        //   title: '站点: ',
+        //   disabled: 1
+        // },
+        // monitor: {
+        //   modifyType: 'text',
+        //   title: '检测点: ',
+        //   disabled: 1
+        // },
       },
-      elementsFields: ['station', ...flowChartMonitorData.params.keyArr],
+      elementsFields: ['station', 'monitor', ...flowChartMonitorData.params.keyArr],
       handleOk: (values) => {
         console.log('handleOk:', values);
 

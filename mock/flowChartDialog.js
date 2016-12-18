@@ -25,6 +25,14 @@ module.exports = {
               tips: '备注'
             },
             setting: {
+              station: {
+                title: '站点',
+                disabled: 1, // 1 禁止用户修改
+              },
+              monitor: {
+                title: '检测点',
+                disabled: 1, // 1 禁止用户修改
+              },
               model: {
                 disabled: 1, // 1 禁止用户修改
                 title: keyArrCN[0]

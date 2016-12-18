@@ -3,6 +3,7 @@ import { Link } from 'dva/router';
 import { connect } from 'dva';
 import MainLayout from '../components/MainLayout';
 import FlowChart from '../components/ChartLayout/FlowChart';
+import FlowChartClick from '../components/ChartLayout/FlowChartClick';
 import getMenuKeyFromUrl from '../utils/getMenuKeyFromUrl';
 import FlowChartDialog from '../components/ChartLayout/FlowChartDialog';
 
@@ -35,7 +36,8 @@ const Page = (props) => {
       <div>
         <FlowChart { ...flowChartLayoutProps } />
         <div id="flowChart" />
-        <FlowChartDialog dispatch={dispatch} station={flowChart.station} flowChartMonitorData={flowChart.flowChartMonitorData} monitorSubmitSuccess={flowChart.monitorSubmitSuccess} />
+        <FlowChartClick dispatch={dispatch} pageData={flowChart} />
+        <FlowChartDialog dispatch={dispatch} station={flowChart.station} monitor={flowChart.monitor} flowChartMonitorData={flowChart.flowChartMonitorData} monitorSubmitSuccess={flowChart.monitorSubmitSuccess} />
       </div>
     </MainLayout>
   );
