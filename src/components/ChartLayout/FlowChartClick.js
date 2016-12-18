@@ -104,8 +104,7 @@ const Page = (props) => {
             top: el.y,
             width: '40px',
             height: '40px',
-            background: 'red',
-          }}>{getMonitor(station).stationTitle[i]}</a>
+          }} />
         })
       }
     </div>

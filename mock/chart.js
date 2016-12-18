@@ -23,6 +23,7 @@ module.exports = {
                 {name: '温度', time: '2015-03-01T21:00:00.000Z', value: 9.1},
               ],
               config: {
+                title: '图表标题1',
                 height: 220,
                 formatDate: 'HH:MM',
                 guideLine: {
@@ -57,6 +58,7 @@ module.exports = {
                 {name: '压力', time: '2015-03-01T21:00:00.000Z', value: 1800.1},
               ],
               config: {
+                title: '图表标题2',
                 height: 220,
                 formatDate: 'mm-dd',
                 guideLine: {
@@ -83,6 +85,7 @@ module.exports = {
                 {name: '瞬时流量', time: '2015-03-02T21:00:00.000Z', value: 100.111},
               ],
               config: {
+                title: '图表标题3',
                 height: 220,
                 formatDate: 'mm-dd HH:MM',
                 guideRect: {

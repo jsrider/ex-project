@@ -63,6 +63,8 @@ function FormLayout(props) {
   // const { location, dispatch } = props;
   const { chartData, loading } = props.pageData;
 
+  const chartWrap = document.getElementById(CHART_ID);
+
   const drawChart = (dataObj) => {
     // debugger;
     for (let key in chartCvs) {
@@ -75,14 +77,27 @@ function FormLayout(props) {
 
     Object.keys(dataObj).forEach((dataKey, index) => {
       const { data, config } = dataObj[dataKey];
-      const { guideLine, guideRect, guideTag, height, formatDate } = config;
+      const { guideLine, guideRect, guideTag, height, formatDate, title } = config;
 
       if (!(Array.isArray(data) && data.length)) {
         return;
       }
+      const titleId = 'chart_title' + index;
+
+      if (document.getElementById(titleId)) {
+        chartWrap.removeChild(document.getElementById(titleId))
+      }
+
+      const titleElement = document.createElement('h4');
+
+      titleElement.id = titleId;
+      titleElement.style = "text-align: center;margin-bottom: 5px;"
+      titleElement.innerText = title;
+
+      chartWrap.appendChild(titleElement)
 
       chartCvs[dataKey] = new G2.Chart({
-        id: 'c1',
+        id: CHART_ID,
         width: chartWidth || (chartWidth = document.getElementById(CHART_ID) && document.getElementById(CHART_ID).offsetWidth) || 952,
         height,
         plotCfg: {

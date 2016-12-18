@@ -31,7 +31,6 @@ class MainLayout extends React.Component {
         }
       },
       elementsFields: ['password'],
-      cancel: false,
       handleOk: (values) => {
         // console.log('handleOk:', values);
 
@@ -42,7 +41,10 @@ class MainLayout extends React.Component {
         });
       },
       handleCancel: () => {
-        return false;
+        if (menuKey === 'set-setting') {
+          return window.location.href = `${location.protocol}//${location.host}`;
+        }
+        return message.error('请输入密码!');
       }
     };
 
