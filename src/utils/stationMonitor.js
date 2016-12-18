@@ -15,7 +15,7 @@ const getMonitor = (station) => {
       break;
 
     case stationObj.tuoerzhan:
-      stationTitle = ['坨二自用', '坨二产气', '轻烃进口', '轻烃出口', '坨二外输'];
+      stationTitle = ['坨二自用', '坨二产气', '轻烃进口', '轻烃出口', '坨二外输', '坨二稳定'];
       title = '坨二站流程图';
       break;
 

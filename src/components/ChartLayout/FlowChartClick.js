@@ -28,10 +28,56 @@ stationBtns[stationObj.tuoyizhan] = [
 
 stationBtns[stationObj.tuoerzhan] = [
   {x: 518, y: 198},
-  {x: 247, y: 425},
-  {x: 397, y: 425},
-  {x: 639, y: 425},
-  {x: 778, y: 425},
+  {x: 247, y: 348},
+  {x: 397, y: 348},
+  {x: 639, y: 348},
+  {x: 778, y: 348},
+  {x: 247, y: 504},
+];
+
+stationBtns[stationObj.tuosanzhan] = [
+  {x: 247, y: 338},
+  {x: 247, y: 509},
+  {x: 247, y: 199},
+  {x: 469, y: 146},
+  {x: 731, y: 359},
+  {x: 572, y: 285},
+  {x: 731, y: 509},
+  {x: 844, y: 146},
+];
+
+stationBtns[stationObj.tuosizhan] = [
+  {x: 330, y: 199},
+  {x: 658, y: 199},
+  {x: 658, y: 359},
+  {x: 330, y: 359},
+  {x: 330, y: 504},
+];
+
+stationBtns[stationObj.tuowuzhan] = [
+  {x: 145, y: 359},
+  {x: 330, y: 199},
+  {x: 330, y: 359},
+  {x: 611, y: 359},
+  {x: 798, y: 359},
+  {x: 798, y: 199},
+  {x: 798, y: 504},
+];
+
+stationBtns[stationObj.tuoliuzhan] = [
+  {x: 330, y: 199},
+  {x: 658, y: 379},
+  {x: 658, y: 199},
+  {x: 330, y: 359},
+];
+
+stationBtns[stationObj.ninghaizhan] = [
+  {x: 143, y: 504},
+  {x: 237, y: 199},
+  {x: 517, y: 199},
+  {x: 703, y: 359},
+  {x: 703, y: 199},
+  {x: 703, y: 504},
 ];
 
 const Page = (props) => {
