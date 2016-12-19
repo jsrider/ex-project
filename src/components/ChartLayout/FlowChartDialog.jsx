@@ -64,6 +64,7 @@ class Setting extends React.Component {
         // },
       },
       elementsFields: ['station', 'monitor', ...flowChartMonitorData.params.keyArr],
+      confirm: true,
       handleOk: (values) => {
         console.log('handleOk:', values);
 

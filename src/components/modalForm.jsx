@@ -4,7 +4,7 @@
  * @date 2016-10-6
  **/
 import React, { PropTypes } from 'react';
-import { Modal, Input, Button, Form, Select, Radio, message, InputNumber, DatePicker } from 'antd';
+import { Modal, Input, Button, Form, Select, Radio, message, InputNumber, DatePicker, Popconfirm } from 'antd';
 import QueueAnim from 'rc-queue-anim';
 import moment from 'moment';
 
@@ -89,7 +89,7 @@ class ModalForm extends React.Component {
   render() {
     const props = this.props;
     const state = this.state;
-    const { options, visible, handleCancel, title, disableKeys, modifySetting, elementsFields, cancel, width, children } = props;
+    const { options, visible, handleCancel, title, disableKeys, modifySetting, elementsFields, cancel, width, children, confirm } = props;
     const { getFieldDecorator, getFieldError } = props.form;
     console.log('ModalForm: ', this.props, this.state);
 
@@ -103,6 +103,17 @@ class ModalForm extends React.Component {
         确定
       </Button>;
       modalProps.closable = false;
+    } else if (confirm) {
+      modalProps.footer = <div>
+        <Button onClick={handleCancel.bind(this)}>
+          取消
+        </Button>
+        <Popconfirm title="确定修改?" onConfirm={this.handleOk.bind(this)}>
+          <Button type="primary">
+            确定
+          </Button>
+        </Popconfirm>
+      </div>;
     }
     return (
       <div>
@@ -155,7 +166,7 @@ class ModalForm extends React.Component {
                         break;
 
                       case 'textarea':
-                        children = <Input type="textarea" rows="3" />;
+                        children = <Input type="textarea" autosize={{ minRows: 3, maxRows: 6 }} />;
                         break;
 
                       case 'number':

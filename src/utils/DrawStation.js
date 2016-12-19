@@ -528,6 +528,7 @@ const registText = {
             attrs: {
               x: x3,
               y: targetY,
+              // text: '无数据',
               text: dataObj[el] || '0',
               ...textConfig,
               fill: 'blue',
