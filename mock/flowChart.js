@@ -46,8 +46,8 @@ module.exports = {
         success: 1,
         data: {
           // title: '中心站流程图', // 可传,不传 用页面默认标题
-          data: getData(),
-          // data: [],
+          // data: getData(),
+          data: [],
           params: {
             // stationTitle, // 可传,不传 用页面默认站点名称
             keyArr,

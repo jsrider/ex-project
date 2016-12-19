@@ -521,33 +521,47 @@ const registText = {
 
         const flagArr = [unicodeText.template, 'KPa', `${unicodeText.m3}/h`, unicodeText.m3];
 
-        keyArr.map((el, i) => {
-          let targetY = y2 + distanceY * (i+1);
+        if (typeof dataObj === 'object') {
+          keyArr.map((el, i) => {
+            let targetY = y2 + distanceY * (i+1);
 
+            group.addShape('text', {
+              attrs: {
+                x: x3,
+                y: targetY,
+                // text: '无数据',
+                text: dataObj[el] || '0',
+                ...textConfig,
+                fill: 'blue',
+                fontWeight: 'bold'
+              }
+            });
+
+            // 单位
+            group.addShape('text', {
+              attrs: {
+                x: x2-15,
+                y: targetY,
+                text: flagArr[i],
+                ...textConfig,
+                textAlign: 'left',
+                fontWeight: 'bold'
+              }
+            });
+          });
+        } else {
           group.addShape('text', {
             attrs: {
-              x: x3,
-              y: targetY,
-              // text: '无数据',
-              text: dataObj[el] || '0',
+              x: x - 19,
+              y: y2 + 50,
+              text: '无数据',
               ...textConfig,
               fill: 'blue',
-              fontWeight: 'bold'
+              textAlign: 'center',
+              fontWeight: 'bold',
             }
           });
-
-          // 单位
-          group.addShape('text', {
-            attrs: {
-              x: x2-15,
-              y: targetY,
-              text: flagArr[i],
-              ...textConfig,
-              textAlign: 'left',
-              fontWeight: 'bold'
-            }
-          });
-        });
+        }
 
         // title
         if (vertical) {
@@ -798,7 +812,7 @@ DrawStation.prototype = {
 
   // 当前数据 瞬时流量 flow字段
   getFlowNumByData(dataObj) {
-    return dataObj[this.keyArr[2]]
+    return typeof dataObj === 'object' ? dataObj[this.keyArr[2]] : 0
   },
 
 

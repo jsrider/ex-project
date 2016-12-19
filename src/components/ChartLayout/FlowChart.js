@@ -104,14 +104,13 @@ const drawChart = (data, station) => {
   // debugger;
   chart && chart.destroy();
 
-  const flowData = Array.isArray(data.data) && data.data.length ?
-    data :
-    {
-      data: getStationDefautlData(),
-      params: {
-        keyArr: stationKeyArrDefault
-      }
-    };
+  const flowData = data;
+    // {
+    //   data: getStationDefautlData(),
+    //   params: {
+    //     keyArr: stationKeyArrDefault
+    //   }
+    // };
 
   const drawStation = drawStations({
     station,

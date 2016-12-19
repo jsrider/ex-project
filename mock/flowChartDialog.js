@@ -27,9 +27,15 @@ module.exports = {
             setting: {
               station: {
                 title: '站点',
-                disabled: 1, // 1 禁止用户修改
+                modifyType: 'select', // radio: 单选框; select: 下拉框
+                modifyValue: '正常,故障,其他', // 多个值用逗号分隔
+                modifyText: '正常,故障,其他', // value 对应的中文值你
+                // disabled: 1, // 1 禁止用户修改
               },
               monitor: {
+                modifyType: 'select', // radio: 单选框; select: 下拉框
+                modifyValue: '正常,故障,其他', // 多个值用逗号分隔
+                modifyText: '正常,故障,其他', // value 对应的中文值你
                 title: '检测点',
                 disabled: 1, // 1 禁止用户修改
               },
@@ -57,7 +63,7 @@ module.exports = {
                 modifyType: 'date'
               },
               useStatus: {
-                modifyType: 'radio', // radio: 单选框; select: 下拉框
+                modifyType: 'select', // radio: 单选框; select: 下拉框
                 modifyValue: '正常,故障,其他', // 多个值用逗号分隔
                 modifyText: '正常,故障,其他', // value 对应的中文值你
                 title: keyArrCN[6]
