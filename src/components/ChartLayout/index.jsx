@@ -75,6 +75,9 @@ function FormLayout(props) {
       }
     }
 
+    // chartWrap.removeChild(chartWrap.querySelectorAll('h4'));
+    chartWrap && chartWrap.querySelectorAll('h4').forEach(el => el.remove());
+
     Object.keys(dataObj).forEach((dataKey, index) => {
       const { data, config } = dataObj[dataKey];
       const { guideLine, guideRect, guideTag, height, formatDate, title } = config;
@@ -84,17 +87,17 @@ function FormLayout(props) {
       }
       const titleId = 'chart_title' + index;
 
-      if (document.getElementById(titleId)) {
-        chartWrap.removeChild(document.getElementById(titleId))
-      }
+      // if (document.getElementById(titleId)) {
+      //   chartWrap.removeChild(document.getElementById(titleId))
+      // }
 
       const titleElement = document.createElement('h4');
 
       titleElement.id = titleId;
-      titleElement.style = "text-align: center;margin-bottom: 5px;"
+      titleElement.style = "text-align: center;margin-bottom: 5px;";
       titleElement.innerText = title;
 
-      chartWrap.appendChild(titleElement)
+      chartWrap.appendChild(titleElement);
 
       chartCvs[dataKey] = new G2.Chart({
         id: CHART_ID,
