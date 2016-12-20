@@ -32,11 +32,11 @@ export default {
             type: 'getKeyFile'
           })
         }
-        if (new Date().getTime() > finalKeyTime && cacheKey.getValue() != finalKeyTime) {
-          dispatch({
-            type: 'getFinalKeyFile'
-          })
-        }
+        // if (new Date().getTime() > finalKeyTime && cacheKey.getValue() != finalKeyTime) {
+        //   dispatch({
+        //     type: 'getFinalKeyFile'
+        //   })
+        // }
       });
     },
   },
@@ -94,25 +94,25 @@ export default {
         }
       }
     },
-    *getFinalKeyFile({ key }, { put, call}) {
-
-      const { data } = yield call(query, {}, 'getFinalKey');
-      // debugger;
-
-      if (typeof data === 'object' && data.success == 1 && data.data == finalKeyTime) {
-        cacheKey.setValue(finalKeyTime);
-      } else {
-        if (typeof data === 'object' && typeof data.message === 'string') {
-          alert(`error key msg: ${data.message}`);
-        } else {
-          alert('需要产品最终激活码!')
-        }
-
-        yield put({
-          type: 'needKey'
-        });
-      }
-    },
+    // *getFinalKeyFile({ key }, { put, call}) {
+    //
+    //   const { data } = yield call(query, {}, 'getFinalKey');
+    //   // debugger;
+    //
+    //   if (typeof data === 'object' && data.success == 1 && data.data == finalKeyTime) {
+    //     cacheKey.setValue(finalKeyTime);
+    //   } else {
+    //     if (typeof data === 'object' && typeof data.message === 'string') {
+    //       alert(`error key msg: ${data.message}`);
+    //     } else {
+    //       alert('需要产品最终激活码!')
+    //     }
+    //
+    //     yield put({
+    //       type: 'needKey'
+    //     });
+    //   }
+    // },
   },
 
   reducers: {
