@@ -83,7 +83,7 @@ stationBtns[stationObj.ninghaizhan] = [
 const Page = (props) => {
 
   const { dispatch, pageData } = props;
-  const { station } = pageData;
+  const { station, flowData } = pageData;
   const stationBtnsArr = stationBtns[station];
 
   console.log('FlowChartClick', props);
@@ -96,7 +96,7 @@ const Page = (props) => {
             dispatch({
               type: 'flowChart/queryMonitorData',
               station,
-              monitor: getMonitor(station).stationTitle[i]
+              monitor: flowData && flowData.params && flowData.params.stationTitle[i]
             });
           }} style={{
             position: 'absolute',

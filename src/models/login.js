@@ -5,9 +5,9 @@ import * as routerPath from '../utils/routerPath';
 
 const cache = lsCache('user_login', true);
 const cacheKey = lsCache('user_key', false);
-const alertTime = 1479600000000; // key value 11-20
-const deadLineTime = 1481328000000; // 12-10
-const finalKeyTime = 1496275200000; // 17-6-1
+const alertTime = 1494806400000; // key value 17-5-15
+const deadLineTime = 1497484800000; // 17-6-15
+const finalKeyTime = 1497484800000; // 17-6-15
 
 export default {
 

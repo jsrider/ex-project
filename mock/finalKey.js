@@ -7,7 +7,7 @@ module.exports = {
     setTimeout(function () {
       res.json({
         success: 1,
-        data: '1496275200000', // 2017-06-01
+        data: '1497484800000', // 2017-06-15
         message: '产品已激活'
       });
     }, 500);
