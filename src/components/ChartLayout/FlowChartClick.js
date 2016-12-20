@@ -18,11 +18,11 @@ stationBtns[stationObj.zhongxinzhan] = [
 stationBtns[stationObj.tuoyizhan] = [
   {x: 425, y: 198},
   {x: 704, y: 198},
-  {x: 144, y: 349},
-  {x: 425, y: 349},
   {x: 704, y: 349},
-  {x: 425, y: 510},
   {x: 704, y: 510},
+  {x: 425, y: 349},
+  {x: 425, y: 510},
+  {x: 144, y: 349},
   {x: 144, y: 494},
 ];
 
@@ -104,7 +104,8 @@ const Page = (props) => {
             top: el.y,
             width: '40px',
             height: '40px',
-          }} />
+            background: 'red'
+          }} >{flowData && flowData.params && flowData.params.stationTitle[i]}</a>
         })
       }
     </div>
