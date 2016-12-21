@@ -88,7 +88,7 @@ class Setting extends React.Component {
       }
     };
 
-    return <ModalForm {...modalProps} />;
+    return modalVisible ? <ModalForm {...modalProps} /> : null;
   }
 }
 
