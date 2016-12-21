@@ -25,8 +25,3 @@ app.router(require('./router'));
 
 // 5. Start
 app.start('#root');
-
-window.onerror = function () {
-  // alert('reload')
-  window.location.reload();
-};
