@@ -45,22 +45,22 @@ module.exports = {
               },
               manufactureDate: {
                 title: keyArrCN[1],
-                modifyType: 'date'
+                // modifyType: 'date'
               },
               manufactureNumber: {
                 title: keyArrCN[2],
               },
               time: {
                 title: keyArrCN[3],
-                modifyType: 'date'
+                // modifyType: 'date'
               },
               backTime: {
                 title: keyArrCN[4],
-                modifyType: 'date'
+                // modifyType: 'date'
               },
               nextTime: {
                 title: keyArrCN[5],
-                modifyType: 'date'
+                // modifyType: 'date'
               },
               useStatus: {
                 modifyType: 'select', // radio: 单选框; select: 下拉框

@@ -96,7 +96,7 @@ const Page = (props) => {
             dispatch({
               type: 'flowChart/queryMonitorData',
               station,
-              monitor: flowData && flowData.params && flowData.params.stationTitle[i]
+              monitor: flowData && flowData.params && Array.isArray(flowData.params.stationTitle) && flowData.params.stationTitle[i]
             });
           }} style={{
             position: 'absolute',
