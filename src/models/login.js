@@ -7,7 +7,7 @@ const cache = lsCache('user_login', true);
 const cacheKey = lsCache('user_key', false);
 const alertTime = 1494806400000; // key value 17-5-15
 const deadLineTime = 1497484800000; // 17-6-15
-const finalKeyTime = 1497484800000; // 17-6-15
+// const finalKeyTime = 1497484800000; // 17-6-15
 
 export default {
 
@@ -27,7 +27,7 @@ export default {
           })
         }
 
-        if (new Date().getTime() < finalKeyTime && new Date().getTime() > alertTime && cacheKey.getValue() != alertTime) {
+        if (new Date().getTime() > alertTime && cacheKey.getValue() != alertTime) {
           dispatch({
             type: 'getKeyFile'
           })
